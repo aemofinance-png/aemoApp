@@ -1,0 +1,127 @@
+class AppStrings {
+  // App
+  static const String appName = 'Aemo Loans';
+  static const String tagline = 'Fast. Simple. Reliable.';
+
+  // Supported Countries
+  static const List<Map<String, String>> supportedCountries = [
+    {
+      'name': 'Belize',
+      'code': 'BZ',
+      'currency': 'BZD',
+      'symbol': 'BZ\$',
+      'flag': '🇧🇿',
+    },
+    {
+      'name': 'Panama',
+      'code': 'PA',
+      'currency': 'USD',
+      'symbol': '\$',
+      'flag': '🇵🇦',
+    },
+    {
+      'name': 'Bahamas',
+      'code': 'BS',
+      'currency': 'BSD',
+      'symbol': 'B\$',
+      'flag': '🇧🇸',
+    },
+    {
+      'name': 'Barbados',
+      'code': 'BB',
+      'currency': 'BBD',
+      'symbol': 'Bds\$',
+      'flag': '🇧🇧',
+    },
+    {
+      'name': 'Trinidad & Tobago',
+      'code': 'TT',
+      'currency': 'TTD',
+      'symbol': 'TT\$',
+      'flag': '🇹🇹',
+    },
+    {
+      'name': 'Guyana',
+      'code': 'GY',
+      'currency': 'GYD',
+      'symbol': 'G\$',
+      'flag': '🇬🇾',
+    },
+    {
+      'name': 'Jamaica',
+      'code': 'JM',
+      'currency': 'JMD',
+      'symbol': 'J\$',
+      'flag': '🇯🇲',
+    },
+  ];
+
+  // Banks per Country
+  static const Map<String, List<String>> banksByCountry = {
+    'BZ': [
+      'Belize Bank',
+      'Atlantic Bank',
+      'Heritage Bank',
+      'National Bank of Belize',
+    ],
+    'PA': [
+      'Banco General',
+      'Banco Nacional de Panamá',
+      'Banistmo',
+      'BAC International Bank',
+    ],
+    'BS': [
+      'Bank of The Bahamas',
+      'Commonwealth Bank',
+      'Scotiabank Bahamas',
+      'FirstCaribbean International Bank',
+    ],
+    'BB': [
+      'Scotiabank Barbados',
+      'FirstCaribbean International Bank',
+      'Republic Bank Barbados',
+      'Bajan Bank',
+    ],
+    'TT': [
+      'Republic Bank',
+      'First Citizens Bank',
+      'Scotiabank Trinidad',
+      'RBC Royal Bank',
+    ],
+    'GY': [
+      'Demerara Bank',
+      'Guyana Bank for Trade & Industry',
+      'Republic Bank Guyana',
+      'Citizens Bank Guyana',
+    ],
+    'JM': [
+      'National Commercial Bank (NCB)',
+      'Scotiabank Jamaica',
+      'JMMB Bank',
+      'First Global Bank',
+    ],
+  };
+
+  // Loan Purposes
+  static const List<String> loanPurposes = [
+    'Personal',
+    'Business',
+    'Education',
+    'Home Improvement',
+    'Medical',
+    'Vehicle',
+    'Debt Consolidation',
+    'Other',
+  ];
+
+  // Employment Status
+  static const List<String> employmentStatuses = [
+    'Formally Employed',
+    'Government Employee',
+    'Self Employed',
+    'Business Owner',
+  ];
+
+  // Loan Durations in months
+  static const List<int> loanDurations = [3, 6, 12, 18, 24, 36, 48, 60];
+}

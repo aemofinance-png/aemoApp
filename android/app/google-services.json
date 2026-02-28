@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "438978127745",
+    "project_id": "aemo-loan-app",
+    "storage_bucket": "aemo-loan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438978127745:android:7e1b015faa992da5ec2a80",
+        "android_client_info": {
+          "package_name": "com.example.aemoloan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpJF9gEeG6QYxcsSj8rO6XZlGoP-ljbOI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
