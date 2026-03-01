@@ -19,10 +19,17 @@ final currentUserProvider = FutureProvider<UserModel?>((ref) async {
     data: (user) async {
       if (user == null) return null;
       final firestoreService = ref.watch(firestoreServiceProvider);
-      return firestoreService.getUser(user.uid);
+      final result = await firestoreService.getUser(user.uid);
+      // 👈 add this
+      return result;
     },
-    loading: () => null,
-    error: (_, __) => null,
+    loading: () {
+      return null;
+    },
+    error: (e, _) {
+      print('Auth state error: $e'); // 👈 add this
+      return null;
+    },
   );
 });
 
@@ -114,8 +121,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return false;
       }
 
+      /// Fetch user profile from Firestore
+      final profile = await _firestoreService.getUser(user.uid);
+
       state = state.copyWith(isLoading: false);
-      return true;
+
+      /// Return role info indirectly using result
+      return profile?.role == 'admin';
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
       return false;

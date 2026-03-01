@@ -48,7 +48,15 @@ class LoanNotifier extends StateNotifier<LoanState> {
     this._storageService,
     this._userId,
     this._countryCode,
-  ) : super(const LoanState());
+  ) : super(const LoanState()) {
+    print('LoanNotifier created — userId: $_userId'); // 👈 add
+    if (_userId.isNotEmpty) {
+      print('Fetching applications...'); // 👈 add
+      fetchApplications();
+    } else {
+      print('userId is empty — skipping fetch'); // 👈 add
+    }
+  }
 
   // Submit application
   Future<bool> submitApplication({
@@ -64,24 +72,30 @@ class LoanNotifier extends StateNotifier<LoanState> {
     required String accountNumber,
     required List<PlatformFile> documents,
   }) async {
+    print('submitApplication called — userId: $_userId');
     state = state.copyWith(isLoading: true, error: null, isSuccess: false);
 
     try {
-      // Step 1 — Generate unique ID
       final applicationId = const Uuid().v4();
+      print('Application ID: $applicationId');
 
-      // Step 2 — Upload documents
       final documentUrls = <String>[];
       for (final document in documents) {
+        print('Uploading document: ${document.name}');
+        print('Document bytes: ${document.bytes?.length}');
+
         final url = await _storageService.uploadFile(
           userId: _userId,
           applicationId: applicationId,
           file: document,
         );
+
+        print('Upload complete: $url');
         documentUrls.add(url);
       }
 
-      // Step 3 — Create application object
+      print('All documents uploaded, saving to Firestore...');
+
       final application = LoanApplicationModel(
         id: applicationId,
         userId: _userId,
@@ -101,8 +115,10 @@ class LoanNotifier extends StateNotifier<LoanState> {
         createdAt: DateTime.now(),
       );
 
-      // Step 4 — Save to Firestore
       await _firestoreService.saveApplication(application);
+
+      // Refetch applications so dashboard is up to date
+      await fetchApplications();
 
       state = state.copyWith(isLoading: false, isSuccess: true);
       return true;
@@ -118,6 +134,7 @@ class LoanNotifier extends StateNotifier<LoanState> {
 
     try {
       final applications = await _firestoreService.getUserApplications(_userId);
+
       state = state.copyWith(
         isLoading: false,
         applications: applications,
@@ -127,12 +144,10 @@ class LoanNotifier extends StateNotifier<LoanState> {
     }
   }
 
-  // Clear success flag
   void clearSuccess() {
     state = state.copyWith(isSuccess: false);
   }
 
-  // Clear error
   void clearError() {
     state = state.copyWith(error: null);
   }
@@ -144,6 +159,9 @@ final loanNotifierProvider =
   final firestoreService = ref.watch(firestoreServiceProvider);
   final storageService = ref.watch(storageServiceProvider);
   final currentUser = ref.watch(currentUserProvider).value;
+
+  // Rebuild provider when user changes
+  ref.listen(currentUserProvider, (_, __) {});
 
   return LoanNotifier(
     firestoreService,

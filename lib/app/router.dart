@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/providers/auth_provider.dart';
-
-// We'll add screen imports here as we build them
-// import '../features/auth/screens/login_screen.dart';
-// import '../features/auth/screens/register_screen.dart';
-// etc.
+import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/register_screen.dart';
+import '../features/dashboard/screens/user_dashboard.dart';
+import '../features/loan_application/screens/loan_application_screen.dart';
+import '../features/loan_status/screens/application_status_screen.dart';
+import '../features/calculator/screens/loan_calculator_screen.dart';
+import '../features/admin/screens/admin_dashboard.dart';
+import '../features/admin/screens/admin_detail_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -21,18 +24,35 @@ class AppRoutes {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  final currentUser = ref.watch(currentUserProvider).value;
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
       final isLoading = authState.isLoading;
-      final isAuthRoute = state.matchedLocation == AppRoutes.login ||
-          state.matchedLocation == AppRoutes.register;
+      final location = state.matchedLocation;
+      final isSplash = location == AppRoutes.splash;
+      final isAuthRoute =
+          location == AppRoutes.login || location == AppRoutes.register;
 
       if (isLoading) return null;
       if (!isLoggedIn && !isAuthRoute) return AppRoutes.login;
       if (isLoggedIn && isAuthRoute) return AppRoutes.dashboard;
+
+      // Logged in on splash — wait for user profile then redirect
+      if (isLoggedIn && isSplash) {
+        if (currentUser == null) return null; // 👈 wait for profile
+        return currentUser.role == 'admin'
+            ? AppRoutes.admin
+            : AppRoutes.dashboard;
+      }
+
+      // Admin route check
+      if (location.startsWith(AppRoutes.admin)) {
+        if (currentUser == null) return null;
+        if (currentUser.role != 'admin') return AppRoutes.dashboard;
+      }
 
       return null;
     },
@@ -45,39 +65,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Login Screen — Coming Soon')),
-        ),
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Register Screen — Coming Soon')),
-        ),
+        builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: AppRoutes.dashboard,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Dashboard — Coming Soon')),
-        ),
+        builder: (context, state) => const UserDashboard(),
       ),
       GoRoute(
         path: AppRoutes.apply,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Apply — Coming Soon')),
-        ),
+        builder: (context, state) => const LoanApplicationScreen(),
       ),
       GoRoute(
         path: AppRoutes.calculator,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Calculator — Coming Soon')),
-        ),
+        builder: (context, state) => const LoanCalculatorScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.status}/:id',
+        builder: (context, state) {
+          final applicationId = state.pathParameters['id']!;
+          return ApplicationStatusScreen(applicationId: applicationId);
+        },
       ),
       GoRoute(
         path: AppRoutes.admin,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Admin — Coming Soon')),
-        ),
+        builder: (context, state) => const AdminDashboard(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) {
+              final applicationId = state.pathParameters['id']!;
+              return AdminDetailScreen(applicationId: applicationId);
+            },
+          ),
+        ],
       ),
     ],
   );
