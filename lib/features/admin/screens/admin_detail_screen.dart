@@ -5,7 +5,7 @@ import '../../../shared/widgets/status_badge.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/loan_application_model.dart';
-import '../../loan_status/screens/application_status_screen.dart';
+
 import '../../../shared/widgets/loading_overlay.dart';
 import '../providers/admin_provider.dart';
 import '../screens/document_viewer_screen.dart';
@@ -157,6 +157,29 @@ class AdminDetailScreen extends ConsumerWidget {
 
                   const SizedBox(height: 32),
 
+                  ElevatedButton.icon(
+                    onPressed: () => () async {
+                      await ref
+                          .read(adminNotifierProvider.notifier)
+                          .approveApplication(applicationId: application.id);
+
+                      if (context.mounted) {
+                        context.go(AppRoutes.admin);
+                      }
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Delete Application'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.errorButton,
+                      foregroundColor: AppColors.white,
+                      minimumSize: const Size(double.infinity, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
                   // Back button
                   ElevatedButton.icon(
                     onPressed: () => context.go(AppRoutes.admin),

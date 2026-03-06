@@ -59,12 +59,13 @@ class LoanNotifier extends StateNotifier<LoanState> {
   }
 
   // Submit application
-  Future<bool> submitApplication({
+  Future<LoanApplicationModel?> submitApplication({
     required String fullName,
     required String phone,
     required String employmentStatus,
     required String employer,
     required double monthlyIncome,
+    // required double interestRate,
     required double loanAmount,
     required String loanPurpose,
     required int loanDuration,
@@ -108,6 +109,7 @@ class LoanNotifier extends StateNotifier<LoanState> {
         loanAmount: loanAmount,
         loanPurpose: loanPurpose,
         loanDuration: loanDuration,
+        // interestRate: interestRate,
         bankName: bankName,
         accountNumber: accountNumber,
         documentUrls: documentUrls,
@@ -121,10 +123,10 @@ class LoanNotifier extends StateNotifier<LoanState> {
       await fetchApplications();
 
       state = state.copyWith(isLoading: false, isSuccess: true);
-      return true;
+      return application;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
+      return null;
     }
   }
 

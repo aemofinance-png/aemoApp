@@ -20,6 +20,8 @@ class UserDashboard extends ConsumerStatefulWidget {
 }
 
 class _UserDashboardState extends ConsumerState<UserDashboard> {
+  LoanStatus? _selectedFilter;
+
   // @override
   // void initState() {
   //   super.initState();
@@ -46,6 +48,10 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
     final currentUser = ref.watch(currentUserProvider).value;
     final loanState = ref.watch(loanNotifierProvider);
     final applications = loanState.applications;
+
+    final filtered = _selectedFilter == null
+        ? applications
+        : applications.where((a) => a.status == _selectedFilter).toList();
 
     // Compute stats
     final total = applications.length;
@@ -96,24 +102,40 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                         const SizedBox(height: 32),
 
                         // Stats row
-                        Row(
-                          children: [
-                            _buildStatCard('Total', total.toString(),
-                                AppColors.primary, AppColors.primaryLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Pending', pending.toString(),
-                                AppColors.pending, AppColors.pendingLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Approved', approved.toString(),
-                                AppColors.success, AppColors.successLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Rejected', rejected.toString(),
-                                AppColors.error, AppColors.errorLight),
-                          ],
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isMobile = constraints.maxWidth < 600;
+                            return GridView.count(
+                              crossAxisSpacing:
+                                  16, // horizontal space between items
+                              mainAxisSpacing: 16,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: isMobile ? 2 : 4,
+                              children: [
+                                _buildStatCard('Total', total.toString(),
+                                    AppColors.primary, AppColors.primaryLight),
+                                _buildStatCard('Pending', pending.toString(),
+                                    AppColors.pending, AppColors.pendingLight),
+                                _buildStatCard('Approved', approved.toString(),
+                                    AppColors.success, AppColors.successLight),
+                                _buildStatCard('Rejected', rejected.toString(),
+                                    AppColors.error, AppColors.errorLight),
+                              ],
+                            );
+                          },
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 50),
 
+                        // filtered.isEmpty
+                        //     ? _buildEmptyState()
+                        //     : Column(
+                        //         children: filtered
+                        //             .map((app) => _buildApplicationCard(
+                        //                 app, currentUser?.countryCode ?? 'BZ'))
+                        //             .toList(),
+                        //       ),
                         // Applications header
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,14 +152,16 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                               children: [
                                 CustomButton(
                                   label: 'Calculator',
-                                  onPressed: () =>
-                                      context.go(AppRoutes.calculator),
+                                  onPressed: () {
+                                    print('Calculator tapped');
+                                    context.push(AppRoutes.calculator);
+                                  },
                                   isOutlined: true,
                                   width: 130,
                                 ),
                                 const SizedBox(width: 12),
                                 CustomButton(
-                                  label: 'Apply Now',
+                                  label: 'Apply ',
                                   onPressed: () => context.go(AppRoutes.apply),
                                   width: 120,
                                 ),
@@ -146,13 +170,14 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                           ],
                         ),
 
-                        const SizedBox(height: 16),
-
+                        const SizedBox(height: 26),
+                        _buildFilterTabs(),
+                        const SizedBox(height: 26),
                         // Applications list
-                        applications.isEmpty
+                        filtered.isEmpty
                             ? _buildEmptyState()
                             : Column(
-                                children: applications
+                                children: filtered
                                     .map((app) => _buildApplicationCard(
                                         app, currentUser?.countryCode ?? 'BZ'))
                                     .toList(),
@@ -242,6 +267,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
       String label, String value, Color color, Color bgColor) {
     return Expanded(
       child: Container(
+        width: 80,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: bgColor,
@@ -350,6 +376,45 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterTabs() {
+    return Row(
+      children: [
+        _buildFilterTab('All', null),
+        const SizedBox(width: 8),
+        _buildFilterTab('Pending', LoanStatus.pending),
+        const SizedBox(width: 8),
+        _buildFilterTab('Approved', LoanStatus.approved),
+        const SizedBox(width: 8),
+        _buildFilterTab('Rejected', LoanStatus.rejected),
+      ],
+    );
+  }
+
+  Widget _buildFilterTab(String label, LoanStatus? status) {
+    final isSelected = _selectedFilter == status;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedFilter = status),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? AppColors.white : AppColors.textSecondary,
+          ),
         ),
       ),
     );

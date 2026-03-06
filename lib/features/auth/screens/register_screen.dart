@@ -25,6 +25,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _streetAddressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
 
   // Local state
   bool _showPassword = false;
@@ -46,6 +49,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final success = await ref.read(authNotifierProvider.notifier).register(
+          streetAddress: _streetAddressController.text.trim(),
+          city: _cityController.text.trim(),
+          stateProvince: _stateController.text.trim(),
+          postalCode: '', // You can add a postal code field if needed
           email: _emailController.text.trim(),
           password: _passwordController.text,
           fullName: _fullNameController.text.trim(),
@@ -93,21 +100,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
-                              Icons.account_balance,
-                              color: AppColors.primary,
-                              size: 28,
-                            ),
                           ),
                           const SizedBox(height: 16),
-                          Text(
-                            AppStrings.appName,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                          Image.asset('assets/images/aemo-logo.png'),
+                          const SizedBox(height: 16),
                           const SizedBox(height: 4),
                           Text(
                             AppStrings.tagline,
@@ -232,6 +228,58 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         }
                         if (value.length < 7) {
                           return 'Enter a valid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    CustomTextField(
+                      label: 'Street Address',
+                      hint: 'Enter your street address',
+                      controller: _streetAddressController,
+                      prefixIcon: const Icon(Icons.home_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Street address is required';
+                        }
+                        if (value.length < 7) {
+                          return 'Enter a valid street address';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      label: 'City',
+                      hint: 'Enter your city',
+                      controller: _cityController,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'City is required';
+                        }
+                        if (value.length < 7) {
+                          return 'Enter a valid city';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      label: 'State',
+                      hint: 'Enter your state',
+                      controller: _stateController,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'State is required';
+                        }
+                        if (value.length < 7) {
+                          return 'Enter a valid state';
                         }
                         return null;
                       },

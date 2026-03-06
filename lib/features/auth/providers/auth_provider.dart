@@ -65,6 +65,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // Register
   Future<bool> register({
     required String email,
+    required String streetAddress,
+    required String city,
+    required String stateProvince,
+    required String postalCode,
     required String password,
     required String fullName,
     required String phone,
@@ -87,6 +91,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         UserModel(
           id: user.uid,
           fullName: fullName,
+          streetAddress: streetAddress,
+          city: city,
+          state: stateProvince,
+          postalCode: postalCode,
           email: email,
           phone: phone,
           countryCode: countryCode,

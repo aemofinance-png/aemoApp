@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Blue
-  static const Color primary = Color(0xFF1A56DB);
+  static const Color primary =
+      Color.from(alpha: 1, red: 0.027, green: 0.212, blue: 0.396);
   static const Color primaryLight = Color(0xFFEBF2FF);
   static const Color primaryDark = Color(0xFF1040B0);
 
   // Neutrals
   static const Color white = Color(0xFFFFFFFF);
   static const Color background = Color(0xFFF8FAFC);
+  static const Color backgroundDark = Color.fromARGB(255, 240, 240, 240);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color border = Color(0xFFE2E8F0);
 
@@ -23,6 +25,7 @@ class AppColors {
   static const Color warning = Color(0xFFD97706);
   static const Color warningLight = Color(0xFFFEF3C7);
   static const Color error = Color(0xFFDC2626);
+  static const Color errorButton = Color(0xFF840303);
   static const Color errorLight = Color(0xFFFEE2E2);
   static const Color pending = Color(0xFF7C3AED);
   static const Color pendingLight = Color(0xFFEDE9FE);

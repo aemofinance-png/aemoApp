@@ -27,6 +27,16 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
   int _currentStep = 0;
   final int _totalSteps = 4;
 
+  Map<int, double> get _availableRates {
+    final amount = double.tryParse(_loanAmountController.text.trim()) ?? 0;
+    return Map.fromEntries(
+      AppStrings.loanRates.entries.where((entry) {
+        final minimum = AppStrings.loanMinimums[entry.key] ?? 0;
+        return amount >= minimum;
+      }),
+    );
+  }
+
   // Form keys
   final _step1Key = GlobalKey<FormState>();
   final _step2Key = GlobalKey<FormState>();
@@ -45,7 +55,8 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
   // Step 3 controllers
   final _loanAmountController = TextEditingController();
   String _selectedLoanPurpose = AppStrings.loanPurposes.first;
-  int _selectedDuration = AppStrings.loanDurations.first;
+  int _selectedDuration = AppStrings.loanRates.keys.first;
+  // int _selectedInterest = AppStrings.loanRates.keys.
 
   // Step 4
   String _selectedBank = '';
@@ -136,7 +147,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
       return;
     }
 
-    final success =
+    final application =
         await ref.read(loanNotifierProvider.notifier).submitApplication(
               fullName: _fullNameController.text.trim(),
               phone: _phoneController.text.trim(),
@@ -151,11 +162,11 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               documents: _documents,
             );
 
-    print('submitApplication returned: $success'); // 👈 add
+    print('submitApplication returned: $application'); //
 
-    if (success && mounted) {
+    if (application != null && mounted) {
       print('Navigating to dashboard...');
-      context.go(AppRoutes.dashboard);
+      context.go(AppRoutes.applicationSubmitted, extra: application);
       setState(() {});
     }
   }
@@ -489,6 +500,15 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
             controller: _loanAmountController,
             keyboardType: TextInputType.number,
             prefixIcon: const Icon(Icons.attach_money),
+            onChanged: (_) {
+              setState(() {
+                // Reset duration if it's no longer available
+                final available = _availableRates;
+                if (!available.containsKey(_selectedDuration)) {
+                  _selectedDuration = available.keys.first;
+                }
+              });
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Loan amount is required';
@@ -525,10 +545,12 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               DropdownButtonFormField<int>(
                 value: _selectedDuration,
                 decoration: _dropdownDecoration(),
-                items: AppStrings.loanDurations.map((months) {
+                items: _availableRates.keys.map((months) {
                   return DropdownMenuItem<int>(
                     value: months,
-                    child: Text(Formatters.duration(months)),
+                    child: Text(
+                      '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) =>

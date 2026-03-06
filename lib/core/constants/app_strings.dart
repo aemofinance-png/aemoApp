@@ -1,6 +1,6 @@
 class AppStrings {
   // App
-  static const String appName = 'Aemo Loans';
+  static const String appName = 'Aemo Finance';
   static const String tagline = 'Fast. Simple. Reliable.';
 
   // Supported Countries
@@ -123,5 +123,35 @@ class AppStrings {
   ];
 
   // Loan Durations in months
-  static const List<int> loanDurations = [3, 6, 12, 18, 24, 36, 48, 60];
+  static const Map<int, double> loanRates = {
+    3: 75.0,
+    6: 60.0,
+    12: 45.0,
+    18: 38.0,
+    24: 30.0,
+    36: 30.0,
+    48: 27.0,
+    60: 25.0,
+    72: 15.0,
+    84: 14.0,
+    96: 14.0,
+    108: 14.0,
+    120: 13.0,
+  };
+
+  static const Map<int, double> loanMinimums = {
+    3: 0,
+    6: 0,
+    12: 0,
+    18: 0,
+    24: 0,
+    36: 0,
+    48: 30000,
+    60: 40000,
+    72: 60000,
+    84: 60000,
+    96: 120000,
+    108: 120000,
+    120: 120000,
+  };
 }

@@ -8,6 +8,9 @@ class CustomButton extends StatelessWidget {
   final bool isOutlined;
   final Color? color;
   final double? width;
+  final double? height;
+  final TextStyle? textStyle;
+  final ButtonStyle? buttonStyle;
 
   const CustomButton({
     super.key,
@@ -17,16 +20,21 @@ class CustomButton extends StatelessWidget {
     this.isOutlined = false,
     this.color,
     this.width,
+    this.height,
+    this.textStyle,
+    this.buttonStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     final buttonColor = color ?? AppColors.primary;
     final buttonWidth = width ?? double.infinity;
+    final buttonHeight = height ?? 52.0;
 
     if (isOutlined) {
       return SizedBox(
         width: buttonWidth,
+        height: buttonHeight,
         child: OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
@@ -44,16 +52,18 @@ class CustomButton extends StatelessWidget {
 
     return SizedBox(
       width: buttonWidth,
+      height: buttonHeight,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColor,
-          foregroundColor: AppColors.white,
-          minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
+        style: buttonStyle ??
+            ElevatedButton.styleFrom(
+              backgroundColor: buttonColor,
+              foregroundColor: AppColors.white,
+              minimumSize: const Size(double.infinity, 52),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
         child: _buildChild(),
       ),
     );
@@ -70,6 +80,6 @@ class CustomButton extends StatelessWidget {
         ),
       );
     }
-    return Text(label);
+    return Text(label, style: textStyle);
   }
 }

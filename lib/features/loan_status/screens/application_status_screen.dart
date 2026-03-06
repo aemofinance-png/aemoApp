@@ -9,8 +9,9 @@ import '../../../shared/widgets/status_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 import '../../../app/router.dart';
+import 'dart:math';
 
-class ApplicationStatusScreen extends ConsumerWidget {
+class ApplicationStatusScreen extends ConsumerStatefulWidget {
   final String applicationId;
 
   const ApplicationStatusScreen({
@@ -19,14 +20,44 @@ class ApplicationStatusScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ApplicationStatusScreen> createState() =>
+      _ApplicationStatusScreenState();
+}
+
+class _ApplicationStatusScreenState
+    extends ConsumerState<ApplicationStatusScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+        () => ref.read(loanNotifierProvider.notifier).fetchApplications());
+  }
+
+  double _calculateMonthlyRepayment(LoanApplicationModel application) {
+    final double principal = application.loanAmount;
+    final double annualRate =
+        AppStrings.loanRates[application.loanDuration] ?? 0;
+    final int months = application.loanDuration;
+
+    if (annualRate == 0) return principal / months;
+
+    final double r = annualRate / 12 / 100;
+    final double factor = pow(1 + r, months).toDouble();
+    return principal * (r * factor) / (factor - 1);
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
     final loanState = ref.watch(loanNotifierProvider);
     final currentUser = ref.watch(currentUserProvider).value;
     final countryCode = currentUser?.countryCode ?? 'BZ';
 
     // Find the application from the list
-    final application =
-        loanState.applications.where((a) => a.id == applicationId).firstOrNull;
+    final application = loanState.applications
+        .where((a) => a.id == widget.applicationId)
+        .firstOrNull;
 
     // Not found
     if (application == null) {
@@ -70,6 +101,15 @@ class ApplicationStatusScreen extends ConsumerWidget {
                     _buildDetailRow('Duration',
                         Formatters.duration(application.loanDuration)),
                     _buildDetailRow(
+                      'Interest Rate',
+                      '${AppStrings.loanRates[application.loanDuration]}% p.a.',
+                    ),
+                    _buildDetailRow(
+                      'Monthly Repayment',
+                      Formatters.currency(
+                          _calculateMonthlyRepayment(application), countryCode),
+                    ),
+                    _buildDetailRow(
                         'Applied On', Formatters.date(application.createdAt)),
                   ],
                 ),
@@ -83,10 +123,6 @@ class ApplicationStatusScreen extends ConsumerWidget {
                   children: [
                     _buildDetailRow('Status', application.employmentStatus),
                     _buildDetailRow('Employer', application.employer),
-                    _buildDetailRow(
-                        'Monthly Income',
-                        Formatters.currency(
-                            application.monthlyIncome, countryCode)),
                   ],
                 ),
 

@@ -12,6 +12,7 @@ class LoanApplicationModel extends Equatable {
   final String employer;
   final double monthlyIncome;
   final double loanAmount;
+  // final double interestRate;
   final String loanPurpose;
   final int loanDuration;
   final String bankName;
@@ -33,6 +34,7 @@ class LoanApplicationModel extends Equatable {
     required this.employer,
     required this.monthlyIncome,
     required this.loanAmount,
+    // required this.interestRate,
     required this.loanPurpose,
     required this.loanDuration,
     required this.bankName,
@@ -56,8 +58,9 @@ class LoanApplicationModel extends Equatable {
       employer: map['employer'] ?? '',
       monthlyIncome: (map['monthlyIncome'] ?? 0).toDouble(),
       loanAmount: (map['loanAmount'] ?? 0).toDouble(),
+      // interestRate: (map['interestRate'] ?? 0).toDouble(),
       loanPurpose: map['loanPurpose'] ?? '',
-      loanDuration: map['loanDuration'] ?? 12,
+      loanDuration: (map['loanDuration'] ?? 12).toInt(),
       bankName: map['bankName'] ?? '',
       accountNumber: map['accountNumber'] ?? '',
       documentUrls: List<String>.from(map['documentUrls'] ?? []),
@@ -84,6 +87,7 @@ class LoanApplicationModel extends Equatable {
       'employer': employer,
       'monthlyIncome': monthlyIncome,
       'loanAmount': loanAmount,
+      // 'interestRate': interestRate,
       'loanPurpose': loanPurpose,
       'loanDuration': loanDuration,
       'bankName': bankName,
@@ -109,6 +113,7 @@ class LoanApplicationModel extends Equatable {
     double? loanAmount,
     String? loanPurpose,
     int? loanDuration,
+    double? interestRate,
     String? bankName,
     String? accountNumber,
     List<String>? documentUrls,
@@ -128,6 +133,7 @@ class LoanApplicationModel extends Equatable {
       employer: employer ?? this.employer,
       monthlyIncome: monthlyIncome ?? this.monthlyIncome,
       loanAmount: loanAmount ?? this.loanAmount,
+      // interestRate: interestRate ?? this.interestRate,
       loanPurpose: loanPurpose ?? this.loanPurpose,
       loanDuration: loanDuration ?? this.loanDuration,
       bankName: bankName ?? this.bankName,
@@ -154,6 +160,7 @@ class LoanApplicationModel extends Equatable {
         loanAmount,
         loanPurpose,
         loanDuration,
+        // interestRate,
         bankName,
         accountNumber,
         documentUrls,

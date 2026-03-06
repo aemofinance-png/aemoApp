@@ -61,7 +61,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await Future.delayed(const Duration(milliseconds: 500));
     }
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
     print('Profile role = "${profile?.role}"');
 
@@ -99,28 +99,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.account_balance,
-                              color: AppColors.primary,
-                              size: 28,
-                            ),
+                          Image.asset(
+                            'assets/images/aemo-logo.png',
+                            width: 250,
                           ),
                           const SizedBox(height: 16),
-                          Text(
-                            AppStrings.appName,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
                           const SizedBox(height: 4),
                           Text(
                             AppStrings.tagline,

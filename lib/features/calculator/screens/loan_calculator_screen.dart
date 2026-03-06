@@ -21,10 +21,11 @@ class LoanCalculatorScreen extends ConsumerStatefulWidget {
 class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
   // Controllers
   final _amountController = TextEditingController();
-  final _interestRateController = TextEditingController(text: '12');
+  // final _interestRateController = TextEditingController(text: '12');
+  double get _interestRate => AppStrings.loanRates[_selectedDuration] ?? 0.0;
 
   // Selected duration
-  int _selectedDuration = AppStrings.loanDurations.first;
+  int _selectedDuration = AppStrings.loanRates.keys.first;
 
   // Results
   double? _monthlyPayment;
@@ -34,17 +35,24 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
   @override
   void dispose() {
     _amountController.dispose();
-    _interestRateController.dispose();
+    // _interestRateController.dispose();
     super.dispose();
+  }
+
+  Map<int, double> get _availableRates {
+    final amount = double.tryParse(_amountController.text.trim()) ?? 0;
+    return Map.fromEntries(
+      AppStrings.loanRates.entries.where((entry) {
+        final minimum = AppStrings.loanMinimums[entry.key] ?? 0;
+        return amount >= minimum;
+      }),
+    );
   }
 
   // Calculate repayment
   void _calculate() {
     final amount = double.tryParse(_amountController.text.trim());
-    final rate = double.tryParse(_interestRateController.text.trim());
-    final months = _selectedDuration;
 
-    // Validate inputs
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -55,26 +63,15 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
       return;
     }
 
-    if (rate == null || rate <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid interest rate'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
+    final monthlyRate = _interestRate / 12 / 100;
+    final months = _selectedDuration;
 
-    // Monthly interest rate
-    final monthlyRate = rate / 12 / 100;
-
-    // Amortization formula
     final monthly = amount *
         (monthlyRate * pow(1 + monthlyRate, months)) /
         (pow(1 + monthlyRate, months) - 1);
 
     setState(() {
-      _monthlyPayment = monthly;
+      _monthlyPayment = monthly.toDouble();
       _totalPayment = monthly * months;
       _totalInterest = (monthly * months) - amount;
     });
@@ -145,24 +142,32 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
                     children: [
                       // Loan amount
                       CustomTextField(
-                        label:
-                            'Loan Amount (${Formatters.getCurrencyCode(countryCode)})',
+                        label: 'Loan Amount ',
                         hint: 'Enter loan amount',
                         controller: _amountController,
                         keyboardType: TextInputType.number,
                         prefixIcon: const Icon(Icons.attach_money),
+                        onChanged: (_) {
+                          setState(() {
+                            // Reset duration if it's no longer available
+                            final available = _availableRates;
+                            if (!available.containsKey(_selectedDuration)) {
+                              _selectedDuration = available.keys.first;
+                            }
+                          });
+                        },
                       ),
 
                       const SizedBox(height: 16),
 
                       // Interest rate
-                      CustomTextField(
-                        label: 'Annual Interest Rate (%)',
-                        hint: 'e.g. 12',
-                        controller: _interestRateController,
-                        keyboardType: TextInputType.number,
-                        prefixIcon: const Icon(Icons.percent),
-                      ),
+                      // CustomTextField(
+                      //   label: 'Annual Interest Rate (%)',
+                      //   hint: 'e.g. 12',
+                      //   controller: _interestRateController,
+                      //   keyboardType: TextInputType.number,
+                      //   prefixIcon: const Icon(Icons.percent),
+                      // ),
 
                       const SizedBox(height: 16),
 
@@ -180,7 +185,10 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
                           ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<int>(
-                            value: _selectedDuration,
+                            value:
+                                _availableRates.containsKey(_selectedDuration)
+                                    ? _selectedDuration
+                                    : _availableRates.keys.first,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: AppColors.white,
@@ -200,14 +208,39 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
                                     color: AppColors.primary, width: 2),
                               ),
                             ),
-                            items: AppStrings.loanDurations.map((months) {
+                            items: _availableRates.keys.map((months) {
                               return DropdownMenuItem<int>(
                                 value: months,
-                                child: Text(Formatters.duration(months)),
+                                child: Text(
+                                  '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
+                                ),
                               );
                             }).toList(),
                             onChanged: (value) =>
                                 setState(() => _selectedDuration = value!),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.info_outline,
+                                    color: AppColors.primary, size: 16),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Interest rate: $_interestRate% per annum',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -317,7 +350,7 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
                         // Table rows
                         ..._buildAmortizationTable(
                           double.parse(_amountController.text.trim()),
-                          double.parse(_interestRateController.text.trim()),
+                          _interestRate,
                           _selectedDuration,
                           countryCode,
                         ),
