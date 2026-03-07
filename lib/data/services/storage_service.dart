@@ -71,4 +71,14 @@ class StorageService {
         return 'application/octet-stream';
     }
   }
+
+  Future<String> uploadKycDocument({
+    required String userId,
+    required String fileName,
+    required PlatformFile file,
+  }) async {
+    final ref = _storage.ref('kyc/$userId/$fileName');
+    await ref.putData(file.bytes!);
+    return await ref.getDownloadURL();
+  }
 }

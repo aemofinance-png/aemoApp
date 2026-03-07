@@ -3,6 +3,8 @@ import '../../../../data/models/loan_application_model.dart';
 import '../../../../data/providers/service_providers.dart';
 import '../../../../data/services/firestore_service.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../../data/models/user_model.dart';
+import 'package:flutter/foundation.dart';
 
 // Admin state
 class AdminState {
@@ -40,6 +42,34 @@ class AdminNotifier extends StateNotifier<AdminState> {
 
   AdminNotifier(this._firestoreService, this._adminId)
       : super(const AdminState());
+
+  Future<void> deleteApplication(String applicationId) async {
+    try {
+      await _firestoreService.deleteApplication(applicationId);
+      state = state.copyWith(
+        applications:
+            state.applications.where((a) => a.id != applicationId).toList(),
+      );
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      debugPrint('Delete application error: $e');
+    }
+  }
+
+  Future<void> updateKycStatus({
+    required String userId,
+    required VerificationStatus status,
+  }) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await _firestoreService.updateVerificationStatus(userId, status);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      debugPrint('KYC update error: $e');
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
+  }
 
   // Fetch all applications
   Future<void> fetchAllApplications() async {

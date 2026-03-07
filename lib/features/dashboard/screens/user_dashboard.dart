@@ -239,11 +239,14 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
               // Add this temporarily to user_dashboard.dart
 // inside the _buildNavbar method, next to the logout button
 
-              Text(
-                userName,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
+              GestureDetector(
+                onTap: () => context.push(AppRoutes.profile),
+                child: Text(
+                  userName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),

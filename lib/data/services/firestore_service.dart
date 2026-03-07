@@ -20,6 +20,20 @@ class FirestoreService {
     }
   }
 
+  Future<void> updateVerificationStatus(
+      String userId, VerificationStatus status) async {
+    await _firestore.collection('users').doc(userId).update({
+      'verificationStatus': status.name,
+    });
+  }
+
+  Future<void> deleteApplication(String applicationId) async {
+    await _firestore
+        .collection('loan_applications')
+        .doc(applicationId)
+        .delete();
+  }
+
   // Get user
   Future<UserModel?> getUser(String userId) async {
     try {
@@ -40,6 +54,18 @@ class FirestoreService {
     } catch (e) {
       throw 'Failed to submit application. Please try again.';
     }
+  }
+
+  Future<void> saveKycDocuments({
+    required String userId,
+    required String idDocumentUrl,
+    required String selfieUrl,
+  }) async {
+    await _firestore.collection('users').doc(userId).update({
+      'idDocumentUrl': idDocumentUrl,
+      'selfieUrl': selfieUrl,
+      'verificationStatus': VerificationStatus.pending.name,
+    });
   }
 
   // Get applications for a specific user

@@ -32,7 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Local state
   bool _showPassword = false;
   bool _showConfirmPassword = false;
-  String _selectedCountry = 'BZ'; // Default to Belize
+  String _selectedCountry = 'Belize'; // Default to Belize
 
   @override
   void dispose() {
@@ -49,6 +49,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final success = await ref.read(authNotifierProvider.notifier).register(
+          // countryName:
+          //     _selectedCountry, // Replace 'Other' with actual country name if needed
           streetAddress: _streetAddressController.text.trim(),
           city: _cityController.text.trim(),
           stateProvince: _stateController.text.trim(),

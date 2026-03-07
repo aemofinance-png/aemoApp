@@ -134,6 +134,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
   Future<void> _handleSubmit() async {
     if (!_validateCurrentStep()) {
+      // context.go(AppRoutes.dashboard);
       return;
     }
 
@@ -165,7 +166,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     print('submitApplication returned: $application'); //
 
     if (application != null && mounted) {
-      print('Navigating to dashboard...');
       context.go(AppRoutes.applicationSubmitted, extra: application);
       setState(() {});
     }

@@ -13,14 +13,36 @@ import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 
-class AdminDetailScreen extends ConsumerWidget {
-  const AdminDetailScreen({super.key, required this.applicationId});
+class AdminDetailScreen extends ConsumerStatefulWidget {
+  const AdminDetailScreen({
+    super.key,
+    required this.applicationId,
+    required this.userId,
+  });
   final String applicationId;
+  final String userId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminDetailScreen> createState() => _AdminDetailScreenState();
+}
+
+class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () => ref.read(adminNotifierProvider.notifier).fetchAllApplications(),
+    );
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
     final adminState = ref.watch(adminNotifierProvider);
-    final application = adminState.selectedApplication;
+    final application = adminState.applications
+        .where((a) => a.id == widget.applicationId)
+        .firstOrNull;
     final loanState = ref.watch(loanNotifierProvider);
     final currentUser = ref.watch(currentUserProvider).value;
     final countryCode = currentUser?.countryCode ?? 'BZ';
@@ -158,11 +180,11 @@ class AdminDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   ElevatedButton.icon(
-                    onPressed: () => () async {
+                    onPressed: () async {
                       await ref
                           .read(adminNotifierProvider.notifier)
-                          .approveApplication(applicationId: application.id);
-
+                          .deleteApplication(application.id);
+                      debugPrint('Deleted application ${application.id}');
                       if (context.mounted) {
                         context.go(AppRoutes.admin);
                       }
@@ -180,7 +202,28 @@ class AdminDetailScreen extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 32),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      debugPrint('userId: ${application.userId}');
+                      debugPrint('applicationId: ${application.id}');
+                      context.go(
+                          '${AppRoutes.adminUserProfile}/${application.userId}');
+                    },
+                    icon: const Icon(Icons.person),
+                    label: const Text('User Profile'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      minimumSize: const Size(double.infinity, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
                   // Back button
+
+                  const SizedBox(height: 32),
                   ElevatedButton.icon(
                     onPressed: () => context.go(AppRoutes.admin),
                     icon: const Icon(Icons.arrow_back),

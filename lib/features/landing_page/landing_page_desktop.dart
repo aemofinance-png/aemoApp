@@ -102,48 +102,53 @@ class LandingPage extends ConsumerWidget {
                                       SizedBox(height: 24),
                                       Row(
                                         children: [
-                                          CustomButton(
-                                            width: 120,
-                                            label: 'Apply Now',
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.copyWith(
-                                                  color: AppColors.white,
-                                                ),
-                                            onPressed: () =>
-                                                context.go(AppRoutes.login),
+                                          Expanded(
+                                            child: CustomButton(
+                                              width: 120,
+                                              label: 'Apply Now',
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: AppColors.white,
+                                                  ),
+                                              onPressed: () =>
+                                                  context.go(AppRoutes.login),
+                                            ),
                                           ),
                                           const SizedBox(width: 16),
-                                          CustomButton(
-                                            width: 165,
-                                            label: 'Calculate Payment',
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.copyWith(
-                                                  color: AppColors.primary,
+                                          Expanded(
+                                            child: CustomButton(
+                                              width: 165,
+                                              label: 'Calculate Payment',
+                                              textStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: AppColors.primary,
+                                                  ),
+                                              buttonStyle:
+                                                  ElevatedButton.styleFrom(
+                                                side: BorderSide(
+                                                    color: const Color.fromARGB(
+                                                        255, 183, 194, 211),
+                                                    width: 2),
+                                                shadowColor: Colors.transparent,
+                                                elevation: 0,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                foregroundColor:
+                                                    AppColors.white,
+                                                minimumSize: const Size(
+                                                    double.infinity, 52),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
                                                 ),
-                                            buttonStyle:
-                                                ElevatedButton.styleFrom(
-                                              side: BorderSide(
-                                                  color: const Color.fromARGB(
-                                                      255, 183, 194, 211),
-                                                  width: 2),
-                                              shadowColor: Colors.transparent,
-                                              elevation: 0,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              foregroundColor: AppColors.white,
-                                              minimumSize: const Size(
-                                                  double.infinity, 52),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
                                               ),
+                                              onPressed: () => context
+                                                  .go(AppRoutes.calculator),
                                             ),
-                                            onPressed: () => context
-                                                .go(AppRoutes.calculator),
                                           ),
                                         ],
                                       ),
@@ -163,7 +168,7 @@ class LandingPage extends ConsumerWidget {
                                 Expanded(
                                   child: Container(
                                     width: 380,
-                                    height: 220,
+                                    height: 270,
                                     child: Image.asset(
                                       'assets/images/computer.png',
                                       fit: BoxFit.fill,

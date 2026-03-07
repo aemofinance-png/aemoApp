@@ -8,11 +8,16 @@ import '../features/auth/providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/user_dashboard.dart';
+import '../features/dashboard/screens/kyc_screen.dart';
+import '../features/dashboard/screens/user_profile.dart';
+import '../features/dashboard/screens/kyc_state.dart';
 import '../features/loan_application/screens/loan_application_screen.dart';
 import '../features/loan_application/screens/loan_application_submitted.dart';
 import '../features/loan_status/screens/application_status_screen.dart';
 import '../features/calculator/screens/loan_calculator_screen.dart';
 import '../features/admin/screens/admin_dashboard.dart';
+import '../features/admin/screens/admin_user_profile.dart';
+import '../features/admin/screens/admin_kyc_screen.dart';
 import '../data/models/loan_application_model.dart';
 import '../features/admin/screens/admin_detail_screen.dart';
 
@@ -26,6 +31,13 @@ class AppRoutes {
   static const String calculator = '/calculator';
   static const String admin = '/admin';
   static const String applicationSubmitted = '/application-submitted';
+  static const String profile = '/profile';
+  static const String kyc = '/kyc';
+  static const String adminUserProfile = '/admin-user-profile';
+  static const String reviewKYc = '/review-kyc';
+  static const String kycStatus = '/kyc-status';
+
+// In routes list:
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -49,16 +61,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == AppRoutes.login || location == AppRoutes.register;
 
       if (isLoading) return null;
-      // if (!isLoggedIn && !isAuthRoute) return AppRoutes.home;
       if (!isLoggedIn && !isPublicRoute) return AppRoutes.home;
       if (isLoggedIn && isAuthRoute) return AppRoutes.dashboard;
 
       // Logged in on splash — wait for user profile then redirect
       if (isLoggedIn && isSplash) {
-        if (currentUser == null) return null; // 👈 wait for profile
+        if (currentUser == null) return null;
         return currentUser.role == 'admin'
             ? AppRoutes.admin
             : AppRoutes.dashboard;
+      }
+
+      // Admin user profile route guard — must come before the admin check
+      if (location.startsWith(AppRoutes.adminUserProfile)) {
+        if (currentUser == null) return null; // wait for user to load
+        if (currentUser.role != 'admin') return AppRoutes.dashboard;
+        return null; // explicitly allow through
       }
 
       // Admin route check
@@ -71,6 +89,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
+        path: AppRoutes.kyc,
+        builder: (context, state) => const KycScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminUserProfile}/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          return AdminUserProfile(userId: userId);
+        },
+      ),
+      GoRoute(
           path: AppRoutes.home,
           builder: (context, state) => const ResponsiveLayout(
                 mobileLayout: LandingPageMobile(),
@@ -82,15 +111,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           application: state.extra as LoanApplicationModel,
         ),
       ),
-      // GoRoute(
-      //   path: AppRoutes.splash,
-      //   builder: (context, state) => const Scaffold(
-      //     body: Center(child: CircularProgressIndicator()),
-      //   ),
-      // ),
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,
@@ -123,10 +150,26 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: ':id',
             builder: (context, state) {
               final applicationId = state.pathParameters['id']!;
-              return AdminDetailScreen(applicationId: applicationId);
+              final userId = state.uri.queryParameters['userId'] ?? '';
+              return AdminDetailScreen(
+                  applicationId: applicationId, userId: userId);
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '${AppRoutes.reviewKYc}/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          return KycApprovalScreen(userId: userId);
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.kycStatus}/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          return KycStatusScreen(userId: userId);
+        },
       ),
     ],
   );

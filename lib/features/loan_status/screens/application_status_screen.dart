@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -58,8 +59,8 @@ class _ApplicationStatusScreenState
     final application = loanState.applications
         .where((a) => a.id == widget.applicationId)
         .firstOrNull;
-
-    // Not found
+    final canVerify = application?.status == LoanStatus.approved &&
+        currentUser?.verificationStatus == VerificationStatus.unverified;
     if (application == null) {
       return Scaffold(
         appBar: _buildAppBar(context),
@@ -192,8 +193,21 @@ class _ApplicationStatusScreenState
                 ],
 
                 const SizedBox(height: 32),
-
-                // Back button
+                ElevatedButton.icon(
+                  onPressed: canVerify ? () => context.go(AppRoutes.kyc) : null,
+                  icon: const Icon(Icons.perm_identity),
+                  label: const Text('Proceed to KYC'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        canVerify ? AppColors.primary : AppColors.primaryLight,
+                    foregroundColor: AppColors.white,
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
                 ElevatedButton.icon(
                   onPressed: () => context.go(AppRoutes.dashboard),
                   icon: const Icon(Icons.arrow_back),

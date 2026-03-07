@@ -93,20 +93,28 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                         const SizedBox(height: 32),
 
                         // Stats row
-                        Row(
-                          children: [
-                            _buildStatCard('Total', total.toString(),
-                                AppColors.primary, AppColors.primaryLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Pending', pending.toString(),
-                                AppColors.pending, AppColors.pendingLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Approved', approved.toString(),
-                                AppColors.success, AppColors.successLight),
-                            const SizedBox(width: 16),
-                            _buildStatCard('Rejected', rejected.toString(),
-                                AppColors.error, AppColors.errorLight),
-                          ],
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isMobile = constraints.maxWidth < 600;
+                            return GridView.count(
+                              crossAxisSpacing:
+                                  16, // horizontal space between items
+                              mainAxisSpacing: 16,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: isMobile ? 2 : 4,
+                              children: [
+                                _buildStatCard('Total', total.toString(),
+                                    AppColors.primary, AppColors.primaryLight),
+                                _buildStatCard('Pending', pending.toString(),
+                                    AppColors.pending, AppColors.pendingLight),
+                                _buildStatCard('Approved', approved.toString(),
+                                    AppColors.success, AppColors.successLight),
+                                _buildStatCard('Rejected', rejected.toString(),
+                                    AppColors.error, AppColors.errorLight),
+                              ],
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 32),

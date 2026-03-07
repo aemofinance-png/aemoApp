@@ -1,19 +1,26 @@
 import 'package:equatable/equatable.dart';
 
+enum VerificationStatus { unverified, pending, verified }
+
 class UserModel extends Equatable {
   final String id;
   final String fullName;
   final String email;
   final String phone;
   final String countryCode;
+  // final String countryName;
   final String streetAddress;
   final String city;
   final String state;
   final String postalCode;
   final String role;
   final DateTime createdAt;
+  final VerificationStatus verificationStatus;
+  final String? idDocumentUrl;
+  final String? selfieUrl;
 
   const UserModel({
+    // required this.countryName,
     required this.id,
     required this.fullName,
     required this.email,
@@ -25,6 +32,9 @@ class UserModel extends Equatable {
     required this.countryCode,
     required this.role,
     required this.createdAt,
+    this.verificationStatus = VerificationStatus.unverified,
+    this.idDocumentUrl,
+    this.selfieUrl,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -37,9 +47,16 @@ class UserModel extends Equatable {
       city: map['city'] ?? '',
       state: map['state'] ?? '',
       postalCode: map['postalCode'] ?? '',
-      countryCode: map['countryCode'] ?? 'BZ',
+      countryCode: map['countryCode'] ?? '',
+      idDocumentUrl: map['idDocumentUrl'] as String?,
+      selfieUrl: map['selfieUrl'] as String?,
+      // countryName: map['countryName'] ?? 'Belize',
       role: map['role'] ?? 'user',
       createdAt: DateTime.parse(map['createdAt']),
+      verificationStatus: VerificationStatus.values.firstWhere(
+        (e) => e.name == map['verificationStatus'],
+        orElse: () => VerificationStatus.unverified,
+      ),
     );
   }
 
@@ -55,11 +72,16 @@ class UserModel extends Equatable {
       'state': state,
       'postalCode': postalCode,
       'role': role,
+      'verificationStatus': verificationStatus.name,
       'createdAt': createdAt.toIso8601String(),
     };
   }
 
   UserModel copyWith({
+    VerificationStatus? verificationStatus,
+// and in the return:
+    String? idDocumentUrl,
+    String? selfieUrl,
     String? id,
     String? fullName,
     String? streetAddress,
@@ -69,10 +91,15 @@ class UserModel extends Equatable {
     String? email,
     String? phone,
     String? countryCode,
+    bool? isVerified,
+
+    // String? countryName,
     String? role,
     DateTime? createdAt,
   }) {
     return UserModel(
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
@@ -82,6 +109,9 @@ class UserModel extends Equatable {
       state: state ?? this.state,
       postalCode: postalCode ?? this.postalCode,
       countryCode: countryCode ?? this.countryCode,
+      idDocumentUrl: idDocumentUrl ?? this.idDocumentUrl,
+      selfieUrl: selfieUrl ?? this.selfieUrl,
+      // countryName: countryName ?? this.countryName,
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -95,6 +125,7 @@ class UserModel extends Equatable {
         phone,
         countryCode,
         streetAddress,
+        // countryName,
         city,
         state,
         postalCode,

@@ -308,7 +308,7 @@ class LandingPageMobile extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
-                          Icons.devices_outlined,
+                          Icons.verified_user_outlined,
                           color: Color(0xFF1E2A3B),
                           size: 24,
                         ),
@@ -318,7 +318,7 @@ class LandingPageMobile extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Fully Online',
+                            'Secure and Reliable',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
@@ -330,7 +330,7 @@ class LandingPageMobile extends ConsumerWidget {
                           const SizedBox(height: 8),
                           // Description
                           Text(
-                            'Complete your application\nfrom the comfort of your home',
+                            'Bank Grade encryption ensures your\ndata is safe.',
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       fontSize: 16,
@@ -397,6 +397,64 @@ class LandingPageMobile extends ConsumerWidget {
                     ],
                   ),
                 ),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 60, horizontal: 40),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    border: Border(top: BorderSide(color: AppColors.border)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Brand column
+
+                          // Solutions column
+                          Expanded(
+                            child: _buildFooterColumn(context, 'SOLUTIONS', [
+                              'Personal Loans',
+                              'Business Credit',
+                              'Mortgage Refinance',
+                              'Student Loans',
+                            ]),
+                          ),
+
+                          // Company column
+                          Expanded(
+                            child: _buildFooterColumn(context, 'COMPANY', [
+                              'About Us',
+                              'Careers',
+                              'Press Room',
+                              'Impact',
+                            ]),
+                          ),
+
+                          // Compliance column
+                          Expanded(
+                            child: _buildFooterColumn(context, 'COMPLIANCE', [
+                              'Privacy Policy',
+                              'Terms of Service',
+                              'Cookie Settings',
+                              'Security',
+                            ]),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 48),
+                      const Divider(),
+                      const SizedBox(height: 24),
+                      Text(
+                        '© 2024 ${AppStrings.appName} Inc. All rights reserved.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -404,4 +462,33 @@ class LandingPageMobile extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget _buildFooterColumn(
+    BuildContext context, String title, List<String> items) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title,
+        style: TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF1E2A3B),
+          letterSpacing: 1.2,
+        ),
+      ),
+      const SizedBox(height: 16),
+      ...items.map((item) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              item,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 8,
+                    color: AppColors.textSecondary,
+                  ),
+            ),
+          )),
+    ],
+  );
 }
