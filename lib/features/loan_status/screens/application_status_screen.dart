@@ -13,8 +13,10 @@ import '../../../app/router.dart';
 import 'dart:math';
 import '../../admin/screens/document_viewer_screen.dart';
 import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:js_interop';
 
 class ApplicationStatusScreen extends ConsumerStatefulWidget {
   final String applicationId;
@@ -294,10 +296,11 @@ class _ApplicationStatusScreenState
 
     // Open PDF in browser
     if (response.statusCode == 200) {
-      final blob = html.Blob([response.bodyBytes], 'application/pdf');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      html.window.open(url, '_blank');
-      html.Url.revokeObjectUrl(url);
+      final blob = web.Blob([response.bodyBytes.toJS].toJS,
+          web.BlobPropertyBag(type: 'application/pdf'));
+      final url = web.URL.createObjectURL(blob);
+      web.window.open(url, '_blank', '');
+      web.URL.revokeObjectURL(url);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to generate agreement')),

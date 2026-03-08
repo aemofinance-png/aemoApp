@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class DocumentViewerScreen extends StatefulWidget {
   final String imageUrl;
@@ -56,7 +57,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
       }
 
       // Open PDF in a new browser tab using dart:html
-      html.window.open(widget.imageUrl, '_blank');
+      web.window.open(widget.imageUrl, '_blank', '');
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
