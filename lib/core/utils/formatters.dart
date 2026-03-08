@@ -23,11 +23,19 @@ class Formatters {
   // Format currency based on country
   static String currency(double amount, String countryCode) {
     final symbol = getCurrencySymbol(countryCode);
-    final formatter = NumberFormat.currency(
-      symbol: symbol,
-      decimalDigits: 2,
-    );
-    return formatter.format(amount);
+
+    try {
+      final formatter = NumberFormat.currency(
+        locale: 'en_US',
+        symbol: symbol,
+        decimalDigits: 2,
+      );
+
+      return formatter.format(amount);
+    } catch (_) {
+      // Fallback formatting if intl fails on web release build
+      return '$symbol${amount.toStringAsFixed(2)}';
+    }
   }
 
   // Date

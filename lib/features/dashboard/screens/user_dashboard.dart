@@ -232,7 +232,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
               GestureDetector(
                 onTap: () => context.push(AppRoutes.profile),
                 child: CircleAvatar(
-                  radius: 28,
+                  radius: 20,
                   backgroundColor: AppColors.primaryLight,
                   backgroundImage: currentUser?.selfieUrl != null &&
                           currentUser!.selfieUrl!.isNotEmpty
@@ -253,15 +253,15 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                       : null,
                 ),
               ),
-              const SizedBox(width: 16),
-              TextButton.icon(
-                onPressed: _handleLogout,
-                icon: const Icon(Icons.logout, size: 18),
-                label: const Text('Logout'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                ),
-              ),
+              // const SizedBox(width: 16),
+              // TextButton.icon(
+              //   onPressed: _handleLogout,
+              //   icon: const Icon(Icons.logout, size: 18),
+              //   label: const Text('Logout'),
+              //   style: TextButton.styleFrom(
+              //     foregroundColor: AppColors.error,
+              //   ),
+              // ),
             ],
           ),
         ],

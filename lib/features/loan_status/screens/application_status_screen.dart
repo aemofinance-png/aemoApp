@@ -280,7 +280,8 @@ class _ApplicationStatusScreenState
 
     // Call API
     final response = await http.post(
-      Uri.parse('loanagreementscript-production.up.railway.app'),
+      Uri.parse(
+          'https://loanagreementscript-production.up.railway.app/generate-agreement'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'clientName': currentUser.fullName,
