@@ -11,6 +11,10 @@ import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 import '../../../app/router.dart';
 import 'dart:math';
+import '../../admin/screens/document_viewer_screen.dart';
+import 'dart:html' as html;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ApplicationStatusScreen extends ConsumerStatefulWidget {
   final String applicationId;
@@ -208,6 +212,22 @@ class _ApplicationStatusScreenState
                   ),
                 ),
                 const SizedBox(height: 22),
+                if (application.status == LoanStatus.approved)
+                  ElevatedButton.icon(
+                    onPressed: () =>
+                        _generateAgreement(context, application, currentUser!),
+                    icon: const Icon(Icons.picture_as_pdf),
+                    label: const Text('View Loan Agreement'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      minimumSize: const Size(double.infinity, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 22),
                 ElevatedButton.icon(
                   onPressed: () => context.go(AppRoutes.dashboard),
                   icon: const Icon(Icons.arrow_back),
@@ -227,6 +247,62 @@ class _ApplicationStatusScreenState
         ),
       ),
     );
+  }
+
+  Future<void> _generateAgreement(
+    BuildContext context,
+    LoanApplicationModel application,
+    UserModel currentUser,
+  ) async {
+    // Calculate dates
+    final firstPayment = application.reviewedAt!.add(const Duration(days: 60));
+    final firstPaymentDate =
+        '${firstPayment.year}-${firstPayment.month.toString().padLeft(2, '0')}-${firstPayment.day.toString().padLeft(2, '0')}';
+
+    final now = DateTime.now();
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    final agreementDate = '${months[now.month - 1]} ${now.day}, ${now.year}';
+
+    // Call API
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8001/generate-agreement'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'clientName': currentUser.fullName,
+        'loanAmount': application.loanAmount,
+        'annualRatePct': AppStrings.loanRates[application.loanDuration],
+        'loanTermMonths': application.loanDuration,
+        'monthlyPayment': _calculateMonthlyRepayment(application),
+        'firstPaymentDate': firstPaymentDate,
+        'agreementDate': agreementDate,
+        'referenceNo': application.id,
+      }),
+    );
+
+    // Open PDF in browser
+    if (response.statusCode == 200) {
+      final blob = html.Blob([response.bodyBytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.window.open(url, '_blank');
+      html.Url.revokeObjectUrl(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to generate agreement')),
+      );
+    }
   }
 
   // App bar
@@ -329,11 +405,11 @@ class _ApplicationStatusScreenState
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
               ),
             ],
           ),
@@ -357,20 +433,20 @@ class _ApplicationStatusScreenState
             width: 140,
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
             ),
           ),
         ],
@@ -392,12 +468,25 @@ class _ApplicationStatusScreenState
             const Icon(Icons.insert_drive_file_outlined,
                 color: AppColors.primary, size: 18),
             const SizedBox(width: 8),
-            Text(
-              'Document $index',
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.primary,
-                decoration: TextDecoration.underline,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DocumentViewerScreen(
+                      imageUrl: url,
+                      title: 'Document $index',
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'Document $index',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.primary,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ],

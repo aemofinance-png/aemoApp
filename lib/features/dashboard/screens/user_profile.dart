@@ -42,16 +42,23 @@ class ProfileScreen extends ConsumerWidget {
                           CircleAvatar(
                             radius: 48,
                             backgroundColor: AppColors.primaryLight,
-                            child: Text(
-                              user.fullName.isNotEmpty
-                                  ? user.fullName[0].toUpperCase()
-                                  : '?',
-                              style: TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
+                            backgroundImage: user?.selfieUrl != null &&
+                                    user!.selfieUrl!.isNotEmpty
+                                ? NetworkImage(user!.selfieUrl!)
+                                : null,
+                            child: user?.selfieUrl == null ||
+                                    user!.selfieUrl!.isEmpty
+                                ? Text(
+                                    user?.fullName.isNotEmpty ?? false
+                                        ? user!.fullName[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
+                                    ),
+                                  )
+                                : null,
                           ),
                           Positioned(
                             bottom: 0,
@@ -94,22 +101,51 @@ class ProfileScreen extends ConsumerWidget {
 
                       const SizedBox(height: 20),
 
-                      // Edit profile button
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.edit_outlined, size: 16),
-                        label: const Text('Edit Profile'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: user.verificationStatus ==
+                                  VerificationStatus.verified
+                              ? AppColors.successLight
+                              : user.verificationStatus ==
+                                      VerificationStatus.unverified
+                                  ? AppColors.errorLight
+                                  : AppColors.pendingLight,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          "KYC ${user.verificationStatus.name.toUpperCase()}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: user.verificationStatus ==
+                                    VerificationStatus.verified
+                                ? AppColors.success
+                                : user.verificationStatus ==
+                                        VerificationStatus.unverified
+                                    ? AppColors.error
+                                    : AppColors.pending,
                           ),
                         ),
                       ),
+
+                      // Edit profile button
+                      // ElevatedButton.icon(
+                      //   onPressed: () {},
+                      //   icon: const Icon(Icons.edit_outlined, size: 16),
+                      //   label: const Text('Edit Profile'),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: AppColors.primary,
+                      //     foregroundColor: Colors.white,
+                      //     elevation: 0,
+                      //     padding: const EdgeInsets.symmetric(
+                      //         horizontal: 24, vertical: 12),
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(10),
+                      //     ),
+                      //   ),
+                      // ),
 
                       const SizedBox(height: 32),
 
@@ -171,7 +207,9 @@ class ProfileScreen extends ConsumerWidget {
                                 child: const Icon(Icons.person_outline,
                                     color: AppColors.primary, size: 18),
                               ),
-                              title: const Text('Personal Details'),
+                              title: Text('Personal Details',
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -209,7 +247,9 @@ class ProfileScreen extends ConsumerWidget {
                                 child: const Icon(Icons.mail_outline,
                                     color: AppColors.primary, size: 18),
                               ),
-                              title: const Text('Contact Information'),
+                              title: Text('Contact Information',
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -373,20 +413,10 @@ class ProfileScreen extends ConsumerWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.account_balance,
-                    color: AppColors.primary, size: 20),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                AppStrings.appName,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+                child: Image.asset('assets/images/aemo-logo.png'),
               ),
             ],
           ),

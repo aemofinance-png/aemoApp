@@ -101,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         children: [
                           Image.asset(
                             'assets/images/aemo-logo.png',
-                            width: 250,
+                          
                           ),
                           const SizedBox(height: 16),
                           const SizedBox(height: 4),

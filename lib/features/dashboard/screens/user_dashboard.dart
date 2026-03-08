@@ -11,6 +11,7 @@ import '../../../shared/widgets/status_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 import '../../../app/router.dart';
+import '../../../data/models/user_model.dart';
 
 class UserDashboard extends ConsumerStatefulWidget {
   const UserDashboard({super.key});
@@ -69,7 +70,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
         body: Column(
           children: [
             // Navbar
-            _buildNavbar(currentUser?.fullName ?? ''),
+            _buildNavbar(currentUser?.fullName ?? '', currentUser),
 
             // Body
             Expanded(
@@ -195,7 +196,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
   }
 
   // Navbar
-  Widget _buildNavbar(String userName) {
+  Widget _buildNavbar(String userName, UserModel? currentUser) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       decoration: const BoxDecoration(
@@ -212,24 +213,12 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.account_balance,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
+                child: Image.asset('assets/images/aemo-logo.png'),
               ),
               const SizedBox(width: 10),
-              Text(
-                AppStrings.appName,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
             ],
           ),
 
@@ -241,12 +230,26 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
 
               GestureDetector(
                 onTap: () => context.push(AppRoutes.profile),
-                child: Text(
-                  userName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: AppColors.primaryLight,
+                  backgroundImage: currentUser?.selfieUrl != null &&
+                          currentUser!.selfieUrl!.isNotEmpty
+                      ? NetworkImage(currentUser!.selfieUrl!)
+                      : null,
+                  child: currentUser?.selfieUrl == null ||
+                          currentUser!.selfieUrl!.isEmpty
+                      ? Text(
+                          currentUser?.fullName.isNotEmpty ?? false
+                              ? currentUser!.fullName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : null,
                 ),
               ),
               const SizedBox(width: 16),

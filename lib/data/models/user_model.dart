@@ -74,6 +74,8 @@ class UserModel extends Equatable {
       'role': role,
       'verificationStatus': verificationStatus.name,
       'createdAt': createdAt.toIso8601String(),
+      'idDocumentUrl': idDocumentUrl, // add this
+      'selfieUrl': selfieUrl,
     };
   }
 
