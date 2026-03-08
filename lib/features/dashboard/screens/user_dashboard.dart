@@ -129,6 +129,26 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
 
                         const SizedBox(height: 50),
 
+                        Row(
+                          children: [
+                            CustomButton(
+                              label: 'Calculator',
+                              onPressed: () {
+                                print('Calculator tapped');
+                                context.push(AppRoutes.calculator);
+                              },
+                              isOutlined: true,
+                              width: 130,
+                            ),
+                            const SizedBox(width: 12),
+                            CustomButton(
+                              label: 'Apply ',
+                              onPressed: () => context.go(AppRoutes.apply),
+                              width: 120,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
                         // filtered.isEmpty
                         //     ? _buildEmptyState()
                         //     : Column(
@@ -148,25 +168,6 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
-                            ),
-                            Row(
-                              children: [
-                                CustomButton(
-                                  label: 'Calculator',
-                                  onPressed: () {
-                                    print('Calculator tapped');
-                                    context.push(AppRoutes.calculator);
-                                  },
-                                  isOutlined: true,
-                                  width: 130,
-                                ),
-                                const SizedBox(width: 12),
-                                CustomButton(
-                                  label: 'Apply ',
-                                  onPressed: () => context.go(AppRoutes.apply),
-                                  width: 120,
-                                ),
-                              ],
                             ),
                           ],
                         ),
@@ -271,36 +272,34 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
   // Stat card
   Widget _buildStatCard(
       String label, String value, Color color, Color bgColor) {
-    return Expanded(
-      child: Container(
-        width: 80,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return Container(
+      width: 80,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
