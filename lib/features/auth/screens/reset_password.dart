@@ -89,9 +89,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    if (!_codeValid) {
-      return const Center(child: Text('Invalid or expired reset link.'));
-    }
+    // if (!_codeValid) {
+    //   return const Center(child: Text('Invalid or expired reset link.'));
+    // }
     bool _showPassword = false;
     return Scaffold(
       body: Center(
@@ -115,11 +115,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 //     return null;
                 //   },
                 // ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _resetPassword,
-                  child: const Text('Reset Password'),
-                ),
+                // const SizedBox(height: 24),
+                // ElevatedButton(
+                //   onPressed: _resetPassword,
+                //   child: const Text('Reset Password'),
+                // ),
 
                 CustomTextField(
                   label: 'Password',
