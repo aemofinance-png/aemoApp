@@ -66,7 +66,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoading) return null;
       // if (state.uri.path == '/') return AppRoutes.home;
 
-      final isSplash = location == AppRoutes.home;
+      final isSplash = location == AppRoutes.home || location == '/';
 
       final mode = state.uri.queryParameters['mode'];
       final oobCode = state.uri.queryParameters['oobCode'];

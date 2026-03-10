@@ -49678,7 +49678,7 @@ q=!r
 p=s.gji()
 A.i9(d+" | isLoading: "+p+" | isLoggedIn: "+q+" | isPublicRoute: "+e)
 if(p)return i
-o=f==="/home"
+o=f==="/home"||f==="/"
 n=g.glW().h(0,"mode")
 m=g.glW().h(0,"oobCode")
 if(n==="resetPassword"&&m!=null)return j
