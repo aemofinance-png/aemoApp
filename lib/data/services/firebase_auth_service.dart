@@ -51,8 +51,9 @@ class FirebaseAuthService {
     switch (e.code) {
       case 'email-already-in-use':
         return 'An account already exists with this email.';
-      case 'invalid-email':
-        return 'Please enter a valid email address.';
+      case 'invalid-credential':
+      case 'invalid-login-credentials':
+        return 'Incorrect email or password.';
       case 'weak-password':
         return 'Password must be at least 6 characters.';
       case 'user-not-found':

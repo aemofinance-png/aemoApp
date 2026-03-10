@@ -221,64 +221,62 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
   // Stat card
   Widget _buildStatCard(
       String label, String value, Color color, Color bgColor) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            // Click stat card to filter by that status
-            if (label == 'Total') {
-              _selectedFilter = null;
-            } else if (label == 'Pending') {
-              _selectedFilter = LoanStatus.pending;
-            } else if (label == 'Approved') {
-              _selectedFilter = LoanStatus.approved;
-            } else if (label == 'Rejected') {
-              _selectedFilter = LoanStatus.rejected;
-            }
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: _selectedFilter == null && label == 'Total'
-                  ? color
-                  : _selectedFilter == LoanStatus.pending && label == 'Pending'
-                      ? color
-                      : _selectedFilter == LoanStatus.approved &&
-                              label == 'Approved'
-                          ? color
-                          : _selectedFilter == LoanStatus.rejected &&
-                                  label == 'Rejected'
-                              ? color
-                              : Colors.transparent,
-              width: 2,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          // Click stat card to filter by that status
+          if (label == 'Total') {
+            _selectedFilter = null;
+          } else if (label == 'Pending') {
+            _selectedFilter = LoanStatus.pending;
+          } else if (label == 'Approved') {
+            _selectedFilter = LoanStatus.approved;
+          } else if (label == 'Rejected') {
+            _selectedFilter = LoanStatus.rejected;
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _selectedFilter == null && label == 'Total'
+                ? color
+                : _selectedFilter == LoanStatus.pending && label == 'Pending'
+                    ? color
+                    : _selectedFilter == LoanStatus.approved &&
+                            label == 'Approved'
+                        ? color
+                        : _selectedFilter == LoanStatus.rejected &&
+                                label == 'Rejected'
+                            ? color
+                            : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: color,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: color,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

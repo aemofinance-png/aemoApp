@@ -228,7 +228,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Phone number is required';
                         }
-                        if (value.length < 7) {
+                        if (value.length < 5) {
                           return 'Enter a valid phone number';
                         }
                         return null;
@@ -246,7 +246,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Street address is required';
                         }
-                        if (value.length < 7) {
+                        if (value.length < 5) {
                           return 'Enter a valid street address';
                         }
                         return null;
@@ -263,7 +263,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return 'City is required';
                         }
-                        if (value.length < 7) {
+                        if (value.length < 4) {
                           return 'Enter a valid city';
                         }
                         return null;
@@ -280,7 +280,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return 'State is required';
                         }
-                        if (value.length < 7) {
+                        if (value.length < 4) {
                           return 'Enter a valid state';
                         }
                         return null;
