@@ -53,6 +53,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoading = authState.isLoading;
       final location = state.matchedLocation;
       final isSplash = location == AppRoutes.home;
+
+      final mode = state.uri.queryParameters['mode'];
+      final oobCode = state.uri.queryParameters['oobCode'];
+
+      // 🔹 Detect Firebase reset links
+      if (mode == 'resetPassword' && oobCode != null) {
+        return AppRoutes.resetPassword;
+      }
       final isPublicRoute = location == AppRoutes.login ||
           location == AppRoutes.register ||
           location == AppRoutes.home ||

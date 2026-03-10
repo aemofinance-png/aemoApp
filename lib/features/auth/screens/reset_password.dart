@@ -28,6 +28,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _codeValid = false;
   String? _oobCode;
   String? _email;
+  bool _showPassword = false;
 
   @override
   void initState() {
@@ -92,7 +93,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     // if (!_codeValid) {
     //   return const Center(child: Text('Invalid or expired reset link.'));
     // }
-    bool _showPassword = false;
+
     return Scaffold(
       body: Center(
         child: SizedBox(
