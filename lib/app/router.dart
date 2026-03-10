@@ -49,6 +49,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     redirect: (context, state) {
+      if (state.uri.path == '/') return AppRoutes.home;
       final isLoggedIn = authState.value != null;
       final isLoading = authState.isLoading;
       final location = state.uri.path;
