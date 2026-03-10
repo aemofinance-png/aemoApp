@@ -51,7 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
       final isLoading = authState.isLoading;
-      final location = state.matchedLocation;
+      final location = state.uri.path;
       final isSplash = location == AppRoutes.home;
 
       final mode = state.uri.queryParameters['mode'];
