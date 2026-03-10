@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/providers/auth_provider.dart';
 import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/reset_password.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/user_dashboard.dart';
 import '../features/dashboard/screens/kyc_screen.dart';
@@ -36,6 +37,7 @@ class AppRoutes {
   static const String adminUserProfile = '/admin-user-profile';
   static const String reviewKYc = '/review-kyc';
   static const String kycStatus = '/kyc-status';
+  static const String resetPassword = '/reset-password';
 
 // In routes list:
 }

@@ -95,14 +95,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
                           const SizedBox(height: 16),
                           Image.asset('assets/images/aemo-logo.png'),
                           const SizedBox(height: 16),
@@ -326,7 +318,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           items: AppStrings.supportedCountries.map((country) {
                             return DropdownMenuItem<String>(
-                              value: country['code'],
+                              value: country['name'],
                               child: Text(
                                 '${country['flag']}  ${country['name']} (${country['currency']})',
                               ),

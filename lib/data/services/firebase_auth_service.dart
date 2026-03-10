@@ -46,6 +46,22 @@ class FirebaseAuthService {
     await _auth.signOut();
   }
 
+  Future<void> resetPassword(String email) async {
+    final isProd =
+        const bool.fromEnvironment('dart.vm.product'); // true in release builds
+
+    final resetUrl = isProd
+        ? 'https://aemoapp-49jj.onrender.com/reset-password'
+        : 'http://localhost:5000/reset-password';
+    await FirebaseAuth.instance.sendPasswordResetEmail(
+      email: email,
+      actionCodeSettings: ActionCodeSettings(
+        url: resetUrl, // must match your Flutter web route
+        handleCodeInApp: true, // essential for web
+      ),
+    );
+  }
+
   // Error handler
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {

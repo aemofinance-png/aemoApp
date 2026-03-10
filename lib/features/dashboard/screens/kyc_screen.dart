@@ -37,6 +37,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
   IdDocumentType _selectedDocument = IdDocumentType.passport;
   PlatformFile? _idFile;
   PlatformFile? _selfieFile;
+  bool isLoading = false;
 
   final PageController _pageController = PageController();
   int _currentStep = 0;
@@ -129,7 +130,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
   Widget build(BuildContext context) {
     final loanState = ref.watch(loanNotifierProvider);
     return LoadingOverlay(
-      isLoading: loanState.isLoading,
+      isLoading: isLoading,
       child: Scaffold(
         backgroundColor: AppColors.background,
         // appBar: AppBar(
@@ -489,6 +490,9 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               child: ElevatedButton(
                 onPressed: canContinue
                     ? () async {
+                        setState(() {
+                          isLoading = true;
+                        });
                         final user = ref.read(currentUserProvider).value;
                         if (user == null) return;
 
@@ -500,6 +504,9 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                           VerificationStatus.pending,
                         );
                         _submitKyc();
+                        setState(() {
+                          isLoading = false;
+                        });
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

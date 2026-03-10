@@ -37,6 +37,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _resetPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please enter your email to reset password')),
+      );
+      return;
+    }
+
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .sendPasswordResetEmail(email);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Password reset email sent. Please check your inbox.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Failed to send password reset email. Please try again.')),
+      );
+    }
+  }
+
   // Handle login
   Future<void> _handleLogin() async {
     if (!mounted) return;
@@ -101,7 +129,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         children: [
                           Image.asset(
                             'assets/images/aemo-logo.png',
-                          
                           ),
                           const SizedBox(height: 16),
                           const SizedBox(height: 4),
@@ -253,6 +280,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           onTap: () => context.go(AppRoutes.register),
                           child: const Text(
                             'Create one',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Don't remember your password? ",
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => _resetPassword(),
+                          child: const Text(
+                            'Reset it',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14,

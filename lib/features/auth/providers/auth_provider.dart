@@ -114,6 +114,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      await _authService.resetPassword(email);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+      return false;
+    }
+  }
+
   // Login
   Future<bool> login({
     required String email,
@@ -157,8 +174,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(error: null);
   }
 }
-
-
 
 // Auth notifier provider
 final authNotifierProvider =
