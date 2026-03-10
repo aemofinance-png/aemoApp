@@ -47,12 +47,25 @@ final routerProvider = Provider<GoRouter>((ref) {
   final currentUser = ref.watch(currentUserProvider).value;
 
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: Uri.base.path,
+    routerNeglect: false,
     redirect: (context, state) {
-      if (state.uri.path == '/') return AppRoutes.home;
+      final location = state.uri.path;
+      final isPublicRoute = location.startsWith(AppRoutes.login) ||
+          location.startsWith(AppRoutes.register) ||
+          location.startsWith(AppRoutes.home) ||
+          location.startsWith(AppRoutes.calculator) ||
+          location.startsWith(AppRoutes.applicationSubmitted) ||
+          location.startsWith(AppRoutes.resetPassword);
+      print('location: $location');
+
       final isLoggedIn = authState.value != null;
       final isLoading = authState.isLoading;
-      final location = state.uri.path;
+      print(
+          'location: $location | isLoading: $isLoading | isLoggedIn: $isLoggedIn | isPublicRoute: $isPublicRoute');
+      if (isLoading) return null;
+      // if (state.uri.path == '/') return AppRoutes.home;
+
       final isSplash = location == AppRoutes.home;
 
       final mode = state.uri.queryParameters['mode'];
@@ -62,17 +75,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (mode == 'resetPassword' && oobCode != null) {
         return AppRoutes.resetPassword;
       }
-      final isPublicRoute = location == AppRoutes.login ||
-          location == AppRoutes.register ||
-          location == AppRoutes.home ||
-          location == AppRoutes.calculator ||
-          location == AppRoutes.applicationSubmitted ||
-          location == AppRoutes.resetPassword;
 
       final isAuthRoute =
           location == AppRoutes.login || location == AppRoutes.register;
 
-      if (isLoading) return null;
       if (!isLoggedIn && !isPublicRoute) return AppRoutes.home;
       if (isLoggedIn && isAuthRoute) return AppRoutes.dashboard;
 
