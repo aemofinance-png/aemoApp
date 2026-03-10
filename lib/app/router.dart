@@ -51,6 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     routerNeglect: false,
     redirect: (context, state) {
       final location = state.uri.path;
+      if (location == AppRoutes.resetPassword) return null;
       final isPublicRoute = location.startsWith(AppRoutes.login) ||
           location.startsWith(AppRoutes.register) ||
           location.startsWith(AppRoutes.home) ||
@@ -191,7 +192,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.resetPassword,
-        builder: (context, state) => const ResetPasswordScreen(),
+        builder: (context, state) {
+          final oobCode = state.uri.queryParameters['oobCode'];
+          final email = state.uri.queryParameters['email'];
+          return ResetPasswordScreen(oobCode: oobCode, email: email);
+        },
       ),
     ],
   );

@@ -15,7 +15,10 @@ import '../../../app/router.dart';
 import '../../../data/models/user_model.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String? oobCode;
+  final String? email;
+
+  const ResetPasswordScreen({super.key, this.email, this.oobCode});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -37,16 +40,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   Future<void> _checkResetCode() async {
-    final uri = Uri.base;
-    final code = uri.queryParameters['oobCode'];
-    final mode = uri.queryParameters['mode'];
-
-    if (mode == 'resetPassword' && code != null) {
+    if (widget.oobCode != null) {
       try {
-        final email = await FirebaseAuth.instance.verifyPasswordResetCode(code);
+        final email = await FirebaseAuth.instance
+            .verifyPasswordResetCode(widget.oobCode!);
         setState(() {
           _codeValid = true;
-          _oobCode = code;
+          _oobCode = widget.oobCode;
           _email = email;
           _isLoading = false;
         });
