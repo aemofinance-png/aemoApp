@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/loading_overlay.dart';
+import '../providers/auth_provider.dart';
+import '../../../app/router.dart';
+
+import '../../../data/models/user_model.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -80,7 +92,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (!_codeValid) {
       return const Center(child: Text('Invalid or expired reset link.'));
     }
-
+    bool _showPassword = false;
     return Scaffold(
       body: Center(
         child: SizedBox(
@@ -91,22 +103,57 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Reset password for $_email'),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'New password'),
+                // const SizedBox(height: 16),
+                // TextFormField(
+                //   controller: _passwordController,
+                //   obscureText: true,
+                //   decoration: const InputDecoration(labelText: 'New password'),
+                //   validator: (value) {
+                //     if (value == null || value.length < 6) {
+                //       return 'Password must be at least 6 characters';
+                //     }
+                //     return null;
+                //   },
+                // ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _resetPassword,
+                  child: const Text('Reset Password'),
+                ),
+
+                CustomTextField(
+                  label: 'Password',
                   validator: (value) {
                     if (value == null || value.length < 6) {
                       return 'Password must be at least 6 characters';
                     }
                     return null;
                   },
+                  hint: 'Enter your password',
+                  controller: _passwordController,
+                  obscureText: !_showPassword,
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.textSecondary,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showPassword = !_showPassword;
+                      });
+                    },
+                  ),
                 ),
+
                 const SizedBox(height: 24),
-                ElevatedButton(
+
+                // Login button
+                CustomButton(
+                  label: 'Reset Password',
                   onPressed: _resetPassword,
-                  child: const Text('Reset Password'),
                 ),
               ],
             ),

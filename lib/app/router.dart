@@ -57,7 +57,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == AppRoutes.register ||
           location == AppRoutes.home ||
           location == AppRoutes.calculator ||
-          location == AppRoutes.applicationSubmitted;
+          location == AppRoutes.applicationSubmitted ||
+          location == AppRoutes.resetPassword;
 
       final isAuthRoute =
           location == AppRoutes.login || location == AppRoutes.register;
@@ -172,6 +173,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final userId = state.pathParameters['userId']!;
           return KycStatusScreen(userId: userId);
         },
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
     ],
   );
