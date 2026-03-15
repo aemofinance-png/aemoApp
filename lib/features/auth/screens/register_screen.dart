@@ -32,7 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Local state
   bool _showPassword = false;
   bool _showConfirmPassword = false;
-  String _selectedCountry = 'Belize'; // Default to Belize
+  String _selectedCountry = 'BZ'; // Default to Belize
 
   @override
   void dispose() {
@@ -318,7 +318,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           items: AppStrings.supportedCountries.map((country) {
                             return DropdownMenuItem<String>(
-                              value: country['name'],
+                              value: country['code'],
                               child: Text(
                                 '${country['flag']}  ${country['name']} (${country['currency']})',
                               ),

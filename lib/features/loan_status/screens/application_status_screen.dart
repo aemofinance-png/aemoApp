@@ -347,7 +347,8 @@ class _ApplicationStatusScreenState
       case LoanStatus.approved:
         bgColor = AppColors.successLight;
         textColor = AppColors.success;
-        message = 'Your application has been approved!';
+        message =
+            'Your application has been approved!\nClick the button below to see your loan contract';
         icon = Icons.check_circle_outline_rounded;
         break;
       case LoanStatus.rejected:
