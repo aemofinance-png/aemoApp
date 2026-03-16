@@ -636,7 +636,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Upload your ID and latest pay slip (PDF, JPG, PNG)',
+            'Upload your ID and latest pay slip, you can upload multiple documents (PDF, JPG, PNG)',
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,

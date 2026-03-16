@@ -21,7 +21,7 @@ class FirebaseAuthService {
       );
       return result.user;
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     }
   }
 
@@ -71,11 +71,12 @@ class FirebaseAuthService {
       case 'invalid-login-credentials':
         return 'Incorrect email or password.';
       case 'weak-password':
-        return 'Password must be at least 6 characters.';
+        return 'Password too weak (add a number or special character)';
       case 'user-not-found':
         return 'No account found with this email.';
       case 'wrong-password':
         return 'Incorrect password. Please try again.';
+
       case 'too-many-requests':
         return 'Too many attempts. Please try again later.';
       case 'network-request-failed':

@@ -450,7 +450,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
 
             // Title
             const Text(
-              'Upload a selfie',
+              'Upload a selfie holding your ID',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
