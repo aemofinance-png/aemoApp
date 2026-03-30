@@ -54,6 +54,13 @@ class AppStrings {
       'symbol': 'J\$',
       'flag': '🇯🇲',
     },
+    {
+      'name': 'South Africa',
+      'code': 'ZA',
+      'currency': 'ZAR',
+      'symbol': 'R',
+      'flag': '🇿🇦',
+    },
   ];
 
   // Banks per Country
@@ -63,6 +70,12 @@ class AppStrings {
       'Atlantic Bank',
       'Heritage Bank',
       'National Bank of Belize',
+    ],
+    'ZA': [
+      'Standard Bank of South Africa',
+      'Capitec Bank',
+      ' Nedbank',
+      'FNB (First National Bank)',
     ],
     'PA': [
       'Banco General',
