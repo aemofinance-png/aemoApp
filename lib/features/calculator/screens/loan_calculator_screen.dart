@@ -80,7 +80,7 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider).value;
-    final countryCode = currentUser?.countryCode ?? 'BZ';
+    final countryCode = currentUser?.countryCode ?? 'USD';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -315,50 +315,50 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
                   const SizedBox(height: 24),
 
                   // Repayment breakdown table
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Repayment Breakdown',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                  // Container(
+                  //   padding: const EdgeInsets.all(20),
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.white,
+                  //     borderRadius: BorderRadius.circular(12),
+                  //     border: Border.all(color: AppColors.border),
+                  //   ),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       const Text(
+                  //         'Repayment Breakdown',
+                  //         style: TextStyle(
+                  //           fontSize: 15,
+                  //           fontWeight: FontWeight.w600,
+                  //           color: AppColors.textPrimary,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 16),
 
-                        // Table header
-                        _buildTableRow(
-                          'Month',
-                          'Payment',
-                          'Principal',
-                          'Interest',
-                          'Balance',
-                          isHeader: true,
-                        ),
+                  //       // Table header
+                  //       _buildTableRow(
+                  //         'Month',
+                  //         'Payment',
+                  //         'Principal',
+                  //         'Interest',
+                  //         'Balance',
+                  //         isHeader: true,
+                  //       ),
 
-                        const Divider(),
+                  //       const Divider(),
 
-                        // Table rows
-                        ..._buildAmortizationTable(
-                          double.parse(_amountController.text.trim()),
-                          _interestRate,
-                          _selectedDuration,
-                          countryCode,
-                        ),
-                      ],
-                    ),
-                  ),
+                  //       // Table rows
+                  //       ..._buildAmortizationTable(
+                  //         double.parse(_amountController.text.trim()),
+                  //         _interestRate,
+                  //         _selectedDuration,
+                  //         countryCode,
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 50),
 
                   // Apply now button
                   CustomButton(

@@ -12,6 +12,7 @@ import '../../../shared/widgets/loading_overlay.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/loan_provider.dart';
 import '../../../app/router.dart';
+import 'dart:math';
 
 class LoanApplicationScreen extends ConsumerStatefulWidget {
   const LoanApplicationScreen({super.key});
@@ -37,6 +38,10 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     );
   }
 
+  double get _interestRate => AppStrings.loanRates[_selectedDuration] ?? 0.0;
+
+  // Selected duration
+  // int _selectedDuration = AppStrings.loanRates.keys.first;
   // Form keys
   final _step1Key = GlobalKey<FormState>();
   final _step2Key = GlobalKey<FormState>();
@@ -92,6 +97,35 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     super.dispose();
   }
 
+  double? _monthlyPayment;
+  double? _totalPayment;
+  double? _totalInterest;
+  void _calculate() {
+    final amount = double.tryParse(_loanAmountController.text.trim());
+
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid loan amount'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final monthlyRate = _interestRate / 12 / 100;
+    final months = _selectedDuration;
+
+    final monthly = amount *
+        (monthlyRate * pow(1 + monthlyRate, months)) /
+        (pow(1 + monthlyRate, months) - 1);
+
+    setState(() {
+      _monthlyPayment = monthly.toDouble();
+      _totalPayment = monthly * months;
+      _totalInterest = (monthly * months) - amount;
+    });
+  }
   // ── Navigation ──────────────────────────────────────────
 
   void _nextStep() {
@@ -183,6 +217,40 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
   }
 
   // ── Build ────────────────────────────────────────────────
+  Widget _buildResultCard(
+      String label, String value, Color color, Color bgColor) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -486,80 +554,131 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
     return Form(
       key: _step3Key,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStepHeader(
-            'Loan Details',
-            'Tell us about the loan you need',
-          ),
-          const SizedBox(height: 24),
-          CustomTextField(
-            label: 'Loan Amount (${Formatters.getCurrencyCode(countryCode)})',
-            hint: 'Enter loan amount',
-            controller: _loanAmountController,
-            keyboardType: TextInputType.number,
-            prefixIcon: const Icon(Icons.attach_money),
-            onChanged: (_) {
-              setState(() {
-                // Reset duration if it's no longer available
-                final available = _availableRates;
-                if (!available.containsKey(_selectedDuration)) {
-                  _selectedDuration = available.keys.first;
-                }
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Loan amount is required';
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _buildStepHeader(
+          'Loan Details',
+          'Tell us about the loan you need',
+        ),
+        const SizedBox(height: 24),
+        CustomTextField(
+          label: 'Loan Amount (${Formatters.getCurrencyCode(countryCode)})',
+          hint: 'Enter loan amount',
+          controller: _loanAmountController,
+          keyboardType: TextInputType.number,
+          prefixIcon: const Icon(Icons.attach_money),
+          onChanged: (_) {
+            setState(() {
+              _calculate();
+              final available = _availableRates;
+              if (!available.containsKey(_selectedDuration)) {
+                _selectedDuration = available.keys.first;
               }
-              if (double.tryParse(value) == null) {
-                return 'Enter a valid amount';
-              }
-              if (double.parse(value) < 100) {
-                return 'Minimum loan amount is 100';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildDropdown(
-            label: 'Loan Purpose',
-            value: _selectedLoanPurpose,
-            items: AppStrings.loanPurposes,
-            onChanged: (value) => setState(() => _selectedLoanPurpose = value!),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Loan Duration',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
+            });
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Loan amount is required';
+            }
+            if (double.tryParse(value) == null) {
+              return 'Enter a valid amount';
+            }
+            if (double.parse(value) < 100) {
+              return 'Minimum loan amount is 100';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildDropdown(
+          label: 'Loan Purpose',
+          value: _selectedLoanPurpose,
+          items: AppStrings.loanPurposes,
+          onChanged: (value) => setState(() => _selectedLoanPurpose = value!),
+        ),
+        const SizedBox(height: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Loan Duration',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
               ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<int>(
-                value: _selectedDuration,
-                decoration: _dropdownDecoration(),
-                items: _availableRates.keys.map((months) {
-                  return DropdownMenuItem<int>(
-                    value: months,
-                    child: Text(
-                      '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedDuration = value!),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<int>(
+              value: _selectedDuration,
+              decoration: _dropdownDecoration(),
+              items: _availableRates.keys.map((months) {
+                return DropdownMenuItem<int>(
+                  value: months,
+                  child: Text(
+                    '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) => setState(() {
+                _selectedDuration = value!;
+                _calculate();
+              }),
+            ),
+          ],
+        ),
+        if (_monthlyPayment != null) ...[
+          const SizedBox(height: 24),
+
+          // Summary cards
+          Row(
+            children: [
+              _buildResultCard(
+                'Monthly Payment',
+                Formatters.currency(_monthlyPayment!, countryCode),
+                AppColors.primary,
+                AppColors.primaryLight,
+              ),
+              const SizedBox(width: 16),
+              _buildResultCard(
+                'Total Interest',
+                Formatters.currency(_totalInterest!, countryCode),
+                AppColors.warning,
+                AppColors.warningLight,
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.successLight,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Total Repayment',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.success,
+                  ),
+                ),
+                Text(
+                  Formatters.currency(_totalPayment!, countryCode),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.success,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
-      ),
+      ]),
     );
   }
 
@@ -601,7 +720,10 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                     child: Text(bank),
                   );
                 }).toList(),
-                onChanged: (value) => setState(() => _selectedBank = value!),
+                onChanged: (value) => setState(() {
+                  _selectedBank = value!;
+                  _calculate();
+                }),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please select a bank';
