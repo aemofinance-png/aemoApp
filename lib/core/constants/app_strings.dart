@@ -20,6 +20,13 @@ class AppStrings {
       'flag': '🇵🇦',
     },
     {
+      'name': 'Oman',
+      'code': 'OM',
+      'currency': 'OMR',
+      'symbol': 'OMR',
+      'flag': '🇴🇲'
+    },
+    {
       'name': 'Bahamas',
       'code': 'BS',
       'currency': 'BSD',
@@ -70,6 +77,12 @@ class AppStrings {
       'Atlantic Bank',
       'Heritage Bank',
       'National Bank of Belize',
+    ],
+    'OM': [
+      'Bank Muscat',
+      'National Bank of Oman',
+      'Bank Dhofar',
+      'Bank Sohar',
     ],
     'ZA': [
       'Standard Bank of South Africa',

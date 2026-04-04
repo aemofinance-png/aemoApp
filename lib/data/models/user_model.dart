@@ -8,7 +8,7 @@ class UserModel extends Equatable {
   final String email;
   final String phone;
   final String countryCode;
-  // final String countryName;
+  final String countryName;
   final String streetAddress;
   final String city;
   final String state;
@@ -20,7 +20,7 @@ class UserModel extends Equatable {
   final String? selfieUrl;
 
   const UserModel({
-    // required this.countryName,
+    required this.countryName,
     required this.id,
     required this.fullName,
     required this.email,
@@ -50,7 +50,7 @@ class UserModel extends Equatable {
       countryCode: map['countryCode'] ?? '',
       idDocumentUrl: map['idDocumentUrl'] as String?,
       selfieUrl: map['selfieUrl'] as String?,
-      // countryName: map['countryName'] ?? 'Belize',
+      countryName: map['countryName'] as String? ?? 'Unknown',
       role: map['role'] ?? 'user',
       createdAt: DateTime.parse(map['createdAt']),
       verificationStatus: VerificationStatus.values.firstWhere(
@@ -67,6 +67,7 @@ class UserModel extends Equatable {
       'email': email,
       'phone': phone,
       'countryCode': countryCode,
+      'countryName': countryName,
       'streetAddress': streetAddress,
       'city': city,
       'state': state,
@@ -94,14 +95,12 @@ class UserModel extends Equatable {
     String? phone,
     String? countryCode,
     bool? isVerified,
-
-    // String? countryName,
+    String? countryName,
     String? role,
     DateTime? createdAt,
   }) {
     return UserModel(
       verificationStatus: verificationStatus ?? this.verificationStatus,
-
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
@@ -113,7 +112,7 @@ class UserModel extends Equatable {
       countryCode: countryCode ?? this.countryCode,
       idDocumentUrl: idDocumentUrl ?? this.idDocumentUrl,
       selfieUrl: selfieUrl ?? this.selfieUrl,
-      // countryName: countryName ?? this.countryName,
+      countryName: countryName ?? this.countryName,
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -127,7 +126,7 @@ class UserModel extends Equatable {
         phone,
         countryCode,
         streetAddress,
-        // countryName,
+        countryName,
         city,
         state,
         postalCode,

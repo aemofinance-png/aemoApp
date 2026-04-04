@@ -224,7 +224,11 @@ class ProfileScreen extends ConsumerWidget {
                                         user.phone,
                                       ),
                                       _detailRow(
-                                          context, 'Country', user.countryCode),
+                                          context,
+                                          'Country',
+                                          user.countryName.isEmpty
+                                              ? 'Not set'
+                                              : user.countryName),
                                     ],
                                   ),
                                 ),
@@ -275,22 +279,22 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
 
                       // Security section
-                      _buildSection(
-                        context,
-                        title: 'SECURITY & PASSWORD',
-                        items: [
-                          _ProfileItem(
-                            icon: Icons.lock_outline,
-                            label: 'Change Password',
-                            onTap: () {},
-                          ),
-                          _ProfileItem(
-                            icon: Icons.fingerprint,
-                            label: 'Biometric Login',
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
+                      // _buildSection(
+                      //   context,
+                      //   title: 'SECURITY & PASSWORD',
+                      //   items: [
+                      //     _ProfileItem(
+                      //       icon: Icons.lock_outline,
+                      //       label: 'Change Password',
+                      //       onTap: () {},
+                      //     ),
+                      //     _ProfileItem(
+                      //       icon: Icons.fingerprint,
+                      //       label: 'Biometric Login',
+                      //       onTap: () {},
+                      //     ),
+                      //   ],
+                      // ),
 
                       const SizedBox(height: 16),
 
