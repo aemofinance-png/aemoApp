@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/models/user_model.dart';
@@ -103,6 +104,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
           role: 'user',
           createdAt: DateTime.now(),
         ),
+      );
+
+      await EmailService.sendWelcomeEmail(
+        toEmail: email,
+        toName: fullName,
       );
 
       state = state.copyWith(isLoading: false);

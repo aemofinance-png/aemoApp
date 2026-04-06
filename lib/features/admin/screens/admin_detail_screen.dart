@@ -1,3 +1,10 @@
+import 'dart:math';
+
+import 'package:aemo_loan_app/core/constants/app_strings.dart';
+import 'package:aemo_loan_app/core/utils/email_service.dart';
+import 'package:aemo_loan_app/data/models/user_model.dart';
+import 'package:aemo_loan_app/features/admin/screens/admin_user_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -52,6 +59,72 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
         body: Center(
           child: Text('Application not found'),
         ),
+      );
+    }
+    final applicantAsync = ref.watch(userByIdProvider(application!.userId));
+    final applicant = applicantAsync.value;
+
+    Widget _buildActionButtons(
+      BuildContext context,
+      WidgetRef ref,
+      LoanApplicationModel app,
+      UserModel user,
+    ) {
+      return Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: app.status == LoanStatus.pending
+                  ? () async {
+                      await ref
+                          .read(adminNotifierProvider.notifier)
+                          .approveApplication(applicationId: app.id);
+                      print('Sending approval email to: ${user?.email}');
+                      print('User: $user');
+                      await EmailService.sendApprovalEmail(
+                        duration: app.loanDuration,
+                        repayment: Formatters.currency(
+                            _calculateMonthlyRepayment(app), user.countryCode),
+                        toEmail: applicant?.email ?? '',
+                        toName: applicant!.fullName,
+                        loanAmount: Formatters.currency(
+                            app.loanAmount, user.countryCode),
+                        referenceNo: app.id,
+                        // date: app.createdAt);
+                      );
+
+                      if (context.mounted) {
+                        context.go(AppRoutes.admin);
+                      }
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.success,
+              ),
+              child: const Text('Approve'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: app.status == LoanStatus.pending
+                  ? () async {
+                      await ref
+                          .read(adminNotifierProvider.notifier)
+                          .rejectApplication(applicationId: app.id);
+
+                      if (context.mounted) {
+                        context.go(AppRoutes.admin);
+                      }
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+              ),
+              child: const Text('Reject'),
+            ),
+          ),
+        ],
       );
     }
 
@@ -175,7 +248,7 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
 
                   const SizedBox(height: 32),
 // Action buttons (only show if pending)
-                  _buildActionButtons(context, ref, application),
+                  _buildActionButtons(context, ref, application, applicant!),
 
                   const SizedBox(height: 32),
 
@@ -462,52 +535,14 @@ Widget _buildSection({
   );
 }
 
-Widget _buildActionButtons(
-  BuildContext context,
-  WidgetRef ref,
-  LoanApplicationModel app,
-) {
-  return Row(
-    children: [
-      Expanded(
-        child: ElevatedButton(
-          onPressed: app.status == LoanStatus.pending
-              ? () async {
-                  await ref
-                      .read(adminNotifierProvider.notifier)
-                      .approveApplication(applicationId: app.id);
+double _calculateMonthlyRepayment(LoanApplicationModel application) {
+  final double principal = application.loanAmount;
+  final double annualRate = AppStrings.loanRates[application.loanDuration] ?? 0;
+  final int months = application.loanDuration;
 
-                  if (context.mounted) {
-                    context.go(AppRoutes.admin);
-                  }
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.success,
-          ),
-          child: const Text('Approve'),
-        ),
-      ),
-      const SizedBox(width: 16),
-      Expanded(
-        child: ElevatedButton(
-          onPressed: app.status == LoanStatus.pending
-              ? () async {
-                  await ref
-                      .read(adminNotifierProvider.notifier)
-                      .rejectApplication(applicationId: app.id);
+  if (annualRate == 0) return principal / months;
 
-                  if (context.mounted) {
-                    context.go(AppRoutes.admin);
-                  }
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.error,
-          ),
-          child: const Text('Reject'),
-        ),
-      ),
-    ],
-  );
+  final double r = annualRate / 12 / 100;
+  final double factor = pow(1 + r, months).toDouble();
+  return principal * (r * factor) / (factor - 1);
 }

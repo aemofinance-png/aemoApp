@@ -85,6 +85,7 @@ class AppStrings {
       'Bank Sohar',
     ],
     'ZA': [
+      "First Treasury Bank",
       'Standard Bank of South Africa',
       'Capitec Bank',
       ' Nedbank',
@@ -161,8 +162,8 @@ class AppStrings {
     72: 15.0,
     84: 14.0,
     96: 14.0,
-    108: 12.0,
-    120: 11.0,
+    108: 10.0,
+    120: 8.0,
   };
 
   static const Map<int, double> loanMinimums = {
