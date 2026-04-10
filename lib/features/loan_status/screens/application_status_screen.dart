@@ -33,6 +33,7 @@ class ApplicationStatusScreen extends ConsumerStatefulWidget {
 
 class _ApplicationStatusScreenState
     extends ConsumerState<ApplicationStatusScreen> {
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -216,10 +217,23 @@ class _ApplicationStatusScreenState
                 const SizedBox(height: 22),
                 if (application.status == LoanStatus.approved)
                   ElevatedButton.icon(
-                    onPressed: () =>
-                        _generateAgreement(context, application, currentUser!),
-                    icon: const Icon(Icons.picture_as_pdf),
-                    label: const Text('View Loan Agreement'),
+                    onPressed: () => _generateAgreement(
+                      context,
+                      application,
+                      currentUser!,
+                    ),
+                    icon: _isLoading ? null : const Icon(Icons.picture_as_pdf),
+                    label: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: AppColors.white,
+                              strokeWidth:
+                                  2, // make the stroke thinner to match the smaller size
+                            ),
+                          )
+                        : const Text('View Loan Agreement'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.white,
@@ -255,7 +269,11 @@ class _ApplicationStatusScreenState
     BuildContext context,
     LoanApplicationModel application,
     UserModel currentUser,
+    // bool isLoading,
   ) async {
+    setState(() {
+      _isLoading = true;
+    });
     // Calculate dates
     final firstPayment = application.reviewedAt!.add(const Duration(days: 60));
     final firstPaymentDate =
@@ -294,7 +312,9 @@ class _ApplicationStatusScreenState
         'referenceNo': application.id,
       }),
     );
-
+    setState(() {
+      _isLoading = false;
+    });
     // Open PDF in browser
     if (response.statusCode == 200) {
       final blob = web.Blob([response.bodyBytes.toJS].toJS,

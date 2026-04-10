@@ -417,7 +417,9 @@ class _KycScreenState extends ConsumerState<KycScreen> {
         idDocumentUrl: idUrl,
         selfieUrl: selfieUrl,
       );
-
+      setState(() {
+        isLoading = false;
+      });
       _nextStep(); // go to step 3 (success screen)
     }
 
@@ -504,9 +506,6 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                           VerificationStatus.pending,
                         );
                         _submitKyc();
-                        setState(() {
-                          isLoading = false;
-                        });
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

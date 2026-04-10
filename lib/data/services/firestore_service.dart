@@ -11,6 +11,34 @@ class FirestoreService {
   CollectionReference get _applications =>
       _firestore.collection('loan_applications');
 
+  Future<void> updateBankVerificationStatus({
+    required String userId,
+    required String bankAccountId,
+    required BankVerificationStatus status,
+  }) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    final user = UserModel.fromMap(userDoc.data()!);
+
+    final updatedAccounts = user.bankAccounts.map((account) {
+      if (account.id == bankAccountId) {
+        return BankAccount(
+          id: account.id,
+          bankName: account.bankName,
+          accountNumber: account.accountNumber,
+          accountName: account.accountName,
+          verificationStatus: status,
+        );
+      }
+      return account;
+    }).toList();
+
+    final updatedUser = user.copyWith(bankAccounts: updatedAccounts);
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .update(updatedUser.toMap());
+  }
+
   // Save user
   Future<void> saveUser(UserModel user) async {
     try {
@@ -25,6 +53,10 @@ class FirestoreService {
     await _firestore.collection('users').doc(userId).update({
       'verificationStatus': status.name,
     });
+  }
+
+  Future<void> updateUser(UserModel user) async {
+    await _firestore.collection('users').doc(user.id).update(user.toMap());
   }
 
   Future<void> deleteApplication(String applicationId) async {

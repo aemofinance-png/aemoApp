@@ -112,7 +112,19 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
                       await ref
                           .read(adminNotifierProvider.notifier)
                           .rejectApplication(applicationId: app.id);
-
+                      print('Sending rejection email to: ${user?.email}');
+                      print('User: $user');
+                      await EmailService.sendRejectionEmail(
+                        duration: app.loanDuration,
+                        repayment: Formatters.currency(
+                            _calculateMonthlyRepayment(app), user.countryCode),
+                        toEmail: applicant?.email ?? '',
+                        toName: applicant!.fullName,
+                        loanAmount: Formatters.currency(
+                            app.loanAmount, user.countryCode),
+                        referenceNo: app.id,
+                        // date: app.createdAt);
+                      );
                       if (context.mounted) {
                         context.go(AppRoutes.admin);
                       }

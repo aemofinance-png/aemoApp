@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -400,6 +401,11 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
                         userId: user.id,
                         status: VerificationStatus.unverified,
                       );
+
+                  await EmailService.sendKycRejectionEmail(
+                    toEmail: user.email,
+                    toName: user.fullName,
+                  );
                   if (context.mounted) context.go(AppRoutes.admin);
                 },
                 icon: const Icon(Icons.close, size: 18, color: AppColors.error),
@@ -432,6 +438,10 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
                               userId: user.id,
                               status: VerificationStatus.verified,
                             );
+                        await EmailService.sendKycApprovalEmail(
+                          toEmail: user.email,
+                          toName: user.fullName,
+                        );
                         debugPrint("$VerificationStatus");
                         if (context.mounted) context.go(AppRoutes.admin);
                       }

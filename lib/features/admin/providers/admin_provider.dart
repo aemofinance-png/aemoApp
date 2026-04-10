@@ -56,6 +56,18 @@ class AdminNotifier extends StateNotifier<AdminState> {
     }
   }
 
+  Future<void> updateBankVerificationStatus({
+    required String userId,
+    required String bankAccountId,
+    required BankVerificationStatus status,
+  }) async {
+    await _firestoreService.updateBankVerificationStatus(
+      userId: userId,
+      bankAccountId: bankAccountId,
+      status: status,
+    );
+  }
+
   Future<void> updateKycStatus({
     required String userId,
     required VerificationStatus status,

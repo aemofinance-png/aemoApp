@@ -1,3 +1,5 @@
+import 'package:aemo_loan_app/features/admin/providers/admin_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -245,6 +247,97 @@ class AdminUserProfile extends ConsumerWidget {
                           ),
 
                           const SizedBox(height: 24),
+                          _buildSection(
+                            context,
+                            title: 'BANK ACCOUNTS',
+                            items: [
+                              _ProfileItem(
+                                icon: Icons.account_balance_outlined,
+                                label: user.bankAccounts.isEmpty
+                                    ? 'No Bank Accounts Added'
+                                    : '${user.bankAccounts.length} Account(s) Added',
+                                onTap: () {
+                                  // Navigate to bank account management screen
+                                },
+                              ),
+                            ],
+                          ),
+                          if (user.bankAccounts.isNotEmpty)
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Column(
+                                children: user.bankAccounts
+                                    .map((account) => ListTile(
+                                          onTap: () =>
+                                              _showBankVerificationSheet(
+                                                  context, account, user, ref),
+                                          leading: Container(
+                                            width: 36,
+                                            height: 36,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryLight,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: const Icon(
+                                                Icons.account_balance_outlined,
+                                                color: AppColors.primary,
+                                                size: 18),
+                                          ),
+                                          title: Text(account.bankName,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14)),
+                                          subtitle: Text(account.accountNumber,
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color:
+                                                      AppColors.textSecondary)),
+                                          trailing: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: account
+                                                          .verificationStatus ==
+                                                      BankVerificationStatus
+                                                          .verified
+                                                  ? AppColors.successLight
+                                                  : account.verificationStatus ==
+                                                          BankVerificationStatus
+                                                              .pending
+                                                      ? AppColors.pendingLight
+                                                      : AppColors.errorLight,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              account.verificationStatus.name
+                                                  .toUpperCase(),
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: account
+                                                            .verificationStatus ==
+                                                        BankVerificationStatus
+                                                            .verified
+                                                    ? AppColors.success
+                                                    : account.verificationStatus ==
+                                                            BankVerificationStatus
+                                                                .pending
+                                                        ? AppColors.pending
+                                                        : AppColors.error,
+                                              ),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
 
                           // Version
                           Text(
@@ -423,6 +516,66 @@ Widget _detailRow(
         ),
       ],
     ),
+  );
+}
+
+void _showBankVerificationSheet(
+    BuildContext context, BankAccount account, UserModel user, WidgetRef ref) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Bank Account Verification',
+                style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            Text('Bank Name: ${account.bankName}'),
+            Text('Account Number: ${account.accountNumber}'),
+            Text('Account Name: ${account.accountName}'),
+            Text('Verification Status: ${account.verificationStatus.name}'),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed:
+                  account.verificationStatus == BankVerificationStatus.verified
+                      ? null
+                      : () async {
+                          await ref
+                              .read(adminNotifierProvider.notifier)
+                              .updateBankVerificationStatus(
+                                userId: user.id,
+                                bankAccountId: account.id,
+                                status: BankVerificationStatus.verified,
+                              );
+                          ref.invalidate(userByIdProvider(user.id));
+                          if (context.mounted) Navigator.pop(context);
+                        },
+              child: const Text('Verify Account'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: account.verificationStatus ==
+                      BankVerificationStatus.unverified
+                  ? null
+                  : () async {
+                      await ref
+                          .read(adminNotifierProvider.notifier)
+                          .updateBankVerificationStatus(
+                            userId: user.id,
+                            bankAccountId: account.id,
+                            status: BankVerificationStatus.unverified,
+                          );
+                      ref.invalidate(userByIdProvider(user.id));
+                      if (context.mounted) Navigator.pop(context);
+                    },
+              child: const Text('Unverify Account'),
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 

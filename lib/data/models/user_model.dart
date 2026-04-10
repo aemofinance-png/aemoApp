@@ -1,5 +1,46 @@
 import 'package:equatable/equatable.dart';
 
+enum BankVerificationStatus { unverified, pending, verified }
+
+class BankAccount {
+  final String id;
+  final String bankName;
+  final String accountNumber;
+  final String accountName;
+  final BankVerificationStatus verificationStatus;
+
+  const BankAccount({
+    required this.id,
+    required this.bankName,
+    required this.accountNumber,
+    required this.accountName,
+    this.verificationStatus = BankVerificationStatus.unverified,
+  });
+
+  factory BankAccount.fromMap(Map<String, dynamic> map) {
+    return BankAccount(
+      id: map['id'] ?? '',
+      bankName: map['bankName'] ?? '',
+      accountNumber: map['accountNumber'] ?? '',
+      accountName: map['accountName'] ?? '',
+      verificationStatus: BankVerificationStatus.values.firstWhere(
+        (e) => e.name == map['verificationStatus'],
+        orElse: () => BankVerificationStatus.unverified,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'bankName': bankName,
+      'accountNumber': accountNumber,
+      'accountName': accountName,
+      'verificationStatus': verificationStatus.name,
+    };
+  }
+}
+
 enum VerificationStatus { unverified, pending, verified }
 
 class UserModel extends Equatable {
@@ -18,6 +59,7 @@ class UserModel extends Equatable {
   final VerificationStatus verificationStatus;
   final String? idDocumentUrl;
   final String? selfieUrl;
+  final List<BankAccount> bankAccounts;
 
   const UserModel({
     required this.countryName,
@@ -35,6 +77,7 @@ class UserModel extends Equatable {
     this.verificationStatus = VerificationStatus.unverified,
     this.idDocumentUrl,
     this.selfieUrl,
+    this.bankAccounts = const [],
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -57,6 +100,9 @@ class UserModel extends Equatable {
         (e) => e.name == map['verificationStatus'],
         orElse: () => VerificationStatus.unverified,
       ),
+      bankAccounts: (map['bankAccounts'] as List<dynamic>? ?? [])
+          .map((e) => BankAccount.fromMap(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -77,12 +123,13 @@ class UserModel extends Equatable {
       'createdAt': createdAt.toIso8601String(),
       'idDocumentUrl': idDocumentUrl, // add this
       'selfieUrl': selfieUrl,
+      'bankAccounts': bankAccounts.map((e) => e.toMap()).toList(),
     };
   }
 
   UserModel copyWith({
     VerificationStatus? verificationStatus,
-// and in the return:
+    List<BankAccount>? bankAccounts,
     String? idDocumentUrl,
     String? selfieUrl,
     String? id,
@@ -100,6 +147,7 @@ class UserModel extends Equatable {
     DateTime? createdAt,
   }) {
     return UserModel(
+      bankAccounts: bankAccounts ?? this.bankAccounts,
       verificationStatus: verificationStatus ?? this.verificationStatus,
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
@@ -120,6 +168,7 @@ class UserModel extends Equatable {
 
   @override
   List<Object?> get props => [
+        bankAccounts,
         id,
         fullName,
         email,

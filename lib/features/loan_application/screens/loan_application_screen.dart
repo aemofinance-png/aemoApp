@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/data/models/user_model.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -180,6 +181,25 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
         ),
       );
       return;
+    }
+    final currentUser = ref.read(currentUserProvider).value;
+    if (currentUser != null) {
+      final alreadySaved = currentUser.bankAccounts.any(
+        (a) => a.accountNumber == _accountNumberController.text.trim(),
+      );
+
+      if (!alreadySaved) {
+        final newAccount = BankAccount(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          bankName: _selectedBank,
+          accountNumber: _accountNumberController.text.trim(),
+          accountName: currentUser.fullName,
+        );
+        final updatedUser = currentUser.copyWith(
+          bankAccounts: [...currentUser.bankAccounts, newAccount],
+        );
+        await ref.read(firestoreServiceProvider).updateUser(updatedUser);
+      }
     }
 
     final application =
@@ -688,6 +708,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     final currentUser = ref.read(currentUserProvider).value;
     final countryCode = currentUser?.countryCode ?? 'BZ';
     final banks = AppStrings.banksByCountry[countryCode] ?? [];
+    final savedAccounts = currentUser?.bankAccounts ?? [];
 
     return Form(
       key: _step4Key,
@@ -696,9 +717,131 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
         children: [
           _buildStepHeader(
             'Bank & Documents',
-            'Enter your bank details and upload documents',
+            'Select your bank account and upload documents',
           ),
           const SizedBox(height: 24),
+
+          // ── Saved accounts ───────────────────────────────
+          if (savedAccounts.isNotEmpty) ...[
+            const Text(
+              'Your Bank Accounts',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...savedAccounts.map((account) {
+              final isSelected = _selectedBank == account.bankName &&
+                  _accountNumberController.text == account.accountNumber;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedBank = account.bankName;
+                    _accountNumberController.text = account.accountNumber;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected ? AppColors.primaryLight : AppColors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.border,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.account_balance_outlined,
+                            color: AppColors.primary, size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(account.bankName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: AppColors.textPrimary,
+                                )),
+                            Text(account.accountNumber,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                )),
+                          ],
+                        ),
+                      ),
+                      // Verification badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: account.verificationStatus ==
+                                  BankVerificationStatus.verified
+                              ? AppColors.successLight
+                              : account.verificationStatus ==
+                                      BankVerificationStatus.pending
+                                  ? AppColors.pendingLight
+                                  : AppColors.errorLight,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          account.verificationStatus.name.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: account.verificationStatus ==
+                                    BankVerificationStatus.verified
+                                ? AppColors.success
+                                : account.verificationStatus ==
+                                        BankVerificationStatus.pending
+                                    ? AppColors.pending
+                                    : AppColors.error,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 8),
+            const Divider(),
+            const SizedBox(height: 8),
+            const Text(
+              'Or enter manually',
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // ── Manual bank entry ────────────────────────────
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -714,15 +857,15 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               DropdownButtonFormField<String>(
                 value: _selectedBank.isEmpty ? null : _selectedBank,
                 decoration: _dropdownDecoration(),
-                items: banks.map((bank) {
-                  return DropdownMenuItem<String>(
-                    value: bank,
-                    child: Text(bank),
-                  );
-                }).toList(),
+                items: banks
+                    .map((bank) => DropdownMenuItem<String>(
+                          value: bank,
+                          child: Text(bank),
+                        ))
+                    .toList(),
                 onChanged: (value) => setState(() {
                   _selectedBank = value!;
-                  _calculate();
+                  _accountNumberController.clear();
                 }),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -733,7 +876,9 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               ),
             ],
           ),
+
           const SizedBox(height: 16),
+
           CustomTextField(
             label: 'Account Number',
             hint: 'Enter your account number',
@@ -747,7 +892,10 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               return null;
             },
           ),
+
           const SizedBox(height: 24),
+
+          // ── Documents ────────────────────────────────────
           const Text(
             'Supporting Documents',
             style: TextStyle(
@@ -758,7 +906,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Upload your ID and latest pay slip, you can upload multiple documents (PDF, JPG, PNG)',
+            'Upload your ID and latest pay slip (PDF, JPG, PNG)',
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
@@ -766,7 +914,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Uploaded files
           ..._documents.asMap().entries.map((entry) {
             final index = entry.key;
             final file = entry.value;
@@ -807,7 +954,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
           const SizedBox(height: 8),
 
-          // Upload button
           OutlinedButton.icon(
             onPressed: _pickDocument,
             icon: const Icon(Icons.upload_outlined),
@@ -825,7 +971,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
       ),
     );
   }
-
   // ── Helpers ──────────────────────────────────────────────
 
   Widget _buildStepHeader(String title, String subtitle) {
