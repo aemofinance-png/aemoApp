@@ -342,6 +342,115 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      SizedBox(height: 30),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 14),
+                              child: Text(
+                                'BANK ACCOUNTS',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textSecondary,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            const Divider(height: 1),
+                            ExpansionTile(
+                              shape: Border.all(
+                                  color: Colors
+                                      .transparent), // removes ExpansionTile's own border
+                              collapsedShape:
+                                  Border.all(color: Colors.transparent),
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.person_outline,
+                                    color: AppColors.primary, size: 18),
+                              ),
+                              title: Text('Bank Accounts',
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
+                                  child: Column(
+                                    children: [
+                                      _detailRow(
+                                          context, 'Full Name', user.fullName),
+                                      _detailRow(
+                                        context,
+                                        'Phone',
+                                        user.phone,
+                                      ),
+                                      _detailRow(
+                                          context,
+                                          'Country',
+                                          user.countryName.isEmpty
+                                              ? 'Not set'
+                                              : user.countryName),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 1),
+                            ExpansionTile(
+                              shape: Border.all(
+                                  color: Colors
+                                      .transparent), // removes ExpansionTile's own border
+                              collapsedShape:
+                                  Border.all(color: Colors.transparent),
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.mail_outline,
+                                    color: AppColors.primary, size: 18),
+                              ),
+                              title: Text('Contact Information',
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
+                                  child: Column(
+                                    children: [
+                                      _detailRow(context, 'Email', user.email),
+                                      _detailRow(context, 'Street',
+                                          user.streetAddress),
+                                      _detailRow(context, 'City', user.city),
+                                      _detailRow(context, 'State', user.state),
+                                      _detailRow(context, 'Postal Code',
+                                          user.postalCode),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
 
                       const SizedBox(height: 24),
 

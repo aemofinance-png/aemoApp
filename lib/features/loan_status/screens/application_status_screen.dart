@@ -281,7 +281,7 @@ class _ApplicationStatusScreenState
     // Call API
     final response = await http.post(
       Uri.parse(
-          'https://loanagreementscript-production.up.railway.app/generate-agreement'),
+          'https://loan-agreement-script.onrender.com/generate-agreement'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'clientName': currentUser.fullName,
@@ -303,6 +303,8 @@ class _ApplicationStatusScreenState
       web.window.open(url, '_blank', '');
       web.URL.revokeObjectURL(url);
     } else {
+      print(
+          'Failed to generate agreement: ${response.statusCode} - ${response.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to generate agreement')),
       );

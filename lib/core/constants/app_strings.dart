@@ -11,6 +11,7 @@ class AppStrings {
       'currency': 'BZD',
       'symbol': 'BZ\$',
       'flag': '🇧🇿',
+      'area': '+501',
     },
     {
       'name': 'Panama',
@@ -18,13 +19,15 @@ class AppStrings {
       'currency': 'USD',
       'symbol': '\$',
       'flag': '🇵🇦',
+      'area': '+507',
     },
     {
       'name': 'Oman',
       'code': 'OM',
       'currency': 'OMR',
       'symbol': 'OMR',
-      'flag': '🇴🇲'
+      'flag': '🇴🇲',
+      'area': '+968',
     },
     {
       'name': 'Bahamas',
@@ -32,6 +35,7 @@ class AppStrings {
       'currency': 'BSD',
       'symbol': 'B\$',
       'flag': '🇧🇸',
+      'area': '+1-242',
     },
     {
       'name': 'Barbados',
@@ -39,6 +43,7 @@ class AppStrings {
       'currency': 'BBD',
       'symbol': 'Bds\$',
       'flag': '🇧🇧',
+      'area': '+1-246',
     },
     {
       'name': 'Trinidad & Tobago',
@@ -46,6 +51,7 @@ class AppStrings {
       'currency': 'TTD',
       'symbol': 'TT\$',
       'flag': '🇹🇹',
+      'area': '+1-868',
     },
     {
       'name': 'Guyana',
@@ -53,6 +59,7 @@ class AppStrings {
       'currency': 'GYD',
       'symbol': 'G\$',
       'flag': '🇬🇾',
+      'area': '+592',
     },
     {
       'name': 'Jamaica',
@@ -60,6 +67,7 @@ class AppStrings {
       'currency': 'JMD',
       'symbol': 'J\$',
       'flag': '🇯🇲',
+      'area': '+1-876',
     },
     {
       'name': 'South Africa',
@@ -67,6 +75,7 @@ class AppStrings {
       'currency': 'ZAR',
       'symbol': 'R',
       'flag': '🇿🇦',
+      'area': '+27',
     },
   ];
 
