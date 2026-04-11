@@ -66,7 +66,15 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
     return LoadingOverlay(
       isLoading: loanState.isLoading,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          onPressed: () => context.go(AppRoutes.apply),
+          backgroundColor: AppColors.primaryDark,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+        backgroundColor: AppColors.backgroundDark,
         body: Column(
           children: [
             // Navbar
@@ -85,69 +93,93 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                         // Welcome
                         Text(
                           'Welcome back, ${currentUser?.fullName.split(' ').first ?? ''}!',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Here is a summary of your loan applications',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
                         ),
 
                         const SizedBox(height: 32),
-
-                        // Stats row
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isMobile = constraints.maxWidth < 600;
-                            return GridView.count(
-                              crossAxisSpacing:
-                                  16, // horizontal space between items
-                              mainAxisSpacing: 16,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: isMobile ? 2 : 4,
-                              children: [
-                                _buildStatCard('Total', total.toString(),
-                                    AppColors.primary, AppColors.primaryLight),
-                                _buildStatCard('Pending', pending.toString(),
-                                    AppColors.pending, AppColors.pendingLight),
-                                _buildStatCard('Approved', approved.toString(),
-                                    AppColors.success, AppColors.successLight),
-                                _buildStatCard('Rejected', rejected.toString(),
-                                    AppColors.error, AppColors.errorLight),
-                              ],
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 50),
-
+                        _buildStatCard('TOTAL APPLICATIONS', total.toString(),
+                            AppColors.white, AppColors.primaryDark),
+                        SizedBox(height: 16),
                         Row(
                           children: [
-                            CustomButton(
-                              label: 'Calculator',
-                              onPressed: () {
-                                print('Calculator tapped');
-                                context.push(AppRoutes.calculator);
-                              },
-                              isOutlined: true,
-                              width: 130,
+                            Expanded(
+                              child: _buildStatCard(
+                                  'APPROVED',
+                                  approved.toString(),
+                                  AppColors.primaryDark,
+                                  AppColors.white),
                             ),
-                            const SizedBox(width: 12),
-                            CustomButton(
-                              label: 'Apply ',
-                              onPressed: () => context.go(AppRoutes.apply),
-                              width: 120,
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: _buildStatCard(
+                                  'PENDING',
+                                  pending.toString(),
+                                  AppColors.primaryDark,
+                                  AppColors.white),
                             ),
                           ],
                         ),
+
+                        SizedBox(height: 16),
+                        // Stats row
+                        // LayoutBuilder(
+                        //   builder: (context, constraints) {
+                        //     final isMobile = constraints.maxWidth < 600;
+                        //     return GridView.count(
+                        //       crossAxisSpacing:
+                        //           16, // horizontal space between items
+                        //       mainAxisSpacing: 16,
+                        //       shrinkWrap: true,
+                        //       physics: const NeverScrollableScrollPhysics(),
+                        //       crossAxisCount: isMobile ? 2 : 1,
+                        //       children: [
+                        //         _buildStatCard('Approved', approved.toString(),
+                        //             AppColors.primaryDark, AppColors.white),
+                        //         _buildStatCard('Pending', pending.toString(),
+                        //             AppColors.primaryDark, AppColors.white),
+
+                        //         // _buildStatCard('Rejected', rejected.toString(),
+                        //         //     AppColors.error, AppColors.errorLight),
+                        //       ],
+                        //     );
+                        //   },
+                        // ),
+
+                        // const SizedBox(height: 50),
+
+                        // Row(
+                        //   children: [
+                        //     CustomButton(
+                        //       label: 'Calculator',
+                        //       onPressed: () {
+                        //         print('Calculator tapped');
+                        //         context.push(AppRoutes.calculator);
+                        //       },
+                        //       isOutlined: true,
+                        //       width: 130,
+                        //     ),
+                        //     const SizedBox(width: 12),
+                        //     // CustomButton(
+                        //     //   label: 'Apply ',
+                        //     //   onPressed: () => context.go(AppRoutes.apply),
+                        //     //   width: 120,
+                        //     // ),
+                        //   ],
+                        // ),
                         const SizedBox(height: 30),
                         // filtered.isEmpty
                         //     ? _buildEmptyState()
@@ -220,15 +252,17 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                 child: Image.asset('assets/images/aemo-logo.png'),
               ),
               const SizedBox(width: 10),
+              Text(userName,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      )),
             ],
           ),
 
           // User info + logout
           Row(
             children: [
-              // Add this temporarily to user_dashboard.dart
-// inside the _buildNavbar method, next to the logout button
-
               GestureDetector(
                 onTap: () => context.push(AppRoutes.profile),
                 child: CircleAvatar(
@@ -272,34 +306,38 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
   // Stat card
   Widget _buildStatCard(
       String label, String value, Color color, Color bgColor) {
-    return Container(
-      width: 80,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: color,
+    return Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: color,
-              fontWeight: FontWeight.w500,
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 45,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+          ],
+        ),
       ),
     );
   }
@@ -311,7 +349,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
       onTap: () => context.go('${AppRoutes.status}/${application.id}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
@@ -319,18 +357,13 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
         ),
         child: Row(
           children: [
-            // Icon
+            // Left accent border
             Container(
-              width: 44,
-              height: 44,
+              width: 4,
+              height: 60,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.description_outlined,
                 color: AppColors.primary,
-                size: 22,
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
 
@@ -341,23 +374,37 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Purpose + status badge on same line
+                  Row(
+                    children: [
+                      Text(
+                        application.loanPurpose,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      StatusBadge(status: application.status),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // Large amount
                   Text(
-                    application.loanPurpose,
+                    Formatters.currency(application.loanAmount, countryCode),
                     style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryDark,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${Formatters.currency(application.loanAmount, countryCode)} • ${Formatters.duration(application.loanDuration)}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+
+                  const SizedBox(height: 2),
+
+                  // Date
                   Text(
                     'Applied ${Formatters.date(application.createdAt)}',
                     style: const TextStyle(
@@ -369,16 +416,19 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
               ),
             ),
 
-            // Status badge + chevron
-            Row(
-              children: [
-                StatusBadge(status: application.status),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                ),
-              ],
+            // Eye icon button
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.remove_red_eye_outlined,
+                color: AppColors.primaryDark,
+                size: 20,
+              ),
             ),
           ],
         ),
@@ -407,7 +457,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
+          color: isSelected ? AppColors.primaryDark : Color(0xFFa7c8ff),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
@@ -417,8 +467,8 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
           label,
           style: TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? AppColors.white : AppColors.textSecondary,
+            fontWeight: FontWeight.w700,
+            color: isSelected ? AppColors.white : AppColors.primaryDark,
           ),
         ),
       ),

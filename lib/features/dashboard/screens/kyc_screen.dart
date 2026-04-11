@@ -341,7 +341,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               child: ElevatedButton(
                 onPressed: () => context.go(AppRoutes.dashboard),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryDark,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -509,7 +509,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryDark,
                   disabledBackgroundColor: AppColors.primaryLight,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -625,7 +625,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryDark,
                   disabledBackgroundColor: AppColors.primaryLight,
                   elevation: 0,
                   shape: RoundedRectangleBorder(

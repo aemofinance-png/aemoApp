@@ -35,17 +35,14 @@ class _ApplicationSubmittedScreenState
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
-
     _scaleAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.elasticOut,
     );
-
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeIn,
     );
-
     _animationController.forward();
   }
 
@@ -60,9 +57,7 @@ class _ApplicationSubmittedScreenState
     final double annualRate =
         AppStrings.loanRates[widget.application.loanDuration] ?? 0;
     final int months = widget.application.loanDuration;
-
     if (annualRate == 0) return principal / months;
-
     final double r = annualRate / 12 / 100;
     final double factor = pow(1 + r, months).toDouble();
     return principal * (r * factor) / (factor - 1);
@@ -77,223 +72,299 @@ class _ApplicationSubmittedScreenState
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
-              child: Column(
-                children: [
-                  const SizedBox(height: 32),
-
-                  // Animated success icon
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: AppColors.successLight,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check_rounded,
-                        color: AppColors.success,
-                        size: 56,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Heading
-                  FadeTransition(
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => context.go(AppRoutes.dashboard),
+        ),
+        title: const Text(
+          'Loan Application',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          // Scrollable content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: FadeTransition(
                     opacity: _fadeAnimation,
                     child: Column(
                       children: [
+                        const SizedBox(height: 32),
+
+                        // Success icon
+                        ScaleTransition(
+                          scale: _scaleAnimation,
+                          child: Container(
+                            width: 88,
+                            height: 88,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryDark,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              color: Colors.white,
+                              size: 44,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        // Title
                         const Text(
                           'Application Submitted!',
                           style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryDark,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'We\'ve received your loan application and will review it shortly.',
+
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          "Your request is being processed. We'll notify you via email once we're done.",
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 15,
                             color: AppColors.textSecondary,
                             height: 1.5,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
-                  ),
 
-                  const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                  // Loan summary card
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                        // Summary card
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 20,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
                             children: [
-                              Icon(Icons.description_outlined,
-                                  size: 18, color: AppColors.primary),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Loan Summary',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                              // Monthly repayment highlight
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(24, 28, 24, 20),
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'MONTHLY REPAYMENT',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textSecondary,
+                                        letterSpacing: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      Formatters.currency(
+                                          monthlyRepayment, countryCode),
+                                      style: const TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // const Divider(height: 1),
+
+                              // Details grid
+                              Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildDetailCell(
+                                            'LOAN AMOUNT',
+                                            Formatters.currency(
+                                                widget.application.loanAmount,
+                                                countryCode),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: _buildDetailCell(
+                                            'DURATION',
+                                            Formatters.duration(widget
+                                                .application.loanDuration),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildDetailCell(
+                                            'INTEREST RATE',
+                                            '$annualRate% p.a.',
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: _buildDetailCell(
+                                            'PURPOSE',
+                                            widget.application.loanPurpose,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          const Divider(height: 1),
-                          const SizedBox(height: 16),
-
-                          // Highlight: monthly repayment
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.06),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Monthly Repayment',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  Formatters.currency(
-                                      monthlyRepayment, countryCode),
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                                Text(
-                                  'per month',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          _buildRow(
-                            'Loan Amount',
-                            Formatters.currency(
-                                widget.application.loanAmount, countryCode),
-                          ),
-                          _buildRow(
-                            'Duration',
-                            Formatters.duration(
-                                widget.application.loanDuration),
-                          ),
-                          _buildRow(
-                            'Interest Rate',
-                            '$annualRate% p.a.',
-                          ),
-                          _buildRow(
-                            'Purpose',
-                            widget.application.loanPurpose,
-                            isLast: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Back to dashboard button
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: ElevatedButton.icon(
-                      onPressed: () => context.go(AppRoutes.dashboard),
-                      icon: const Icon(Icons.dashboard_outlined),
-                      label: const Text('Back to Dashboard'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
+
+                        const SizedBox(height: 40),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildRow(String label, String value, {bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
+          // Bottom action bar
+          Container(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            color: AppColors.background,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Receipt button
+                        GestureDetector(
+                          onTap: () {},
+                          child: Row(
+                            children: const [
+                              Icon(Icons.receipt_long_outlined,
+                                  color: AppColors.textSecondary, size: 18),
+                              SizedBox(width: 6),
+                              Text(
+                                'RECEIPT',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textSecondary,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Continue button
+                        ElevatedButton(
+                          onPressed: () => context.go(AppRoutes.dashboard),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryDark,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                'CONTINUE',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward, size: 18),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Support text
+                    const Text(
+                      'Need help? Contact our support team at 0-800-AEMO',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-              textAlign: TextAlign.end,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDetailCell(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textSecondary,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -22,20 +22,24 @@ class LandingPageMobile extends ConsumerWidget {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                number,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+          Material(
+            elevation: 5,
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  number,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -50,7 +54,7 @@ class LandingPageMobile extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.primaryDark,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -58,7 +62,7 @@ class LandingPageMobile extends ConsumerWidget {
                   description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.75),
+                    color: AppColors.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -77,11 +81,14 @@ class LandingPageMobile extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Logo
-                Image.asset('assets/images/aemo-logo.png', height: 80),
+                Align(
+                    alignment: Alignment.center,
+                    child:
+                        Image.asset('assets/images/aemo-logo.png', height: 80)),
 
                 const SizedBox(height: 24),
 
@@ -90,7 +97,7 @@ class LandingPageMobile extends ConsumerWidget {
                   "Easy Online Loans\nfor Your Future",
                   style: Theme.of(context)
                       .textTheme
-                      .displayLarge
+                      .bodyLarge
                       ?.copyWith(fontSize: 40),
                 ),
 
@@ -98,11 +105,11 @@ class LandingPageMobile extends ConsumerWidget {
 
                 // Tagline
                 Text(
-                  AppStrings.tagline,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  "Designed for simplicity. Built for speed. Get the funds you need in just a few clicks.",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontSize: 18),
                 ),
 
                 const SizedBox(height: 48),
@@ -114,6 +121,7 @@ class LandingPageMobile extends ConsumerWidget {
                   width: double.infinity,
                   height: 70,
                   buttonStyle: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryDark,
                     shadowColor: Colors.transparent,
                     elevation: 0,
                     foregroundColor: AppColors.white,
@@ -151,19 +159,20 @@ class LandingPageMobile extends ConsumerWidget {
                 ),
                 SizedBox(height: 48),
 
-                Container(
-                  width: double.infinity,
-                  height: 220,
-                  child: Image.asset(
-                    'assets/images/computer.png',
-                    fit: BoxFit.fill,
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   height: 220,
+                //   child: Image.asset(
+                //     'assets/images/computer.png',
+                //     fit: BoxFit.fill,
+                //   ),
+                // ),
 
                 SizedBox(height: 48),
 
                 Text("Why Choose ${AppStrings.appName}?",
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Color(0xFF747779),
                           fontSize: 28,
                         )),
                 SizedBox(height: 16),
@@ -198,13 +207,12 @@ class LandingPageMobile extends ConsumerWidget {
                         children: [
                           Text(
                             'Fully Online',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Color(0xFF444749),
+                                      fontSize: 30,
+                                      // fontWeight: FontWeight.w700,
+                                    ),
                           ),
                           const SizedBox(height: 8),
                           // Description
@@ -260,10 +268,11 @@ class LandingPageMobile extends ConsumerWidget {
                                 'Quick Review',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .titleLarge
+                                    .bodyLarge
                                     ?.copyWith(
+                                      color: Color(0xFF444749),
                                       fontSize: 30,
-                                      fontWeight: FontWeight.w700,
+                                      // fontWeight: FontWeight.w700,
                                     ),
                               ),
                               const SizedBox(height: 8),
@@ -319,13 +328,12 @@ class LandingPageMobile extends ConsumerWidget {
                         children: [
                           Text(
                             'Secure and Reliable',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Color(0xFF444749),
+                                      fontSize: 30,
+                                      // fontWeight: FontWeight.w700,
+                                    ),
                           ),
                           const SizedBox(height: 8),
                           // Description
@@ -342,39 +350,72 @@ class LandingPageMobile extends ConsumerWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 48),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'How It Works',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppColors.primaryDark,
+                          fontSize: 30,
+                          // fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                _buildStep(context, '1', 'Apply Online',
+                    'Fill out our secure 5-minute application form with your business details.'),
+                const SizedBox(height: 32),
+                Align(
+                  alignment: Alignment.center,
+                  child: _buildStep(context, '2', 'Get Approved',
+                      'Our expert team reviews your application and provides a tailored offer.'),
+                ),
+                const SizedBox(height: 32),
+                _buildStep(context, '3', 'Receive Funding',
+                    'Funds are deposited directly into your  account within 24 hours.'),
+
+                SizedBox(height: 60),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(40),
+                  padding: const EdgeInsets.all(50),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1B2F5E),
+                    color: AppColors.primaryDark,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        'How It Works',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Ready to redefine your financial horizon?',
+                          textAlign: TextAlign.center,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: AppColors.white,
+                                    fontSize: 30,
+                                    // fontWeight: FontWeight.w700,
+                                  ),
                         ),
                       ),
                       const SizedBox(height: 40),
-
-                      _buildStep(context, '1', 'Apply Online',
-                          'Fill out our secure 5-minute application form with your business details.'),
-                      const SizedBox(height: 32),
-                      _buildStep(context, '2', 'Get Approved',
-                          'Our expert team reviews your application and provides a tailored offer.'),
-                      const SizedBox(height: 32),
-                      _buildStep(context, '3', 'Receive Funding',
-                          'Funds are deposited directly into your  account within 24 hours.'),
-
-                      const SizedBox(height: 40),
-
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          'Join thousands of forward thinking individuals building their future with AEMO',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.primaryLightShade,
+                                    fontSize: 18,
+                                    // fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ),
                       // Button
+                      SizedBox(height: 40),
                       Container(
                         width: double.infinity,
                         height: 56,
@@ -385,7 +426,7 @@ class LandingPageMobile extends ConsumerWidget {
                         child: TextButton(
                           onPressed: () => context.go(AppRoutes.login),
                           child: Text(
-                            'Start Your Application',
+                            'Get Started',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

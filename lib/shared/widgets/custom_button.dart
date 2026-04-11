@@ -27,7 +27,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonColor = color ?? AppColors.primary;
+    final buttonColor = color ?? AppColors.primaryDark;
     final buttonWidth = width ?? double.infinity;
     final buttonHeight = height ?? 52.0;
 

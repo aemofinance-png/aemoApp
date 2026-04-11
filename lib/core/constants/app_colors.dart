@@ -4,12 +4,13 @@ class AppColors {
   // Primary Blue
   static const Color primary = Color(0xFF073665);
   static const Color primaryLight = Color(0xFFEBF2FF);
-  static const Color primaryDark = Color(0xFF1040B0);
+  static const Color primaryDark = Color(0xFF001B3C);
+  static const Color primaryLightShade = Color(0xFF5478AF);
 
   // Neutrals
   static const Color white = Color(0xFFFFFFFF);
   static const Color background = Color(0xFFF8FAFC);
-  static const Color backgroundDark = Color.fromARGB(255, 240, 240, 240);
+  static const Color backgroundDark = Color(0xFFEFF1F3);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color border = Color(0xFFE2E8F0);
 

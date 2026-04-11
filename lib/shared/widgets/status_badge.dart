@@ -24,11 +24,11 @@ class StatusBadge extends StatelessWidget {
   Color get _textColor {
     switch (status) {
       case LoanStatus.pending:
-        return AppColors.pending;
+        return AppColors.primaryDark;
       case LoanStatus.approved:
-        return AppColors.success;
+        return AppColors.primaryDark;
       case LoanStatus.rejected:
-        return AppColors.error;
+        return AppColors.primaryDark;
     }
   }
 
