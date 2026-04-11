@@ -434,7 +434,7 @@ class _ApplicationStatusScreenState
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: AppColors.textHint),
+          // const Icon(Icons.chevron_right, color: AppColors.textHint),
         ],
       ),
     );

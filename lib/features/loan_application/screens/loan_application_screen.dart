@@ -229,22 +229,22 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               color: AppColors.textPrimary,
             ),
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Center(
-                child: Text(
-                  'STEP ${_currentStep + 1} OF $_totalSteps',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          // actions: [
+          //   Padding(
+          //     padding: const EdgeInsets.only(right: 16),
+          //     child: Center(
+          //       child: Text(
+          //         'STEP ${_currentStep + 1} OF $_totalSteps',
+          //         style: const TextStyle(
+          //           fontSize: 12,
+          //           fontWeight: FontWeight.w600,
+          //           color: AppColors.textSecondary,
+          //           letterSpacing: 0.5,
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ],
         ),
         body: Column(
           children: [
@@ -399,13 +399,42 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                const Text(
-                  "Let's get started.",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
+                // const Text(
+                //   "Let's get started.",
+                //   style: TextStyle(
+                //     fontSize: 28,
+                //     fontWeight: FontWeight.w800,
+                //     color: AppColors.textPrimary,
+                //   ),
+                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Let\'s get started.',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    // Step dots
+                    Row(
+                      children: List.generate(
+                          4,
+                          (i) => Container(
+                                width: i == 0 ? 24 : 8,
+                                height: 8,
+                                margin: const EdgeInsets.only(left: 4),
+                                decoration: BoxDecoration(
+                                  color: i == 0
+                                      ? AppColors.primaryDark
+                                      : AppColors.border,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              )),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -418,11 +447,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                 const SizedBox(height: 24),
 
                 // Security badge
-                _buildInfoBadge(
-                  icon: Icons.shield_outlined,
-                  title: 'SECURE TRANSMISSION',
-                  subtitle: 'Your data is encrypted with bank-grade security.',
-                ),
 
                 const SizedBox(height: 28),
 
@@ -451,6 +475,12 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                 ),
 
                 const SizedBox(height: 28),
+
+                _buildInfoBadge(
+                  icon: Icons.shield_outlined,
+                  title: 'SECURE TRANSMISSION',
+                  subtitle: 'Your data is encrypted with bank-grade security.',
+                ),
               ],
             ),
           ),
@@ -461,6 +491,9 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
   // ── Step 2: Employment ───────────────────────────────────
   Widget _buildStep2() {
+    final currentUser = ref.read(currentUserProvider).value;
+    final countryCode = currentUser?.countryCode ?? 'BZ';
+    final currencyCode = Formatters.getCurrencyCode(countryCode);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -472,13 +505,42 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                const Text(
-                  'Employment & Income',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
+                // const Text(
+                //   'Employment & Income',
+                //   style: TextStyle(
+                //     fontSize: 28,
+                //     fontWeight: FontWeight.w800,
+                //     color: AppColors.textPrimary,
+                //   ),
+                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Employmwent & Income',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    // Step dots
+                    Row(
+                      children: List.generate(
+                          4,
+                          (i) => Container(
+                                width: i == 1 ? 24 : 8,
+                                height: 8,
+                                margin: const EdgeInsets.only(left: 4),
+                                decoration: BoxDecoration(
+                                  color: i == 1
+                                      ? AppColors.primaryDark
+                                      : AppColors.border,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              )),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -510,22 +572,58 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                       : null,
                 ),
                 const SizedBox(height: 20),
-                _buildFieldLabel('GROSS MONTHLY INCOME'),
+                _buildFieldLabel('NETT MONTHLY INCOME'),
                 const SizedBox(height: 8),
-                _buildTextField(
+                // _buildTextField(
+                //   controller: _monthlyIncomeController,
+                //   hint: '0.00',
+                //    prefixText: '$currencyCode  ',
+                //   keyboardType: TextInputType.number,
+                //   validator: (v) {
+                //     if (v == null || v.isEmpty)
+                //       return 'Monthly income is required';
+                //     if (double.tryParse(v) == null)
+                //       return 'Enter a valid amount';
+                //     if (double.parse(v) <= 0)
+                //       return 'Income must be greater than 0';
+                //     return null;
+                //   },
+                // ),
+                TextFormField(
                   controller: _monthlyIncomeController,
-                  hint: '0.00',
-                  icon: Icons.attach_money,
                   keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.isEmpty)
-                      return 'Monthly income is required';
-                    if (double.tryParse(v) == null)
-                      return 'Enter a valid amount';
-                    if (double.parse(v) <= 0)
-                      return 'Income must be greater than 0';
-                    return null;
-                  },
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: AppColors.background,
+                    prefixText: '$currencyCode  ',
+                    prefixStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                    hintText: '0.00',
+                    hintStyle: const TextStyle(color: AppColors.textHint),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide:
+                          const BorderSide(color: AppColors.primary, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 18),
+                  ),
                 ),
                 const SizedBox(height: 28),
                 _buildInfoBadge(
@@ -861,13 +959,42 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                const Text(
-                  'Bank & Documents',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
+                // const Text(
+                //   'Bank & Documents',
+                //   style: TextStyle(
+                //     fontSize: 28,
+                //     fontWeight: FontWeight.w800,
+                //     color: AppColors.textPrimary,
+                //   ),
+                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Bank & Documents',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    // Step dots
+                    Row(
+                      children: List.generate(
+                          4,
+                          (i) => Container(
+                                width: i == 3 ? 24 : 8,
+                                height: 8,
+                                margin: const EdgeInsets.only(left: 4),
+                                decoration: BoxDecoration(
+                                  color: i == 3
+                                      ? AppColors.primaryDark
+                                      : AppColors.border,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              )),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 const Text(

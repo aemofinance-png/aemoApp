@@ -620,7 +620,7 @@ class ProfileScreen extends ConsumerWidget {
         icon: const Icon(Icons.logout_outlined,
             color: Color(0xFFDC2626), size: 18),
         label: const Text(
-          'Secure Log Out',
+          ' Log Out',
           style: TextStyle(
             color: Color(0xFFDC2626),
             fontWeight: FontWeight.w600,

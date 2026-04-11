@@ -71,10 +71,119 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           onPressed: () => context.go(AppRoutes.apply),
-          backgroundColor: AppColors.primaryDark,
+          backgroundColor: AppColors.primaryShade2,
           child: const Icon(Icons.add, color: Colors.white),
         ),
         backgroundColor: AppColors.backgroundDark,
+        drawer: Drawer(
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  color: AppColors.primaryDark,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: AppColors.primaryLight,
+                        backgroundImage: currentUser?.selfieUrl != null &&
+                                currentUser!.selfieUrl!.isNotEmpty
+                            ? NetworkImage(currentUser!.selfieUrl!)
+                            : null,
+                        child: currentUser?.selfieUrl == null
+                            ? Text(
+                                currentUser?.fullName.isNotEmpty ?? false
+                                    ? currentUser!.fullName[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        currentUser?.fullName ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        currentUser?.email ?? '',
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Menu items
+                _buildDrawerItem(
+                  icon: Icons.dashboard_outlined,
+                  label: 'Dashboard',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.dashboard);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.description_outlined,
+                  label: 'Apply for Loan',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.apply);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.calculate_outlined,
+                  label: 'Calculator',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.calculator);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.person_outlined,
+                  label: 'Profile',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.profile);
+                  },
+                ),
+
+                const Spacer(),
+
+                const Divider(),
+
+                // Logout
+                _buildDrawerItem(
+                  icon: Icons.logout,
+                  label: 'Log Out',
+                  color: AppColors.error,
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await ref.read(authNotifierProvider.notifier).logout();
+                    if (mounted) context.go(AppRoutes.login);
+                  },
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
         body: Column(
           children: [
             // Navbar
@@ -129,7 +238,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                                   'PENDING',
                                   pending.toString(),
                                   AppColors.primaryDark,
-                                  AppColors.white),
+                                  AppColors.primaryLightShade2),
                             ),
                           ],
                         ),
@@ -242,14 +351,11 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
           // Logo
           Row(
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
+              Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
-                child: Image.asset('assets/images/aemo-logo.png'),
               ),
               const SizedBox(width: 10),
               Text(userName,
@@ -259,6 +365,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                       )),
             ],
           ),
+// In _buildNavbar, add to the leading side:
 
           // User info + logout
           Row(
@@ -307,7 +414,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
   Widget _buildStatCard(
       String label, String value, Color color, Color bgColor) {
     return Material(
-      elevation: 5,
+      // elevation: 5,
       borderRadius: BorderRadius.circular(15),
       child: Container(
         width: double.infinity,
@@ -339,6 +446,26 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: color ?? AppColors.textPrimary, size: 22),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: color ?? AppColors.textPrimary,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 
@@ -457,10 +584,12 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryDark : Color(0xFFa7c8ff),
+          color:
+              isSelected ? AppColors.primaryShade2 : AppColors.backgroundDark,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            width: 1.5,
+            color: isSelected ? AppColors.primary : AppColors.textSecondary,
           ),
         ),
         child: Text(
