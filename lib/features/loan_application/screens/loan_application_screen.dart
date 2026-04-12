@@ -517,7 +517,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Employmwent & Income',
+                      'Employment & Income',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
