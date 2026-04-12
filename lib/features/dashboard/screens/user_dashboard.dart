@@ -20,8 +20,10 @@ class UserDashboard extends ConsumerStatefulWidget {
   ConsumerState<UserDashboard> createState() => _UserDashboardState();
 }
 
-class _UserDashboardState extends ConsumerState<UserDashboard> {
+class _UserDashboardState extends ConsumerState<UserDashboard>
+    with SingleTickerProviderStateMixin {
   LoanStatus? _selectedFilter;
+  late AnimationController _listAnimationController;
 
   // @override
   // void initState() {
@@ -37,6 +39,21 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
   //     }, fireImmediately: true);
   //   });
   // }
+  @override
+  void initState() {
+    super.initState();
+    _listAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _listAnimationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _listAnimationController.dispose();
+    super.dispose();
+  }
 
   // Handle logout
   Future<void> _handleLogout() async {
@@ -49,7 +66,13 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
     final currentUser = ref.watch(currentUserProvider).value;
     final loanState = ref.watch(loanNotifierProvider);
     final applications = loanState.applications;
-
+    ref.listen<LoanState>(loanNotifierProvider, (previous, next) {
+      if (next.applications.isNotEmpty &&
+          previous?.applications.isEmpty == true) {
+        _listAnimationController.reset();
+        _listAnimationController.forward();
+      }
+    });
     final filtered = _selectedFilter == null
         ? applications
         : applications.where((a) => a.status == _selectedFilter).toList();
@@ -319,12 +342,32 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
                         // Applications list
                         filtered.isEmpty
                             ? _buildEmptyState()
-                            : Column(
-                                children: filtered
-                                    .map((app) => _buildApplicationCard(
-                                        app, currentUser?.countryCode ?? 'BZ'))
-                                    .toList(),
-                              ),
+                            : Column(children: [
+                                ...filtered.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final app = entry.value;
+
+                                  final slideAnimation = Tween<Offset>(
+                                    begin: const Offset(
+                                        1, 0), // starts from the right
+                                    end: Offset.zero,
+                                  ).animate(CurvedAnimation(
+                                    parent: _listAnimationController,
+                                    curve: Interval(
+                                      index *
+                                          0.15, // stagger — each card starts slightly later
+                                      (index * 0.15 + 0.6).clamp(0.0, 1.0),
+                                      curve: Curves.easeOutCubic,
+                                    ),
+                                  ));
+
+                                  return SlideTransition(
+                                    position: slideAnimation,
+                                    child: _buildApplicationCard(
+                                        app, currentUser?.countryCode ?? 'BZ'),
+                                  );
+                                }).toList(),
+                              ]),
                       ],
                     ),
                   ),
@@ -348,7 +391,6 @@ class _UserDashboardState extends ConsumerState<UserDashboard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Logo
           Row(
             children: [
               Builder(
