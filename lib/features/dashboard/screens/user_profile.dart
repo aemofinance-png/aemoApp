@@ -24,10 +24,116 @@ class ProfileScreen extends ConsumerWidget {
     }
 
     return Scaffold(
+      appBar: AppBar(),
       backgroundColor: const Color(0xFFF4F6F9),
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                color: AppColors.primaryDark,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.primaryLight,
+                      backgroundImage:
+                          user.selfieUrl != null && user!.selfieUrl!.isNotEmpty
+                              ? NetworkImage(user!.selfieUrl!)
+                              : null,
+                      child: user.selfieUrl == null
+                          ? Text(
+                              user.fullName.isNotEmpty ?? false
+                                  ? user.fullName[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      user.fullName ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      user.email ?? '',
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Menu items
+              _buildDrawerItem(
+                icon: Icons.dashboard_outlined,
+                label: 'Dashboard',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.dashboard);
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.description_outlined,
+                label: 'Apply for Loan',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.apply);
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.calculate_outlined,
+                label: 'Calculator',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.calculator);
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.account_balance_wallet_outlined,
+                label: 'Withdrawals',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.withdrawals);
+                },
+              ),
+              _buildDrawerItem(
+                icon: Icons.person_outlined,
+                label: 'Profile',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.profile);
+                },
+              ),
+
+              const Spacer(),
+
+              const Divider(),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          _buildNavbar(context, ref, user),
+          // _buildNavbar(context, ref, user),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
@@ -120,6 +226,14 @@ class ProfileScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          const Text(
+            'Profile',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF0D1B3E),
+            ),
+          ),
           GestureDetector(
             onTap: () => context.go(AppRoutes.dashboard),
             child: Container(
@@ -133,29 +247,30 @@ class ProfileScreen extends ConsumerWidget {
                   size: 16, color: Color(0xFF0D1B3E)),
             ),
           ),
-          const Text(
-            'Profile',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF0D1B3E),
-            ),
-          ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.settings_outlined,
-                size: 18, color: Color(0xFF0D1B3E)),
-          ),
         ],
       ),
     );
   }
 
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: color ?? AppColors.textPrimary, size: 22),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: color ?? AppColors.textPrimary,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
   // ─────────────────────────────────────────────────────────────────────────
   // Hero / Avatar Card
   // ─────────────────────────────────────────────────────────────────────────

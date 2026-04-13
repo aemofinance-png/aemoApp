@@ -33,6 +33,7 @@ class ApplicationStatusScreen extends ConsumerStatefulWidget {
 class _ApplicationStatusScreenState
     extends ConsumerState<ApplicationStatusScreen> {
   bool _isLoading = false;
+  bool _isLoading2 = false;
 
   @override
   void initState() {
@@ -148,9 +149,9 @@ class _ApplicationStatusScreenState
                     const SizedBox(height: 12),
                     _buildActionButton(
                       label:
-                          _isLoading ? 'Loading...' : 'Proceed to Withdrawal',
+                          _isLoading2 ? 'Loading...' : 'Proceed to Withdrawal',
                       icon: Icons.account_balance_outlined,
-                      isLoading: _isLoading,
+                      isLoading: _isLoading2,
                       onPressed: () => context.go(
                         '${AppRoutes.withdrawal}/${application.id}',
                         extra: application,
