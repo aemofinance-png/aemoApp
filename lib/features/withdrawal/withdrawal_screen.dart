@@ -2,21 +2,27 @@ import 'package:aemo_loan_app/data/models/loan_application_model.dart';
 import 'package:aemo_loan_app/data/models/user_model.dart';
 import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
 import 'package:aemo_loan_app/data/providers/service_providers.dart';
+import 'package:aemo_loan_app/shared/widgets/custom_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/utils/formatters.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../../app/router.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_strings.dart';
+import '../../core/utils/formatters.dart';
+import '../auth/providers/auth_provider.dart';
+import '../../app/router.dart';
 
 class WithdrawalScreen extends ConsumerStatefulWidget {
-  final LoanApplicationModel application;
+  final LoanApplicationModel? application;
+  final String applicationId;
 
-  const WithdrawalScreen({super.key, required this.application});
+  const WithdrawalScreen({
+    super.key,
+    required this.application,
+    required this.applicationId,
+  });
 
   @override
   ConsumerState<WithdrawalScreen> createState() => _WithdrawalScreenState();
@@ -29,20 +35,55 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
   bool _isUploading = false;
   String? _uploadedUrl;
 
+  LoanApplicationModel? _application;
+  bool _loadingApplication = false;
+
   @override
   void initState() {
     super.initState();
+
+    if (widget.application != null) {
+      _application = widget.application;
+    } else {
+      _fetchApplication();
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // your existing bank account pre-select logic, guarded:
+      if (_application == null) return;
       final user = ref.read(currentUserProvider).value;
       if (user != null && user.bankAccounts.isNotEmpty) {
-        // Pre-select the account matching the application
         final match = user.bankAccounts.firstWhere(
-          (a) => a.accountNumber == widget.application.accountNumber,
+          (a) => a.accountNumber == _application!.accountNumber,
           orElse: () => user.bankAccounts.first,
         );
         setState(() => _selectedAccount = match);
       }
     });
+  }
+
+  Future<void> _fetchApplication() async {
+    setState(() => _loadingApplication = true);
+    try {
+      final app = await ref
+          .read(firestoreServiceProvider)
+          .getLoanApplicationById(widget.applicationId);
+      setState(() {
+        _application = app;
+        _loadingApplication = false;
+      });
+      // now pre-select bank account
+      final user = ref.read(currentUserProvider).value;
+      if (user != null && user.bankAccounts.isNotEmpty && app != null) {
+        final match = user.bankAccounts.firstWhere(
+          (a) => a.accountNumber == app.accountNumber,
+          orElse: () => user.bankAccounts.first,
+        );
+        setState(() => _selectedAccount = match);
+      }
+    } catch (e) {
+      setState(() => _loadingApplication = false);
+    }
   }
 
   Future<void> _pickAndUploadDocument() async {
@@ -63,7 +104,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
       final ref = FirebaseStorage.instance
           .ref()
           .child('withdrawal_documents')
-          .child(widget.application.id)
+          .child(widget.application?.id ?? '')
           .child('${DateTime.now().millisecondsSinceEpoch}_${file.name}');
 
       await ref.putData(
@@ -105,6 +146,11 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loadingApplication || _application == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     final currentUser = ref.watch(currentUserProvider).value;
     final countryCode = currentUser?.countryCode ?? 'BZ';
 
@@ -116,7 +162,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF0D1B3E)),
           onPressed: () =>
-              context.go('${AppRoutes.status}/${widget.application.id}'),
+              context.go('${AppRoutes.status}/${widget.application?.id}'),
         ),
         title: const Text(
           'Withdrawal',
@@ -153,6 +199,148 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
           // Bottom button
           _buildBottomButton(countryCode),
         ],
+      ),
+    );
+  }
+
+  void _showAddBankAccountSheet(
+      BuildContext context, WidgetRef ref, UserModel user) {
+    final bankController = TextEditingController();
+    final accountNumberController = TextEditingController();
+    final accountNameController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final currentUser = ref.read(currentUserProvider).value;
+    final countryCode = currentUser?.countryCode ?? 'BZ';
+    final banks = AppStrings.banksByCountry[countryCode] ?? [];
+    String selectedBank = banks.isNotEmpty ? banks.first : '';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: StatefulBuilder(
+          builder: (context, setModalState) => Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Add Bank Account',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0D1B3E),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text('Bank Name',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: selectedBank.isEmpty ? null : selectedBank,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                  ),
+                  items: banks
+                      .map((bank) => DropdownMenuItem(
+                            value: bank,
+                            child: Text(bank),
+                          ))
+                      .toList(),
+                  onChanged: (value) =>
+                      setModalState(() => selectedBank = value!),
+                  validator: (value) =>
+                      value == null ? 'Please select a bank' : null,
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Account Number',
+                  hint: 'Enter account number',
+                  controller: accountNumberController,
+                  keyboardType: TextInputType.number,
+                  prefixIcon: const Icon(Icons.credit_card_outlined),
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                      return 'Account number is required';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Account Name',
+                  hint: 'Enter account name',
+                  controller: accountNameController,
+                  prefixIcon: const Icon(Icons.person_outlined),
+                  validator: (value) {
+                    if (value == null || value.isEmpty)
+                      return 'Account name is required';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (!formKey.currentState!.validate()) return;
+
+                      final newAccount = BankAccount(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        bankName: selectedBank,
+                        accountNumber: accountNumberController.text.trim(),
+                        accountName: accountNameController.text.trim(),
+                        verificationStatus: BankVerificationStatus.pending,
+                      );
+
+                      final updatedAccounts = [
+                        ...user.bankAccounts,
+                        newAccount
+                      ];
+                      final updatedUser =
+                          user.copyWith(bankAccounts: updatedAccounts);
+
+                      await ref
+                          .read(firestoreServiceProvider)
+                          .updateUser(updatedUser);
+                      ref.invalidate(currentUserProvider);
+                      if (context.mounted) Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D1B3E),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text('Save Account'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -479,6 +667,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
   // ── Step 2: Bank Verification ────────────────────────────
   Widget _buildStep2(UserModel? currentUser) {
+    final currentUser = ref.watch(currentUserProvider).value;
     final accounts = currentUser?.bankAccounts ?? [];
 
     return Column(
@@ -606,7 +795,9 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
               // Link new account
               const Divider(height: 0.5, color: Color(0xFFF1F5F9)),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  _showAddBankAccountSheet(context, ref, currentUser!);
+                },
                 borderRadius:
                     const BorderRadius.vertical(bottom: Radius.circular(16)),
                 child: const Padding(
@@ -653,7 +844,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Verification ensures funds are transferred only to accounts owned by you. Deposits typically reflect within 1-2 business days.',
+                  'Verification ensures funds are transferred only to accounts owned by you. Deposits typically reflect within 2-5 business days.',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF64748B),
@@ -670,7 +861,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
   // ── Step 3: Final Execution ──────────────────────────────
   Widget _buildStep3(String countryCode) {
-    final amount = widget.application.loanAmount;
+    final amount = widget.application?.loanAmount;
     final account = _selectedAccount;
 
     return Column(
@@ -700,7 +891,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                Formatters.currency(amount, countryCode),
+                Formatters.currency(amount ?? 0, countryCode),
                 style: const TextStyle(
                   fontSize: 42,
                   fontWeight: FontWeight.w800,
@@ -823,14 +1014,14 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
           child: Column(
             children: [
               _buildDisbursementRow(
-                  'Estimated Arrival', 'Within 1-2 business days'),
+                  'Estimated Arrival', 'Within 2-5 business days'),
               const Divider(height: 24, color: Color(0xFFF1F5F9)),
               _buildDisbursementRow(
                   'Network Fee', Formatters.currency(0, countryCode)),
               const Divider(height: 24, color: Color(0xFFF1F5F9)),
               _buildDisbursementRow(
                 'Total Disbursement',
-                Formatters.currency(amount, countryCode),
+                Formatters.currency(amount ?? 0, countryCode),
                 isBold: true,
               ),
             ],
@@ -884,7 +1075,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
     final labels = [
       'Continue to Bank Verification',
       'Continue to Final Step',
-      'Execute Withdrawal',
+      'Place Withdrawal',
     ];
 
     return Container(
@@ -894,19 +1085,43 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () async {
-            if (_currentStep < 2) {
-              setState(() => _currentStep++);
+            if (_currentStep < 3 && _uploadedDocument != null) {
+              setState(() {
+                try {
+                  print('First Print: $_currentStep');
+                  _currentStep++;
+                  print('Second Print: $_currentStep');
+                } catch (e, stack) {
+                  print('CAUGHT ERROR: $e');
+                  print(stack);
+                }
+                return;
+              });
             } else {
-              final currentUser = ref.read(currentUserProvider).value;
-              if (currentUser == null || _selectedAccount == null) return;
+              print(_currentStep);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content:
+                        Text('Please upload your loan agreement to proceed.'),
+                    backgroundColor: AppColors.error),
+              );
+            }
+            // if (_currentStep  ) {
+            //   setState(() {
+            //     _currentStep++;
+            //   });
+            // }
 
+            if (_currentStep == 3) {
               try {
+                final currentUser = ref.read(currentUserProvider).value;
+                if (currentUser == null || _selectedAccount == null) return;
                 final withdrawal = WithdrawalModel(
                   id: '',
                   userName: currentUser.fullName,
                   userId: currentUser.id,
-                  applicationId: widget.application.id,
-                  amount: widget.application.loanAmount,
+                  applicationId: widget.application?.id ?? '',
+                  amount: widget.application?.loanAmount ?? 0,
                   bankName: _selectedAccount!.bankName,
                   accountNumber: _selectedAccount!.accountNumber,
                   documentUrl: _uploadedUrl,
@@ -930,6 +1145,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                 }
               }
             }
+
             ;
           },
           style: ElevatedButton.styleFrom(

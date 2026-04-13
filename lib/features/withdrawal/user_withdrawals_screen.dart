@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/utils/formatters.dart';
-import '../../../data/models/withdrawal_model.dart';
-import '../../../data/providers/service_providers.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../../app/router.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/utils/formatters.dart';
+import '../../data/models/withdrawal_model.dart';
+import '../../data/providers/service_providers.dart';
+import '../auth/providers/auth_provider.dart';
+import '../../app/router.dart';
 
 final userWithdrawalsProvider =
     FutureProvider.autoDispose<List<WithdrawalModel>>((ref) async {

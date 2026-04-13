@@ -49,6 +49,14 @@ class FirestoreService {
     }
   }
 
+  Future<LoanApplicationModel?> getLoanApplicationById(String id) async {
+    final doc = await _firestore.collection('loan_applications').doc(id).get();
+    if (!doc.exists) return null;
+    return LoanApplicationModel.fromMap(
+      doc.data()!,
+    );
+  }
+
   Future<void> updateVerificationStatus(
       String userId, VerificationStatus status) async {
     await _firestore.collection('users').doc(userId).update({

@@ -1,11 +1,11 @@
 import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
 import 'package:aemo_loan_app/features/admin/screens/admin_withdrawal_screen.dart';
-import 'package:aemo_loan_app/features/dashboard/screens/user_withdrawals_screen.dart';
+import 'package:aemo_loan_app/features/withdrawal/user_withdrawals_screen.dart';
 import 'package:aemo_loan_app/features/landing_page/landing_page_desktop.dart';
 import 'package:aemo_loan_app/features/landing_page/landing_page_mobile.dart';
 import 'package:aemo_loan_app/features/landing_page/responsive_layout.dart';
-import 'package:aemo_loan_app/features/loan_status/screens/withdrawal_screen.dart';
-import 'package:aemo_loan_app/features/loan_status/screens/withdrawal_success_screen.dart';
+import 'package:aemo_loan_app/features/withdrawal/withdrawal_screen.dart';
+import 'package:aemo_loan_app/features/withdrawal/withdrawal_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -120,8 +120,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '${AppRoutes.withdrawal}/:id',
         builder: (context, state) {
-          final application = state.extra as LoanApplicationModel;
-          return WithdrawalScreen(application: application);
+          final application = state.extra as LoanApplicationModel?;
+          final id = state.pathParameters['id']!;
+          return WithdrawalScreen(application: application, applicationId: id);
         },
       ),
       GoRoute(
