@@ -539,6 +539,24 @@ void _showBankVerificationSheet(
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed:
+                  account.verificationStatus == BankVerificationStatus.pending
+                      ? null
+                      : () async {
+                          await ref
+                              .read(adminNotifierProvider.notifier)
+                              .updateBankVerificationStatus(
+                                userId: user.id,
+                                bankAccountId: account.id,
+                                status: BankVerificationStatus.pending,
+                              );
+                          ref.invalidate(userByIdProvider(user.id));
+                          if (context.mounted) Navigator.pop(context);
+                        },
+              child: const Text('Make Pending'),
+            ),
+            SizedBox(height: 12),
+            ElevatedButton(
+              onPressed:
                   account.verificationStatus == BankVerificationStatus.verified
                       ? null
                       : () async {

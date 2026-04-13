@@ -689,10 +689,10 @@ class ProfileScreen extends ConsumerWidget {
         fg = const Color(0xFF15803D);
         label = 'VERIFIED';
         break;
-      case BankVerificationStatus.unverified:
-        bg = const Color(0xFFFEE2E2);
+      case BankVerificationStatus.pending:
+        bg = AppColors.warningLight;
         fg = const Color(0xFFB91C1C);
-        label = 'UNVERIFIED';
+        label = 'PENDING';
         break;
       default:
         bg = const Color(0xFFFEE2E2);
@@ -873,6 +873,7 @@ void _showAddBankAccountSheet(
                       bankName: selectedBank,
                       accountNumber: accountNumberController.text.trim(),
                       accountName: accountNameController.text.trim(),
+                      verificationStatus: BankVerificationStatus.pending,
                     );
 
                     final updatedAccounts = [...user.bankAccounts, newAccount];

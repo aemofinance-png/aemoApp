@@ -1,6 +1,11 @@
+import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
+import 'package:aemo_loan_app/features/admin/screens/admin_withdrawal_screen.dart';
+import 'package:aemo_loan_app/features/dashboard/screens/user_withdrawals_screen.dart';
 import 'package:aemo_loan_app/features/landing_page/landing_page_desktop.dart';
 import 'package:aemo_loan_app/features/landing_page/landing_page_mobile.dart';
 import 'package:aemo_loan_app/features/landing_page/responsive_layout.dart';
+import 'package:aemo_loan_app/features/loan_status/screens/withdrawal_screen.dart';
+import 'package:aemo_loan_app/features/loan_status/screens/withdrawal_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +43,11 @@ class AppRoutes {
   static const String reviewKYc = '/review-kyc';
   static const String kycStatus = '/kyc-status';
   static const String resetPassword = '/reset-password';
+  static const String withdrawal = '/withdrawal';
+  static const String withdrawals = '/withdrawals';
+  static const String adminWithdrawals = '/admin-withdrawals';
+
+  static const String withdrawalSuccess = '/withdrawal-success';
 
 // In routes list:
 }
@@ -107,6 +117,28 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '${AppRoutes.withdrawal}/:id',
+        builder: (context, state) {
+          final application = state.extra as LoanApplicationModel;
+          return WithdrawalScreen(application: application);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.withdrawals,
+        builder: (context, state) => const WithdrawalsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.withdrawalSuccess,
+        builder: (context, state) {
+          final withdrawal = state.extra as WithdrawalModel;
+          return WithdrawalSuccessScreen(withdrawal: withdrawal);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.adminWithdrawals,
+        builder: (context, state) => AdminWithdrawalsScreen(),
+      ),
       GoRoute(
         path: AppRoutes.kyc,
         builder: (context, state) => const KycScreen(),

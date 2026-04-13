@@ -144,6 +144,19 @@ class _ApplicationStatusScreenState
                     onPressed: () =>
                         _generateAgreement(context, application, currentUser!),
                   ),
+                  if (application.status == LoanStatus.approved) ...[
+                    const SizedBox(height: 12),
+                    _buildActionButton(
+                      label:
+                          _isLoading ? 'Loading...' : 'Proceed to Withdrawal',
+                      icon: Icons.account_balance_outlined,
+                      isLoading: _isLoading,
+                      onPressed: () => context.go(
+                        '${AppRoutes.withdrawal}/${application.id}',
+                        extra: application,
+                      ),
+                    ),
+                  ],
                 ],
 
                 // const SizedBox(height: 12),

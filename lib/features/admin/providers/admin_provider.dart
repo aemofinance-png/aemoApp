@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/models/loan_application_model.dart';
 import '../../../../data/providers/service_providers.dart';
@@ -83,6 +84,10 @@ class AdminNotifier extends StateNotifier<AdminState> {
     }
   }
 
+  final adminWithdrawalsProvider =
+      FutureProvider.autoDispose<List<WithdrawalModel>>((ref) async {
+    return ref.read(firestoreServiceProvider).getAllWithdrawals();
+  });
   // Fetch all applications
   Future<void> fetchAllApplications() async {
     state = state.copyWith(isLoading: true, error: null);

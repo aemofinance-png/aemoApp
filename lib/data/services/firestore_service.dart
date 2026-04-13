@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../models/loan_application_model.dart';
@@ -97,6 +98,48 @@ class FirestoreService {
       'idDocumentUrl': idDocumentUrl,
       'selfieUrl': selfieUrl,
       'verificationStatus': VerificationStatus.pending.name,
+    });
+  }
+
+// Save a withdrawal
+  Future<WithdrawalModel> createWithdrawal(WithdrawalModel withdrawal) async {
+    final doc =
+        await _firestore.collection('withdrawals').add(withdrawal.toMap());
+    return WithdrawalModel.fromMap(withdrawal.toMap(), doc.id);
+  }
+
+// Fetch withdrawals for a user
+  Future<List<WithdrawalModel>> getUserWithdrawals(String userId) async {
+    final snapshot = await _firestore
+        .collection('withdrawals')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => WithdrawalModel.fromMap(doc.data(), doc.id))
+        .toList();
+  }
+
+// Fetch all withdrawals (admin)
+  Future<List<WithdrawalModel>> getAllWithdrawals() async {
+    final snapshot = await _firestore
+        .collection('withdrawals')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => WithdrawalModel.fromMap(doc.data(), doc.id))
+        .toList();
+  }
+
+// Update withdrawal status (admin)
+  Future<void> updateWithdrawalStatus(
+      String withdrawalId, WithdrawalStatus status) async {
+    await _firestore.collection('withdrawals').doc(withdrawalId).update({
+      'status': status.name,
+      if (status == WithdrawalStatus.completed)
+        'completedAt': DateTime.now().toIso8601String(),
     });
   }
 

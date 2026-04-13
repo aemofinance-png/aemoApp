@@ -118,7 +118,13 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                         ),
 
                         const SizedBox(height: 32),
-
+                        ElevatedButton.icon(
+                          onPressed: () =>
+                              context.go(AppRoutes.adminWithdrawals),
+                          icon:
+                              const Icon(Icons.account_balance_wallet_outlined),
+                          label: const Text('Withdrawals'),
+                        ),
                         // Filter tabs
                         _buildFilterTabs(),
 

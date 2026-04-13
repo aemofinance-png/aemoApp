@@ -178,6 +178,14 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                   },
                 ),
                 _buildDrawerItem(
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: 'Withdrawals',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.withdrawals);
+                  },
+                ),
+                _buildDrawerItem(
                   icon: Icons.person_outlined,
                   label: 'Profile',
                   onTap: () {
