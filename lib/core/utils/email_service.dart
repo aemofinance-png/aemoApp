@@ -44,6 +44,19 @@ class EmailService {
     );
   }
 
+  static Future<bool> sendBankVerEmail({
+    required String toEmail,
+    required String toName,
+  }) async {
+    return _send3(
+      templateId: 'template_bank_ver',
+      params: {
+        'email': toEmail,
+        'firstName': toName.split(" ").first,
+      },
+    );
+  }
+
   static Future<bool> sendApprovalEmail({
     required String toEmail,
     required String toName,

@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:aemo_loan_app/features/admin/providers/admin_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -549,6 +550,10 @@ void _showBankVerificationSheet(
                                 bankAccountId: account.id,
                                 status: BankVerificationStatus.pending,
                               );
+                          await EmailService.sendBankVerEmail(
+                            toEmail: user.email,
+                            toName: user.fullName,
+                          );
                           ref.invalidate(userByIdProvider(user.id));
                           if (context.mounted) Navigator.pop(context);
                         },
@@ -567,6 +572,7 @@ void _showBankVerificationSheet(
                                 bankAccountId: account.id,
                                 status: BankVerificationStatus.verified,
                               );
+
                           ref.invalidate(userByIdProvider(user.id));
                           if (context.mounted) Navigator.pop(context);
                         },

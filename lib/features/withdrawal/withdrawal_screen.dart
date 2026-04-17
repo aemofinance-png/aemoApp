@@ -669,13 +669,16 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
   Widget _buildStep2(UserModel? currentUser) {
     final currentUser = ref.watch(currentUserProvider).value;
     final accounts = currentUser?.bankAccounts ?? [];
+    final isVerified = accounts.any((a) =>
+        a.accountNumber == _application?.accountNumber &&
+        a.verificationStatus == BankVerificationStatus.verified);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
         const Text(
-          'Verify bank account',
+          'Select bank account',
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
@@ -703,7 +706,36 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
           ),
         ),
         const SizedBox(height: 12),
+        if (_selectedAccount != null &&
+            _selectedAccount!.verificationStatus !=
+                BankVerificationStatus.verified)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF1F0),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFFECACA)),
+            ),
+            child: Row(
+              children: const [
+                Icon(Icons.warning_amber_outlined,
+                    color: Color(0xFFB91C1C), size: 16),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'The selected account is pending verification. Withdrawals to this account may be delayed until verification is complete.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFB91C1C),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
+        SizedBox(height: 12),
         // Account list
         Container(
           decoration: BoxDecoration(
@@ -718,6 +750,8 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                 final account = entry.value;
                 final isSelected = _selectedAccount?.id == account.id;
                 final isLast = index == accounts.length - 1;
+                final isVerified = account.verificationStatus ==
+                    BankVerificationStatus.verified;
 
                 return Column(
                   children: [
@@ -760,6 +794,45 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                                   ),
                                 ],
                               ),
+                            ),
+                            isVerified
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFDCFCE7),
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 11, vertical: 2),
+                                      child: Text(
+                                        'VERIFIED',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.success,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.errorLight,
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Text(
+                                        'UNVERIFIED',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.error,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            SizedBox(
+                              width: 8,
                             ),
                             if (isSelected)
                               Container(
