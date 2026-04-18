@@ -267,14 +267,10 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                         ),
                       ),
                       Text(
-                        _currentStep == 1
-                            ? '${(progress * 100).toInt()}%'
-                            : stepNames[_currentStep],
+                        stepNames[_currentStep],
                         style: TextStyle(
-                          fontSize: _currentStep == 1 ? 16 : 12,
-                          fontWeight: _currentStep == 1
-                              ? FontWeight.w800
-                              : FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -322,31 +318,34 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+        color: Colors.transparent,
+        // border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
           // Back button
-          GestureDetector(
-            onTap: _currentStep > 0
-                ? _previousStep
-                : () => context.go(AppRoutes.dashboard),
-            child: Row(
-              children: const [
-                Icon(Icons.arrow_back,
-                    size: 16, color: AppColors.textSecondary),
-                SizedBox(width: 4),
-                Text(
-                  'BACK',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
+          Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+            child: GestureDetector(
+              onTap: _currentStep > 0
+                  ? _previousStep
+                  : () => context.go(AppRoutes.dashboard),
+              child: Row(
+                children: const [
+                  Icon(Icons.arrow_back,
+                      size: 16, color: AppColors.textSecondary),
+                  SizedBox(width: 4),
+                  // Text(
+                  //   'BACK',
+                  //   style: TextStyle(
+                  //     fontSize: 13,
+                  //     fontWeight: FontWeight.w600,
+                  //     color: AppColors.textSecondary,
+                  //     letterSpacing: 0.5,
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
 
@@ -360,7 +359,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(30),
               ),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,

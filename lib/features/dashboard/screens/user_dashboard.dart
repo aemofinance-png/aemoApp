@@ -106,7 +106,9 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  color: AppColors.primaryDark,
+                  decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(0)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -167,6 +169,14 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                   onTap: () {
                     Navigator.pop(context);
                     context.go(AppRoutes.apply);
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.summarize_outlined,
+                  label: 'Applications',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.userApplications);
                   },
                 ),
                 _buildDrawerItem(
@@ -351,7 +361,11 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                         filtered.isEmpty
                             ? _buildEmptyState()
                             : Column(children: [
-                                ...filtered.asMap().entries.map((entry) {
+                                ...filtered
+                                    .asMap()
+                                    .entries
+                                    .take(5)
+                                    .map((entry) {
                                   final index = entry.key;
                                   final app = entry.value;
 
@@ -376,6 +390,21 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                                   );
                                 }).toList(),
                               ]),
+
+                        Align(
+                            alignment: Alignment.center,
+                            child: TextButton(
+                              onPressed: () =>
+                                  context.go(AppRoutes.userApplications),
+                              child: Text("Show More",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      )),
+                            ))
                       ],
                     ),
                   ),

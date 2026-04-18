@@ -14,6 +14,7 @@ import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/reset_password.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/dashboard/screens/user_dashboard.dart';
+import '../features/dashboard/screens/user_applications.dart';
 import '../features/dashboard/screens/kyc_screen.dart';
 import '../features/dashboard/screens/user_profile.dart';
 import '../features/dashboard/screens/kyc_state.dart';
@@ -46,6 +47,7 @@ class AppRoutes {
   static const String withdrawal = '/withdrawal';
   static const String withdrawals = '/withdrawals';
   static const String adminWithdrawals = '/admin-withdrawals';
+  static const String userApplications = '/user-applications';
 
   static const String withdrawalSuccess = '/withdrawal-success';
 
@@ -128,6 +130,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.withdrawals,
         builder: (context, state) => const WithdrawalsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.userApplications,
+        builder: (context, state) => const UserApplications(),
       ),
       GoRoute(
         path: AppRoutes.withdrawalSuccess,

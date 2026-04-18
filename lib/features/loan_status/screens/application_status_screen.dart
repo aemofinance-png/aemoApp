@@ -139,7 +139,9 @@ class _ApplicationStatusScreenState
                 if (application.status == LoanStatus.approved) ...[
                   const SizedBox(height: 12),
                   _buildActionButton(
-                    label: _isLoading ? 'Generating...' : 'View Loan Agreement',
+                    label: _isLoading
+                        ? 'Preparing, please wait...'
+                        : 'View Loan Agreement',
                     icon: Icons.picture_as_pdf,
                     isLoading: _isLoading,
                     onPressed: () =>
