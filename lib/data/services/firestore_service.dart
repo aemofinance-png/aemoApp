@@ -40,6 +40,14 @@ class FirestoreService {
         .update(updatedUser.toMap());
   }
 
+  Future<List<UserModel>> getAllUsers() async {
+    final snapshot = await _firestore
+        .collection('users')
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+  }
+
   // Save user
   Future<void> saveUser(UserModel user) async {
     try {

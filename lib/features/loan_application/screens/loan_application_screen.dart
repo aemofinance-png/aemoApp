@@ -325,7 +325,9 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
         children: [
           // Back button
           Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+            ),
             child: GestureDetector(
               onTap: _currentStep > 0
                   ? _previousStep

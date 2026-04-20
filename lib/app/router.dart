@@ -1,4 +1,5 @@
 import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
+import 'package:aemo_loan_app/features/admin/screens/admin_users.dart';
 import 'package:aemo_loan_app/features/admin/screens/admin_withdrawal_screen.dart';
 import 'package:aemo_loan_app/features/withdrawal/user_withdrawals_screen.dart';
 import 'package:aemo_loan_app/features/landing_page/landing_page_desktop.dart';
@@ -48,7 +49,7 @@ class AppRoutes {
   static const String withdrawals = '/withdrawals';
   static const String adminWithdrawals = '/admin-withdrawals';
   static const String userApplications = '/user-applications';
-
+  static const String adminUsers = '/admin-users';
   static const String withdrawalSuccess = '/withdrawal-success';
 
 // In routes list:
@@ -126,6 +127,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['id']!;
           return WithdrawalScreen(application: application, applicationId: id);
         },
+      ),
+      GoRoute(
+        path: AppRoutes.adminUsers,
+        builder: (context, state) => const AdminUsersScreen(),
       ),
       GoRoute(
         path: AppRoutes.withdrawals,
