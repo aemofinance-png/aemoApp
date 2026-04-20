@@ -765,7 +765,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                     Text('Min: $currencyCode 1,000',
                         style: const TextStyle(
                             fontSize: 11, color: AppColors.textHint)),
-                    Text('Max: $currencyCode 50,000',
+                    Text('Max: $currencyCode 2,000,000',
                         style: const TextStyle(
                             fontSize: 11, color: AppColors.textHint)),
                   ],
