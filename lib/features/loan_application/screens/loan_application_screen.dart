@@ -1167,6 +1167,8 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                       border: Border.all(color: AppColors.border, width: 1.5),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
                           width: 48,
@@ -1180,7 +1182,15 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'Upload ID and Pay Stubs (You can upload multiple files)',
+                          'Upload ID and Pay Stubs or Bank Statments',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const Text(
+                          '(You can upload multiple files)',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
