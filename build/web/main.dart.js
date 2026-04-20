@@ -51954,9 +51954,9 @@ f=A.ao(A.b([c.AN("All",b),B.ah,c.AN("Pending",B.bU),B.ah,c.AN("Approved",B.bF),B
 e=J.a3(q)
 if(e.gaa(q)){e=A.W(12)
 d=A.b9(B.A,B.p,1)
-e=A.V(b,A.a2(A.b([A.V(b,B.tI,B.h,b,b,new A.Z(B.ai,b,b,A.W(16),b,b,B.m),b,64,b,b,b,b,64),B.w,B.a58,B.E,B.a70],l),B.j,B.f,B.e),B.h,b,b,new A.Z(B.i,b,d,e,b,b,B.m),b,b,b,B.hc,b,b,1/0)}else{e=e.dc(q,new A.aBD(c),t.l)
+e=A.V(b,A.a2(A.b([A.V(b,B.tI,B.h,b,b,new A.Z(B.ai,b,b,A.W(16),b,b,B.m),b,64,b,b,b,b,64),B.w,B.a58,B.E,B.a7_],l),B.j,B.f,B.e),B.h,b,b,new A.Z(B.i,b,d,e,b,b,B.m),b,b,b,B.hc,b,b,1/0)}else{e=e.dc(q,new A.aBD(c),t.l)
 e=A.Y(e,e.$ti.i("ai.E"))
-e=A.a2(e,B.j,B.f,B.e)}return new A.ku(a0.a,A.dq(b,B.aa,A.a2(A.b([a,A.b_(A.eE(A.bM(new A.db(B.GY,A.a2(A.b([B.a6E,B.ak,B.a61,B.ao,k,B.ao,j,i,h,g,f,B.w,e],l),B.t,B.f,B.e),b),b,b),B.jk,b),1)],l),B.j,B.f,B.e),b,b,b,b),b)},
+e=A.a2(e,B.j,B.f,B.e)}return new A.ku(a0.a,A.dq(b,B.aa,A.a2(A.b([a,A.b_(A.eE(A.bM(new A.db(B.GY,A.a2(A.b([B.a6D,B.ak,B.a61,B.ao,k,B.ao,j,i,h,g,f,B.w,e],l),B.t,B.f,B.e),b),b,b),B.jk,b),1)],l),B.j,B.f,B.e),b,b,b,b),b)},
 AQ(a,b,c,d){var s=null,r=A.W(12),q=this.w
 if(q==null&&a==="Total")q=c
 else if(q===B.bU&&a==="Pending")q=c
@@ -52063,7 +52063,7 @@ m.push(new A.aBF(n).$4(a,f,d,n))
 m.push(B.ao)
 m.push(A.tU(B.NG,B.a76,new A.aBK(this,d,a),A.eQ(h,h,B.Kc,h,h,h,h,h,h,B.i,h,B.dI,h,h,new A.bQ(A.W(10),B.r),h,h,h,h,h)))
 m.push(B.ao)
-m.push(A.tU(B.Ny,B.a6C,new A.aBL(d,a),A.eQ(h,h,B.C,h,h,h,h,h,h,B.i,h,B.dI,h,h,new A.bQ(A.W(10),B.r),h,h,h,h,h)))
+m.push(A.tU(B.Ny,B.a6B,new A.aBL(d,a),A.eQ(h,h,B.C,h,h,h,h,h,h,B.i,h,B.dI,h,h,new A.bQ(A.W(10),B.r),h,h,h,h,h)))
 m.push(B.ao)
 m.push(A.tU(B.hn,B.Ff,new A.aBM(a),A.eQ(h,h,B.C,h,h,h,h,h,h,B.i,h,B.dI,h,h,new A.bQ(A.W(10),B.r),h,h,h,h,h)))
 return new A.ku(e.a,A.dq(s,B.aa,new A.aY(B.an,A.eE(A.a2(m,B.t,B.f,B.e),h,h),h),h,h,h,h),h)}}
@@ -52217,7 +52217,7 @@ k=l?new A.aHG(h,p,a):g
 j=A.W(12)
 i=A.b9(B.A,B.p,1)
 l=q&&l?A.b_S(p,new A.aHH(),B.lR,new A.aHI()):B.Jd
-k=A.b([B.a6V,B.at,r,B.at,m,B.T,s,B.at,A.d4(g,A.V(g,l,B.bT,g,g,new A.Z(B.K4,g,i,j,g,g,B.m),g,280,g,g,g,g,1/0),B.I,!1,g,g,g,g,g,g,g,g,g,g,g,g,g,g,k,g,g,g,g,g,g)],n)
+k=A.b([B.a6U,B.at,r,B.at,m,B.T,s,B.at,A.d4(g,A.V(g,l,B.bT,g,g,new A.Z(B.K4,g,i,j,g,g,B.m),g,280,g,g,g,g,1/0),B.I,!1,g,g,g,g,g,g,g,g,g,g,g,g,g,g,k,g,g,g,g,g,g)],n)
 d=d.length
 if(d>1)B.b.K(k,A.b([B.at,A.ao(A.amR(d,new A.aHJ(h),!0,t.l),B.j,B.aQ,B.e,0)],n))
 k.push(B.ZA)
@@ -52342,7 +52342,7 @@ g=A.b_m(A.b([new A.aY(B.rL,A.a2(A.b([A.xb(r,"Full Name",o),A.xb(r,"Phone",a.d),A
 e=A.b9(B.F,B.p,1)
 f=A.b9(B.F,B.p,1)
 o=A.V(d,B.Nw,B.h,d,d,new A.Z(B.ai,d,d,A.W(8),d,d,B.m),d,36,d,d,d,d,36)
-i=A.V(d,A.a2(A.b([new A.aY(B.jj,B.a6z,d),B.dC,g,B.dC,A.b_m(A.b([new A.aY(B.rL,A.a2(A.b([A.xb(r,"Email",k),A.xb(r,"Street",a.r),A.xb(r,"City",a.w),A.xb(r,"State",a.x),A.xb(r,"Postal Code",a.y)],m),B.j,B.f,B.e),d)],m),f,o,e,B.a5S)],m),B.t,B.f,B.e),B.h,d,d,new A.Z(B.i,d,h,i,d,d,B.m),d,d,d,d,d,d,1/0)
+i=A.V(d,A.a2(A.b([new A.aY(B.jj,B.a6y,d),B.dC,g,B.dC,A.b_m(A.b([new A.aY(B.rL,A.a2(A.b([A.xb(r,"Email",k),A.xb(r,"Street",a.r),A.xb(r,"City",a.w),A.xb(r,"State",a.x),A.xb(r,"Postal Code",a.y)],m),B.j,B.f,B.e),d)],m),f,o,e,B.a5S)],m),B.t,B.f,B.e),B.h,d,d,new A.Z(B.i,d,h,i,d,d,B.m),d,d,d,d,d,d,1/0)
 h=t.mZ
 e=s.Ih(r,A.b([new A.pj(B.tm,"Change Password",new A.abq()),new A.pj(B.nr,"Biometric Login",new A.abr())],h),"SECURITY & PASSWORD")
 o=s.Ih(r,A.b([new A.pj(B.dd,"Manage KYC",new A.abs(r,a))],h),"KYC STATUS")
@@ -52459,7 +52459,7 @@ A.te.prototype={
 a8(){return new A.a_C()}}
 A.a_C.prototype={
 G(a){var s=null,r=this.gbA().bT($.aTr(),t.Ul),q=A.dP(s,s,B.hl,s,s,new A.aBY(a),s,s,s)
-return A.dq(A.fM(A.b([A.dP(s,s,B.tD,s,s,new A.aBZ(this),s,s,s)],t.p),B.i,s,0,s,q,B.a6G),B.cq,A.xH(r,new A.aC_(this),new A.aC0(),new A.aC1(),t.Ly,t.jK),s,s,s,s)},
+return A.dq(A.fM(A.b([A.dP(s,s,B.tD,s,s,new A.aBZ(this),s,s,s)],t.p),B.i,s,0,s,q,B.a6F),B.cq,A.xH(r,new A.aC_(this),new A.aC0(),new A.aC1(),t.Ly,t.jK),s,s,s,s)},
 agf(a,b){var s,r,q=null,p=A.W(16),o=A.b9(B.A,B.p,0.5),n=b.ax,m=n!=null,l=m&&n.length!==0?new A.jN(n,1,q,B.dK):q
 if(!m||n.length===0){n=b.b
 n=A.L(n.length!==0?n[0].toUpperCase():"?",q,q,q,B.a4w,q,q)}else n=q
@@ -53073,7 +53073,7 @@ i=q.cx
 s=A.my(p,new A.cs(4,A.W(10),B.c0),p,p,p,p,p,p,!0,new A.cs(4,A.W(10),B.c0),p,p,p,p,p,B.i,!0,p,p,p,p,new A.cs(4,A.W(10),B.dx),p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,p,!0,!0,!1,p,B.O2,p,p,p,p,p,p,p,p,p,p,p,p)
 r=t.o9
 r=A.Y(new A.X(B.nM,new A.aKJ(),r),r.i("ai.E"))
-j.push(A.a2(A.b([B.a6K,B.E,A.EX(s,p,r,new A.aKK(q),p,i,t.N)],k),B.t,B.f,B.e))
+j.push(A.a2(A.b([B.a6J,B.E,A.EX(s,p,r,new A.aKK(q),p,i,t.N)],k),B.t,B.f,B.e))
 j.push(B.w)
 i=q.ch
 j.push(A.hW(q.Q,"Create a password",B.cj,"Password",!i,p,B.jL,A.dP(p,p,A.eA(i?B.jJ:B.jK,B.K,p,p),p,p,new A.aKL(q),p,p,p),new A.aKA()))
@@ -53296,7 +53296,7 @@ n=A.Y(m,A.j(m).i("q.E"))
 p=A.EX(o,k,n,new A.aIW(l),k,p,t.S)
 o=A.W(8)
 n=t.p
-s=A.b([B.a5r,B.ak,B.a5M,B.ao,A.V(k,A.a2(A.b([q,B.w,B.w,A.a2(A.b([B.a6h,B.E,p,B.E,A.V(k,A.ao(A.b([B.O8,B.ah,A.L("Interest rate: "+l.gWY()+"% per annum",k,k,k,B.a1N,k,k)],n),B.j,B.f,B.e,0),B.h,k,k,new A.Z(B.ai,k,k,o,k,k,B.m),k,k,k,B.hd,k,k,k)],n),B.t,B.f,B.e),B.T,A.mg(k,k,k,!1,"Calculate",l.gagt(),k,k)],n),B.t,B.f,B.e),B.h,k,k,new A.Z(B.i,k,r,s,k,k,B.m),k,k,k,B.an,k,k,k)],n)
+s=A.b([B.a5r,B.ak,B.a5M,B.ao,A.V(k,A.a2(A.b([q,B.w,B.w,A.a2(A.b([B.a6g,B.E,p,B.E,A.V(k,A.ao(A.b([B.O8,B.ah,A.L("Interest rate: "+l.gWY()+"% per annum",k,k,k,B.a1N,k,k)],n),B.j,B.f,B.e,0),B.h,k,k,new A.Z(B.ai,k,k,o,k,k,B.m),k,k,k,B.hd,k,k,k)],n),B.t,B.f,B.e),B.T,A.mg(k,k,k,!1,"Calculate",l.gagt(),k,k)],n),B.t,B.f,B.e),B.h,k,k,new A.Z(B.i,k,r,s,k,k,B.m),k,k,k,B.an,k,k,k)],n)
 r=l.y
 if(r!=null){r=l.TB("Monthly Payment",A.ez(r,h),B.C,B.ai)
 q=l.Q
@@ -53375,13 +53375,13 @@ r.gbA().bT($.t8(),t.wP)
 s=t.p
 return new A.ku(r.z,A.dq(q,B.aa,A.a2(A.b([A.b_(A.b17(A.b([r.aoM(),r.aoN(),r.aoO()],s),r.Q,B.o8),1)],s),B.j,B.f,B.e),q,q,q,q),q)},
 aoO(){var s=null,r=A.fM(s,B.i,!0,0,s,A.dP(s,s,B.hm,s,s,this.gaoP(),s,s,s),B.a64),q=t.p,p=A.bM(A.j2(B.N,A.b([A.V(s,s,B.h,s,s,new A.Z(A.b4(B.d.aP(76.5),B.bi.F()>>>16&255,B.bi.F()>>>8&255,B.bi.F()&255),s,s,s,s,s,B.b4),s,120,s,s,s,s,120),A.V(s,s,B.h,s,s,new A.Z(B.bi,s,s,s,s,s,B.b4),s,90,s,s,s,s,90),A.V(s,B.Oc,B.h,s,s,B.H6,s,64,s,s,s,s,64)],q),B.H,B.c_,s),s,s),o=A.auZ(s,s,s,B.cE,s,s,!0,s,A.dV(A.b([B.a_V,A.dV(s,s,s,s,s,s,s,s,s,A.bF(s,s,B.C,s,s,s,s,s,s,s,s,s,s,s,B.a7,s,s,!0,s,s,s,s,s,s,s,s),"24 hours."),B.a_U],t.VO),s,s,s,s,s,s,s,s,B.kX,s),B.bm,s,s,B.aL,B.b8),n=A.W(12),m=A.b9(B.A,B.p,1)
-return A.dq(r,B.aa,new A.aY(B.an,A.a2(A.b([B.dp,p,B.ao,B.a6p,B.at,o,B.ao,A.V(s,A.ao(A.b([A.V(s,B.tM,B.h,s,s,new A.Z(B.ai,s,s,A.W(8),s,s,B.m),s,36,s,s,s,s,36),B.aV,A.a2(B.Sb,B.t,B.f,B.e)],q),B.j,B.f,B.e,0),B.h,s,s,new A.Z(B.i,s,m,n,s,s,B.m),s,s,s,B.mA,s,s,1/0),B.dp,A.cg(A.hY(B.a6F,new A.aHY(this),A.eQ(s,s,B.ab,s,s,s,0,s,s,s,s,s,s,s,new A.bQ(A.W(14),B.r),s,s,s,s,s)),52,1/0),B.at,A.cg(A.hY(B.a6H,new A.aHZ(),A.eQ(s,s,B.aa,s,s,s,0,s,s,s,s,s,s,s,new A.bQ(A.W(14),B.r),s,s,s,s,s)),52,1/0),B.T],q),B.j,B.f,B.e),s),s,s,s,s)},
+return A.dq(r,B.aa,new A.aY(B.an,A.a2(A.b([B.dp,p,B.ao,B.a6o,B.at,o,B.ao,A.V(s,A.ao(A.b([A.V(s,B.tM,B.h,s,s,new A.Z(B.ai,s,s,A.W(8),s,s,B.m),s,36,s,s,s,s,36),B.aV,A.a2(B.Sb,B.t,B.f,B.e)],q),B.j,B.f,B.e,0),B.h,s,s,new A.Z(B.i,s,m,n,s,s,B.m),s,s,s,B.mA,s,s,1/0),B.dp,A.cg(A.hY(B.a6E,new A.aHY(this),A.eQ(s,s,B.ab,s,s,s,0,s,s,s,s,s,s,s,new A.bQ(A.W(14),B.r),s,s,s,s,s)),52,1/0),B.at,A.cg(A.hY(B.a6G,new A.aHZ(),A.eQ(s,s,B.aa,s,s,s,0,s,s,s,s,s,s,s,new A.bQ(A.W(14),B.r),s,s,s,s,s)),52,1/0),B.T],q),B.j,B.f,B.e),s),s,s,s,s)},
 aoN(){var s,r,q,p=this,o=null,n=p.y,m=n!=null,l=A.fM(o,B.i,o,0,o,A.dP(o,o,B.hm,o,o,new A.aHW(p),o,o,o),B.Fl)
 n=p.TE(n)
 s=p.ag2()
 r=m?new A.aHX(p,new A.aHU(p)):o
 q=A.eQ(o,o,B.ab,B.ai,o,o,0,o,o,o,o,o,o,o,new A.bQ(A.W(12),B.r),o,o,o,o,o)
-return A.dq(l,B.aa,A.eE(A.a2(A.b([B.bZ,B.a5R,B.E,B.a6J,B.bZ,B.T,n,B.T,s,B.ao,A.cg(A.hY(A.L("Continue",o,o,o,A.bF(o,o,m?B.i:B.cN,o,o,o,o,o,o,o,o,15,o,o,B.a7,o,o,!0,o,o,o,o,o,o,o,o),o,o),r,q),52,1/0),B.w,B.qL,B.T],t.p),B.t,B.f,B.e),B.an,o),o,o,o,o)},
+return A.dq(l,B.aa,A.eE(A.a2(A.b([B.bZ,B.a5R,B.E,B.a6I,B.bZ,B.T,n,B.T,s,B.ao,A.cg(A.hY(A.L("Continue",o,o,o,A.bF(o,o,m?B.i:B.cN,o,o,o,o,o,o,o,o,15,o,o,B.a7,o,o,!0,o,o,o,o,o,o,o,o),o,o),r,q),52,1/0),B.w,B.qL,B.T],t.p),B.t,B.f,B.e),B.an,o),o,o,o,o)},
 aoM(){var s,r=this,q=null,p=r.x!=null,o=A.fM(q,B.i,q,0,q,A.dP(q,q,B.hm,q,q,new A.aHQ(r),q,q,q),B.Fl),n=A.b([B.bZ,B.a5s,B.E,B.a5i,B.bZ],t.p),m=r.ax
 B.b.K(n,new A.X(m,new A.aHR(r),A.a_(m).i("X<1,f>")))
 n.push(B.T)
@@ -53407,7 +53407,7 @@ p=m?B.C:B.K
 o=t.p
 return A.d4(n,A.V(n,A.ao(A.b([s,B.i7,A.V(n,A.eA(a.d,p,n,20),B.h,n,n,new A.Z(r,n,n,q,n,n,B.m),n,40,n,n,n,n,40),B.i7,A.b_(A.a2(A.b([A.L(a.b,n,n,n,A.bF(n,n,B.a0,n,n,n,n,n,n,n,n,14,n,n,B.a7,n,n,!0,n,n,n,n,n,n,n,n),n,n),B.cD,A.L(a.c,n,n,n,B.cF,n,n)],o),B.t,B.f,B.e),1)],o),B.j,B.f,B.e,0),B.h,n,n,new A.Z(B.i,n,k,l,n,n,B.m),n,n,B.dc,B.mA,n,n,n),B.I,!1,n,n,n,n,n,n,n,n,n,n,n,n,n,n,new A.aHN(this,a),n,n,n,n,n,n)},
 TE(a){var s=null,r=this.garL(),q=A.W(12),p=A.b9(B.A,B.p,1.5),o=t.p
-o=a!=null?A.a2(A.b([B.Of,B.at,A.L(a.b,s,s,s,B.EW,s,s),B.ak,A.AU(B.a52,r,s)],o),B.j,B.f,B.e):A.a2(A.b([A.eA(B.N_,B.C,s,36),B.at,B.a6r,B.ak,B.a6t],o),B.j,B.f,B.e)
+o=a!=null?A.a2(A.b([B.Of,B.at,A.L(a.b,s,s,s,B.EW,s,s),B.ak,A.AU(B.a52,r,s)],o),B.j,B.f,B.e):A.a2(A.b([A.eA(B.N_,B.C,s,36),B.at,B.a6q,B.ak,B.a6s],o),B.j,B.f,B.e)
 return A.d4(s,A.V(s,o,B.h,s,s,new A.Z(B.aa,s,p,q,s,s,B.m),s,s,s,B.LN,s,s,1/0),B.I,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,r,s,s,s,s,s,s)},
 ag1(){var s=A.b(["Ensure the full document is visible","Avoid shadows and glare","All text must be clearly legible"],t.s),r=A.b([B.Fi,B.at],t.p)
 B.b.K(r,new A.X(s,new A.aHP(),t.vr))
@@ -53540,7 +53540,7 @@ else m=q?"Rejected":"Pending"
 if(r)l="Your identity has been successfully verified."
 else l=q?"Your identity verification was declined.":"Your identity verification is awaiting review."
 k=this.a
-j=A.fM(g,B.i,g,0,B.a0,A.dP(g,g,B.hn,g,g,new A.aml(k),g,g,g),B.a6U)
+j=A.fM(g,B.i,g,0,B.a0,A.dP(g,g,B.hn,g,g,new A.aml(k),g,g,g),B.a6T)
 i=A.b9(p,B.p,3)
 h=t.p
 return A.dq(j,B.aa,new A.aY(B.an,A.bM(A.a2(A.b([B.dp,A.V(g,A.a2(A.b([A.eA(n,p,g,72),B.at,A.L(m,g,g,g,A.bF(g,g,p,g,g,g,g,g,g,g,g,22,g,g,B.v,g,g,!0,g,g,g,g,g,g,g,g),g,g)],h),B.j,B.aQ,B.e),B.h,g,g,new A.Z(o,g,i,g,g,g,B.b4),g,220,g,g,g,g,220),B.ao,A.L(a.b,g,g,g,B.pg,g,g),B.E,A.L(l,g,g,g,B.kR,B.bm,g),B.dp,B.w,A.AU(B.a5U,new A.amm(k),g),B.w],h),B.j,B.f,B.e),g,g),g),g,g,g,g)},
@@ -53575,9 +53575,9 @@ m.ds(s,new A.aOd()).gt(0)
 m.ds(s,new A.aOe()).gt(0)
 m=A.dP(n,n,B.hl,n,n,new A.aOf(a),n,n,n)
 l=t.p
-m=A.fM(A.b([A.dP(n,n,B.nB,n,n,new A.aOg(),n,n,n)],l),B.cq,n,0,n,m,B.a6A)
+m=A.fM(A.b([A.dP(n,n,B.nB,n,n,new A.aOg(),n,n,n)],l),B.cq,n,0,n,m,B.a6z)
 q=J.a3(r)
-if(q.gaa(r))q=A.bM(new A.aY(B.hc,A.a2(A.b([A.V(n,B.nA,B.h,n,n,new A.Z(B.bs,n,n,A.W(16),n,n,B.m),n,64,n,n,n,n,64),B.w,B.a6b,B.dn,B.a6D],l),B.j,B.f,B.e),n),n,n)
+if(q.gaa(r))q=A.bM(new A.aY(B.hc,A.a2(A.b([A.V(n,B.nA,B.h,n,n,new A.Z(B.bs,n,n,A.W(16),n,n,B.m),n,64,n,n,n,n,64),B.w,B.a6b,B.dn,B.a6C],l),B.j,B.f,B.e),n),n,n)
 else{p=A.b([new A.aO9(new A.aO6(o)).$0(),B.w],l)
 q=q.qb(r)
 B.b.K(p,q.gdz(q).dc(0,new A.aOh(o,new A.aO4(a),k),t.Bt).dn(0))
@@ -53702,7 +53702,7 @@ j=a.LR("TOTAL APPLICATIONS",B.k.j(p),B.i,B.ab)
 h=A.cg(a0,16,a0)
 g=A.ao(A.b([A.b_(a.LR("APPROVED",B.k.j(n),B.ab,B.i),1),A.cg(a0,a0,16),A.b_(a.LR("PENDING",B.k.j(o),B.ab,B.JP),1)],i),B.j,B.f,B.e,0)
 f=A.cg(a0,16,a0)
-e=A.ao(A.b([B.a6l],i),B.j,B.b0,B.e,0)
+e=A.ao(A.b([B.a6k],i),B.j,B.b0,B.e,0)
 d=A.ao(A.b([a.CK("All",a0),B.ah,a.CK("Pending",B.bU),B.ah,a.CK("Approved",B.bF),B.ah,a.CK("Rejected",B.cx)],i),B.j,B.f,B.e,0)
 c=J.a3(q)
 if(c.gaa(q))c=a.afD()
@@ -53733,7 +53733,7 @@ return A.d4(s,A.V(s,A.ao(A.b([A.V(s,s,B.h,s,s,new A.Z(B.C,s,s,A.W(4),s,s,B.m),s,
 CK(a,b){var s=null,r=this.w==b,q=r?B.m3:B.h_,p=A.W(20),o=A.b9(r?B.C:B.K,B.p,1.5)
 return A.d4(s,A.V(s,A.L(a,s,s,s,A.bF(s,s,r?B.i:B.ab,s,s,s,s,s,s,s,s,13,s,s,B.v,s,s,!0,s,s,s,s,s,s,s,s),s,s),B.h,s,s,new A.Z(q,s,o,p,s,s,B.m),s,s,s,B.mB,s,s,s),B.I,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,new A.aOl(this,b),s,s,s,s,s,s)},
 afD(){var s=null,r=A.W(12),q=A.b9(B.A,B.p,1)
-return A.V(s,A.a2(A.b([A.V(s,B.tI,B.h,s,s,new A.Z(B.ai,s,s,A.W(16),s,s,B.m),s,64,s,s,s,s,64),B.w,B.a6q,B.E,B.a57,B.T,A.mg(s,s,s,!1,"Apply for a Loan",new A.aOj(this),s,180)],t.p),B.j,B.f,B.e),B.h,s,s,new A.Z(B.i,s,q,r,s,s,B.m),s,s,s,B.hc,s,s,1/0)}}
+return A.V(s,A.a2(A.b([A.V(s,B.tI,B.h,s,s,new A.Z(B.ai,s,s,A.W(16),s,s,B.m),s,64,s,s,s,s,64),B.w,B.a6p,B.E,B.a57,B.T,A.mg(s,s,s,!1,"Apply for a Loan",new A.aOj(this),s,180)],t.p),B.j,B.f,B.e),B.h,s,s,new A.Z(B.i,s,q,r,s,s,B.m),s,s,s,B.hc,s,s,1/0)}}
 A.aOp.prototype={
 $2(a,b){var s,r
 if(J.fL(b.d))s=(a==null?null:J.eL(a.d))===!0
@@ -53903,15 +53903,15 @@ if(s===B.fy)p="Verified \u2014 tap to view"
 else p=s===B.io?"Pending \u2014 tap to check status":"Not verified \u2014 tap to start KYC"
 return A.V(n,A.a2(A.b([new A.aY(B.ct,j,n),B.da,new A.aY(B.ct,k,n),B.da,A.ob(!1,B.lM,!0,A.V(n,A.ao(A.b([q,B.aV,A.b_(A.a2(A.b([B.a73,A.L(p,n,n,n,A.bF(n,n,o.X9(s),n,n,n,n,n,n,n,n,11,n,n,B.a7,n,n,!0,n,n,n,n,n,n,n,n),n,n)],i),B.t,B.f,B.e),1),B.tE],i),B.j,B.f,B.e,0),B.h,n,n,B.H0,n,n,n,B.jj,n,n,n),n,!0,n,n,n,n,n,n,n,n,n,r,n,n,n,n)],i),B.j,B.f,B.e),B.h,n,n,new A.Z(B.i,n,l,m,n,n,B.m),n,n,n,n,n,n,n)},
 afy(a,b){var s=null,r=new A.aT(A.b([b.r,b.w,b.x,b.y],t.s),new A.asq(),t.gD).aN(0,", "),q=A.W(16),p=A.b9(B.A,B.p,0.5),o=b.d,n=t.p
-o=A.ao(A.b([B.NR,B.cC,A.b_(A.a2(A.b([B.a6x,B.ak,A.L(o.length===0?"Not set":o,s,s,s,B.l1,s,s)],n),B.t,B.f,B.e),1)],n),B.t,B.f,B.e,0)
-return A.V(s,A.a2(A.b([new A.aY(B.ct,o,s),B.da,new A.aY(B.ct,A.ao(A.b([B.Np,B.cC,A.b_(A.a2(A.b([B.a6Q,B.ak,A.L(r.length===0?"Not set":r,s,s,s,B.a1Y,s,s)],n),B.t,B.f,B.e),1)],n),B.t,B.f,B.e,0),s)],n),B.j,B.f,B.e),B.h,s,s,new A.Z(B.i,s,p,q,s,s,B.m),s,s,s,s,s,s,s)},
+o=A.ao(A.b([B.NR,B.cC,A.b_(A.a2(A.b([B.a6w,B.ak,A.L(o.length===0?"Not set":o,s,s,s,B.l1,s,s)],n),B.t,B.f,B.e),1)],n),B.t,B.f,B.e,0)
+return A.V(s,A.a2(A.b([new A.aY(B.ct,o,s),B.da,new A.aY(B.ct,A.ao(A.b([B.Np,B.cC,A.b_(A.a2(A.b([B.a6P,B.ak,A.L(r.length===0?"Not set":r,s,s,s,B.a1Y,s,s)],n),B.t,B.f,B.e),1)],n),B.t,B.f,B.e,0),s)],n),B.j,B.f,B.e),B.h,s,s,new A.Z(B.i,s,p,q,s,s,B.m),s,s,s,s,s,s,s)},
 afO(a,b,c){var s=null
 return A.ao(A.b([A.L("LINKED ACCOUNTS",s,s,s,B.kY,s,s),A.d4(s,A.V(s,B.NI,B.h,s,s,new A.Z(B.O,s,s,A.W(8),s,s,B.m),s,28,s,s,s,s,28),B.I,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,new A.ass(a,b,c),s,s,s,s,s,s)],t.p),B.j,B.b0,B.e,0)},
 afs(a,b){var s=null,r=A.W(16),q=A.b9(B.A,B.p,0.5),p=b.ay
 p=new A.f5(p,A.a_(p).i("f5<1>"))
 return A.V(s,A.a2(p.gdz(p).dc(0,new A.asp(this,b),t.o0).dn(0),B.j,B.f,B.e),B.h,s,s,new A.Z(B.i,s,q,r,s,s,B.m),s,s,s,s,s,s,s)},
 afQ(a,b){var s=null,r=A.W(12),q=A.b9(B.ri,B.p,0.5)
-return A.V(s,A.aVH(B.Os,B.a6X,new A.ast(b,a),A.Zt(s,s,s,s,s,s,s,s,s,s,s,s,B.mx,s,s,s,s,s,s,s)),B.h,s,s,new A.Z(B.i,s,q,r,s,s,B.m),s,s,s,s,s,s,1/0)},
+return A.V(s,A.aVH(B.Os,B.a6W,new A.ast(b,a),A.Zt(s,s,s,s,s,s,s,s,s,s,s,s,B.mx,s,s,s,s,s,s,s)),B.h,s,s,new A.Z(B.i,s,q,r,s,s,B.m),s,s,s,s,s,s,1/0)},
 Bs(a,b){var s=null,r=A.L(a,s,s,s,B.ph,s,s)
 return A.a2(A.b([r,B.ak,A.L(b.length===0?"\u2014":b,2,B.bn,s,B.l1,s,s)],t.p),B.t,B.f,B.e)},
 afc(a){var s,r,q,p,o=null
@@ -54518,7 +54518,7 @@ r=n?24:8
 n=n?B.ab:B.A
 q=new A.aS(4,4)
 j[s]=A.V(o,o,B.h,o,o,new A.Z(n,o,o,new A.cy(q,q,q,q),o,o,B.m),o,8,B.jl,o,o,o,r)}n=t.p
-return A.eE(A.bM(new A.db(B.eE,A.qa(A.a2(A.b([B.E,A.ao(A.b([B.a5A,A.ao(j,B.j,B.f,B.e,0)],n),B.j,B.b0,B.e,0),B.E,B.a6s,B.bZ,A.L("EMPLOYMENT STATUS",o,o,o,B.be,o,o),B.E,p.Ie("Select status",B.u6,new A.aIo(p),p.dx),B.bJ,A.L("EMPLOYER NAME",o,o,o,B.be,o,o),B.E,p.TD(p.ch,"e.g. Acme Corporation",B.nu,new A.aIp()),B.bJ,A.L("NETT MONTHLY INCOME",o,o,o,B.be,o,o),B.E,A.azl(p.CW,A.my(o,new A.cs(4,A.W(10),B.r),o,B.eV,o,o,o,o,!0,new A.cs(4,A.W(10),B.r),o,o,o,o,o,B.aa,!0,o,o,o,o,new A.cs(4,A.W(10),B.dx),o,o,o,o,o,o,o,o,B.ic,"0.00",o,o,o,o,o,o,o,o,o,!0,!0,!1,o,o,o,o,B.EU,k+"  ",o,o,o,o,o,o,o,o),o,B.fr,1,!1,o,B.ft,o),B.bZ,p.TA(B.Nh,"Your income details are encrypted and only used for credit assessment purposes.","Data Privacy",!0)],n),B.t,B.f,B.e),p.Q),o),o,o),B.an,o)},
+return A.eE(A.bM(new A.db(B.eE,A.qa(A.a2(A.b([B.E,A.ao(A.b([B.a5A,A.ao(j,B.j,B.f,B.e,0)],n),B.j,B.b0,B.e,0),B.E,B.a6r,B.bZ,A.L("EMPLOYMENT STATUS",o,o,o,B.be,o,o),B.E,p.Ie("Select status",B.u6,new A.aIo(p),p.dx),B.bJ,A.L("EMPLOYER NAME",o,o,o,B.be,o,o),B.E,p.TD(p.ch,"e.g. Acme Corporation",B.nu,new A.aIp()),B.bJ,A.L("NETT MONTHLY INCOME",o,o,o,B.be,o,o),B.E,A.azl(p.CW,A.my(o,new A.cs(4,A.W(10),B.r),o,B.eV,o,o,o,o,!0,new A.cs(4,A.W(10),B.r),o,o,o,o,o,B.aa,!0,o,o,o,o,new A.cs(4,A.W(10),B.dx),o,o,o,o,o,o,o,o,B.ic,"0.00",o,o,o,o,o,o,o,o,o,!0,!0,!1,o,o,o,o,B.EU,k+"  ",o,o,o,o,o,o,o,o),o,B.fr,1,!1,o,B.ft,o),B.bZ,p.TA(B.Nh,"Your income details are encrypted and only used for credit assessment purposes.","Data Privacy",!0)],n),B.t,B.f,B.e),p.Q),o),o,o),B.an,o)},
 ag6(){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e=this,d=null,c=e.gbA().bC(0,$.dA(),t.o),b=c.gp(c),a=b==null?d:b.e
 if(a==null)a="BZ"
 s=A.b_E(a)
@@ -54541,7 +54541,7 @@ g=e.gXi()
 f=A.j(g).i("bb<1>")
 f=A.hi(new A.bb(g,f),new A.aIw(),f.i("q.E"),t.kZ)
 g=A.Y(f,A.j(f).i("q.E"))
-p=A.b([B.E,p,B.E,B.a6I,B.bZ,o,B.E,n,B.dn,m,B.bJ,l,B.E,k,B.bJ,j,B.at,A.EX(h,B.a6Z,g,new A.aIx(e),d,i,t.S)],c)
+p=A.b([B.E,p,B.E,B.a6H,B.bZ,o,B.E,n,B.dn,m,B.bJ,l,B.E,k,B.bJ,j,B.at,A.EX(h,B.a6Y,g,new A.aIx(e),d,i,t.S)],c)
 o=e.go
 if(o!=null){n=A.W(12)
 m=A.V(d,B.tM,B.h,d,d,new A.Z(B.i,d,d,A.W(8),d,d,B.m),d,36,d,d,d,d,36)
@@ -54563,7 +54563,7 @@ n=o?24:8
 o=o?B.ab:B.A
 m=new A.aS(4,4)
 q[p]=A.V(h,h,B.h,h,h,new A.Z(o,h,h,new A.cy(m,m,m,m),h,h,B.m),h,8,B.jl,h,h,h,n)}o=t.p
-n=A.b([B.E,A.ao(A.b([B.a6M,A.ao(q,B.j,B.f,B.e,0)],o),B.j,B.b0,B.e,0),B.E,B.a6k,B.bZ],o)
+n=A.b([B.E,A.ao(A.b([B.a6L,A.ao(q,B.j,B.f,B.e,0)],o),B.j,B.b0,B.e,0),B.E,B.a6j,B.bZ],o)
 if(r.length!==0){m=A.L("SAVED ACCOUNTS",h,h,h,B.be,h,h)
 l=A.W(12)
 k=A.b9(B.A,B.p,1)
@@ -54585,7 +54585,7 @@ n.push(A.L("SUPPORTING DOCUMENTS",h,h,h,B.be,h,h))
 n.push(B.at)
 m=A.W(12)
 l=A.b9(B.A,B.p,1.5)
-n.push(A.d4(h,A.V(h,A.a2(A.b([A.V(h,B.O0,B.h,h,h,B.qi,h,48,h,h,h,h,48),B.at,B.a6e,B.ak,B.a5C,B.at,B.a6w],o),B.j,B.f,B.e),B.h,h,h,new A.Z(B.aa,h,l,m,h,h,B.m),h,h,h,B.LM,h,h,1/0),B.I,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h,i.garK(),h,h,h,h,h,h))
+n.push(A.d4(h,A.V(h,A.a2(A.b([A.V(h,B.O0,B.h,h,h,B.qi,h,48,h,h,h,h,48),B.at,B.a70,B.ak,B.a5C,B.at,B.a6v],o),B.j,B.f,B.e),B.h,h,h,new A.Z(B.aa,h,l,m,h,h,B.m),h,h,h,B.LM,h,h,1/0),B.I,!1,h,h,h,h,h,h,h,h,h,h,h,h,h,h,i.garK(),h,h,h,h,h,h))
 m=i.fy
 if(m.length!==0){o=A.b([B.w],o)
 m=new A.f5(m,A.a_(m).i("f5<1>"))
@@ -54797,7 +54797,7 @@ q=A.Y2(A.V(l,B.Ns,B.h,l,l,B.H4,l,88,l,l,l,l,88),q)
 p=A.W(20)
 o=A.b([new A.bT(0,B.a2,A.b4(15,B.u.F()>>>16&255,B.u.F()>>>8&255,B.u.F()&255),B.k8,20)],t.G)
 n=t.p
-o=A.b_(A.eE(A.bM(new A.db(B.fN,new A.e4(r,!1,A.a2(A.b([B.ao,q,B.bZ,B.a65,B.at,B.a6u,B.ao,A.V(l,A.a2(A.b([new A.aY(B.rP,A.a2(A.b([B.a5Q,B.E,A.L(A.ez(j,k),l,l,l,B.a05,l,l)],n),B.j,B.f,B.e),l),new A.aY(B.an,A.a2(A.b([A.ao(A.b([A.b_(m.AM("LOAN AMOUNT",A.ez(m.a.d.x,k)),1),A.b_(m.AM("DURATION",A.TR(m.a.d.z)),1)],n),B.j,B.f,B.e,0),B.bJ,A.ao(A.b([A.b_(m.AM("INTEREST RATE",""+i+"% p.a."),1),A.b_(m.AM("PURPOSE",m.a.d.y),1)],n),B.j,B.f,B.e,0)],n),B.j,B.aQ,B.e),l)],n),B.j,B.f,B.e),B.h,l,l,new A.Z(B.i,l,l,p,o,l,B.m),l,l,l,l,l,l,1/0),B.kI],n),B.j,B.f,B.e),l),l),l,l),B.rN,l),1)
+o=A.b_(A.eE(A.bM(new A.db(B.fN,new A.e4(r,!1,A.a2(A.b([B.ao,q,B.bZ,B.a65,B.at,B.a6t,B.ao,A.V(l,A.a2(A.b([new A.aY(B.rP,A.a2(A.b([B.a5Q,B.E,A.L(A.ez(j,k),l,l,l,B.a05,l,l)],n),B.j,B.f,B.e),l),new A.aY(B.an,A.a2(A.b([A.ao(A.b([A.b_(m.AM("LOAN AMOUNT",A.ez(m.a.d.x,k)),1),A.b_(m.AM("DURATION",A.TR(m.a.d.z)),1)],n),B.j,B.f,B.e,0),B.bJ,A.ao(A.b([A.b_(m.AM("INTEREST RATE",""+i+"% p.a."),1),A.b_(m.AM("PURPOSE",m.a.d.y),1)],n),B.j,B.f,B.e,0)],n),B.j,B.aQ,B.e),l)],n),B.j,B.f,B.e),B.h,l,l,new A.Z(B.i,l,l,p,o,l,B.m),l,l,l,l,l,l,1/0),B.kI],n),B.j,B.f,B.e),l),l),l,l),B.rN,l),1)
 p=A.d4(l,A.ao(B.Sh,B.j,B.f,B.e,0),B.I,!1,l,l,l,l,l,l,l,l,l,l,l,l,l,l,new A.aCF(),l,l,l,l,l,l)
 q=A.eQ(l,l,B.ab,l,l,l,l,l,l,B.i,l,B.J,B.he,l,new A.bQ(A.W(12),B.r),l,l,B.hH,l,l)
 return A.dq(s,B.aa,A.a2(A.b([o,A.V(l,A.bM(new A.db(B.fN,A.a2(A.b([A.ao(A.b([p,B.dp,A.hY(A.ao(B.Rt,B.j,B.f,B.as,0),new A.aCG(a),q)],n),B.j,B.f,B.e,0),B.w,B.a5T],n),B.j,B.f,B.e),l),l,l),B.h,B.aa,l,l,l,l,l,B.rO,l,l,l)],n),B.j,B.f,B.e),l,l,l,l)},
@@ -55069,7 +55069,7 @@ $2(a,b){var s=null
 return A.bM(A.L("Error: "+A.m(a),s,s,s,s,s,s),s,s)},
 $S:119}
 A.aPC.prototype={
-$1(a){var s,r,q,p=null,o=J.cK(a),n=o.ds(a,new A.aPw()).gt(0),m=this.a,l=t.p,k=A.b([B.a67,B.dn,B.a6y,B.w],l)
+$1(a){var s,r,q,p=null,o=J.cK(a),n=o.ds(a,new A.aPw()).gt(0),m=this.a,l=t.p,k=A.b([B.a67,B.dn,B.a6x,B.w],l)
 if(n>0){s=A.W(10)
 r=A.b9(B.A,B.p,1)
 q=n>1?"S":""
@@ -55267,14 +55267,14 @@ if(l.y!=null)B.b.K(n,A.b([B.ah,B.Or],h))
 s=A.d4(k,A.V(k,new A.aY(B.ct,A.ao(n,B.j,B.aQ,B.e,0),k),B.h,k,k,new A.Z(B.i,k,o,p,k,k,B.m),k,k,k,k,k,k,1/0),B.I,!1,k,k,k,k,k,k,k,k,k,k,k,k,k,k,s,k,k,k,k,k,k)
 p=A.W(12)
 o=A.b9(B.A,B.p,1)
-return A.a2(A.b([B.E,B.a6P,B.at,B.a6S,B.bZ,j,B.w,i,B.w,s,B.bJ,A.V(k,A.ao(A.b([A.V(k,B.On,B.h,k,k,new A.Z(B.eL,k,k,A.W(8),k,k,B.m),k,36,k,k,k,k,36),B.aV,B.Mh],h),B.j,B.f,B.e,0),B.h,k,k,new A.Z(B.aa,k,o,p,k,k,B.m),k,k,k,B.cc,k,k,k)],h),B.t,B.f,B.e)},
+return A.a2(A.b([B.E,B.a6O,B.at,B.a6R,B.bZ,j,B.w,i,B.w,s,B.bJ,A.V(k,A.ao(A.b([A.V(k,B.On,B.h,k,k,new A.Z(B.eL,k,k,A.W(8),k,k,B.m),k,36,k,k,k,k,36),B.aV,B.Mh],h),B.j,B.f,B.e,0),B.h,k,k,new A.Z(B.aa,k,o,p,k,k,B.m),k,k,k,B.cc,k,k,k)],h),B.t,B.f,B.e)},
 awa(a){var s,r,q,p,o,n,m=this,l=null,k=m.gbA().bT($.dA(),t.o)
 a=k.gp(k)
 s=a==null?l:a.ay
 if(s==null)s=A.b([],t.CV)
 B.b.fM(s,new A.aP2(m))
 k=t.p
-r=A.b([B.E,B.a6j,B.E,B.a6v,B.T,B.a6L,B.at],k)
+r=A.b([B.E,B.a6i,B.E,B.a6u,B.T,B.a6K,B.at],k)
 q=m.x
 if(q!=null&&q.e!==B.d2){q=A.W(10)
 p=A.b9(B.ri,B.p,1)
@@ -55421,7 +55421,7 @@ o=A.V(q,A.bM(s,q,q),B.h,q,q,new A.Z(o,q,q,q,q,q,B.b4),q,32,q,q,q,q,32)
 s=this.b[a]
 r=t.p
 s=A.b([o,B.dn,A.L(s.toUpperCase(),q,q,q,A.bF(q,q,m||n?B.O:B.b5,q,q,q,q,q,q,q,q,9,q,q,B.v,q,q,!0,q,0.5,q,q,q,q,q,q),q,q)],r)
-if(n)s.push(B.a6n)
+if(n)s.push(B.a6m)
 o=A.b([A.a2(s,B.j,B.f,B.e)],r)
 if(a<2)o.push(A.b_(A.V(q,q,B.h,a<p.w?B.O:B.A,q,q,q,2,B.LK,q,q,q,q),1))
 return A.b_(A.ao(o,B.j,B.f,B.e,0),1)},
@@ -55540,7 +55540,7 @@ r=s.r
 j=r.length
 if(j>=4)r=B.c.by(r,j-4)
 j=t.p
-q=A.fM(A.b([A.dP(k,k,B.nB,k,k,new A.aPt(),k,k,k)],j),B.cq,!0,0,k,k,B.a6g)
+q=A.fM(A.b([A.dP(k,k,B.nB,k,k,new A.aPt(),k,k,k)],j),B.cq,!0,0,k,k,B.a6f)
 p=l.y
 p===$&&A.a()
 o=l.x
@@ -55548,7 +55548,7 @@ o===$&&A.a()
 o=A.Y2(A.V(k,A.bM(A.V(k,B.Nu,B.h,k,k,B.qk,k,64,k,k,k,k,64),k,k),B.h,k,k,B.qi,k,100,k,k,k,k,100),o)
 n=A.W(20)
 m=A.b([new A.bT(0,B.a2,A.b4(13,B.u.F()>>>16&255,B.u.F()>>>8&255,B.u.F()&255),B.k8,20)],t.G)
-m=A.b_(A.eE(A.bM(new A.db(B.fN,new A.e4(p,!1,A.a2(A.b([B.w,o,B.bZ,B.a5t,B.eo,B.a6O,B.ao,A.V(k,A.a2(A.b([new A.aY(B.rP,A.a2(A.b([B.a5W,B.i8,A.L(A.ez(s.e,h),k,k,k,B.Fa,k,k)],j),B.j,B.f,B.e),k),B.da,new A.aY(B.an,A.a2(A.b([l.afA("DESTINATION",s.f,"Ending in "+r),B.bJ,l.afz("STATUS","PENDING REVIEW",!0)],j),B.j,B.f,B.e),k)],j),B.j,B.f,B.e),B.h,k,k,new A.Z(B.i,k,k,n,m,k,B.m),k,k,k,k,k,k,1/0)],j),B.j,B.f,B.e),k),k),k,k),B.rO,k),1)
+m=A.b_(A.eE(A.bM(new A.db(B.fN,new A.e4(p,!1,A.a2(A.b([B.w,o,B.bZ,B.a5t,B.eo,B.a6N,B.ao,A.V(k,A.a2(A.b([new A.aY(B.rP,A.a2(A.b([B.a5W,B.i8,A.L(A.ez(s.e,h),k,k,k,B.Fa,k,k)],j),B.j,B.f,B.e),k),B.da,new A.aY(B.an,A.a2(A.b([l.afA("DESTINATION",s.f,"Ending in "+r),B.bJ,l.afz("STATUS","PENDING REVIEW",!0)],j),B.j,B.f,B.e),k)],j),B.j,B.f,B.e),B.h,k,k,new A.Z(B.i,k,k,n,m,k,B.m),k,k,k,k,k,k,1/0)],j),B.j,B.f,B.e),k),k),k,k),B.rO,k),1)
 n=A.eQ(k,k,B.O,k,k,k,k,k,k,B.i,k,B.J,B.rH,k,new A.bQ(A.W(14),B.r),k,k,B.hH,k,k)
 return A.dq(q,B.cq,A.a2(A.b([m,A.V(k,A.bM(new A.db(B.fN,A.a2(A.b([A.cg(A.hY(A.ao(B.QN,B.j,B.aQ,B.e,0),new A.aPu(a),n),k,1/0),B.w,A.d4(k,B.a74,B.I,!1,k,k,k,k,k,k,k,k,k,k,k,k,k,k,new A.aPv(a),k,k,k,k,k,k)],j),B.j,B.f,B.e),k),k,k),B.h,B.cq,k,k,k,k,k,B.M4,k,k,k)],j),B.j,B.f,B.e),k,k,k,k)},
 Ts(a,b,c,d){var s=null,r=A.L(a,s,s,s,B.a2i,s,s),q=t.p,p=A.b([],q)
@@ -106292,7 +106292,7 @@ A.a6k.prototype={}
 A.yA.prototype={
 G(a){var s=null,r=this.c
 r=r==null?s:"GoException: "+r.a
-return A.Aj(!0,A.bM(A.a2(A.b([B.a6o,B.w,A.L(r==null?"page not found":r,s,s,s,s,s,s),B.w,new A.L1(new A.ahk(a),B.a5G,s)],t.p),B.j,B.aQ,B.e),s,s),B.aN,!0)}}
+return A.Aj(!0,A.bM(A.a2(A.b([B.a6n,B.w,A.L(r==null?"page not found":r,s,s,s,s,s,s),B.w,new A.L1(new A.ahk(a),B.a5G,s)],t.p),B.j,B.aQ,B.e),s,s),B.aN,!0)}}
 A.ahk.prototype={
 $0(){return A.bj(this.a).b_(0,"/",null)},
 $S:0}
@@ -106342,7 +106342,7 @@ A.zo.prototype={
 G(a){var s=null,r=A.fM(s,s,s,s,s,s,B.a4X),q=this.c
 q=q==null?s:"GoException: "+q.a
 if(q==null)q="page not found"
-return A.dq(r,s,A.bM(A.a2(A.b([new A.IS(q,s),A.AU(B.a6B,new A.apg(a),s)],t.p),B.j,B.aQ,B.e),s,s),s,s,s,s)}}
+return A.dq(r,s,A.bM(A.a2(A.b([new A.IS(q,s),A.AU(B.a6A,new A.apg(a),s)],t.p),B.j,B.aQ,B.e),s,s),s,s,s,s)}}
 A.apg.prototype={
 $0(){return A.bj(this.a).b_(0,"/",null)},
 $S:0}
@@ -114676,8 +114676,8 @@ B.K=new A.J(1,0.39215686274509803,0.4549019607843137,0.5450980392156862,B.l)
 B.O4=new A.aP(B.jE,48,B.K,null,null)
 B.E=new A.cE(null,8,null,null)
 B.kZ=new A.n(!0,B.K,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6T=new A.a7("Failed to load document",null,B.kZ,null,null,null,null,null,null)
-B.PI=s([B.O4,B.E,B.a6T],t.p)
+B.a6S=new A.a7("Failed to load document",null,B.kZ,null,null,null,null,null,null)
+B.PI=s([B.O4,B.E,B.a6S],t.p)
 B.Ks=new A.fP(B.ar,B.f,B.as,B.j,null,B.cG,null,0,B.PI,null)
 B.J7=new A.e2(B.N,null,null,B.Ks,null)
 B.aaM=new A.aBo(0,"material")
@@ -114691,8 +114691,8 @@ B.Ja=new A.e2(B.N,null,null,B.Ku,null)
 B.an=new A.am(24,24,24,24)
 B.Jj=new A.ix(null,null,null,null,null,B.C,null,null,null,null)
 B.bz=new A.n(!0,B.K,null,null,null,null,14,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a7_=new A.a7("Please wait...",null,B.bz,null,null,null,null,null,null)
-B.PG=s([B.Jj,B.w,B.a7_],t.p)
+B.a6Z=new A.a7("Please wait...",null,B.bz,null,null,null,null,null,null)
+B.PG=s([B.Jj,B.w,B.a6Z],t.p)
 B.Kv=new A.fP(B.ar,B.f,B.as,B.j,null,B.cG,null,0,B.PG,null)
 B.VS=new A.aY(B.an,B.Kv,null)
 B.aaN=new A.aDR(0,"elevated")
@@ -115158,8 +115158,8 @@ B.Kt=new A.fP(B.ar,B.f,B.e,B.t,null,B.cG,null,0,B.Sq,null)
 B.Mh=new A.mo(1,B.f2,B.Kt,null)
 B.a7=new A.he(600)
 B.F0=new A.n(!0,B.O,null,null,null,null,13,B.a7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6Y=new A.a7("LOAN_AGREEMENT.PDF",null,B.F0,null,null,null,null,null,null)
-B.Mi=new A.mo(1,B.f2,B.a6Y,null)
+B.a6X=new A.a7("LOAN_AGREEMENT.PDF",null,B.F0,null,null,null,null,null,null)
+B.Mi=new A.mo(1,B.f2,B.a6X,null)
 B.Ml=new A.yC(null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.jo=new A.nW(!1,!1,!1,!1)
 B.jp=new A.nW(!1,!1,!1,!0)
@@ -115637,10 +115637,10 @@ B.ZY=new A.AF(2,"cache")
 B.ue=s([B.p_,B.ZX,B.ZY],A.ag("D<AF>"))
 B.uf=s([0,21,51,121,151,191,271,321,360],t.n)
 B.pc=new A.n(!0,B.a0,null,null,null,null,16,B.v,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6f=new A.a7("KYC Approval",null,B.pc,null,null,null,null,null,null)
+B.a6e=new A.a7("KYC Approval",null,B.pc,null,null,null,null,null,null)
 B.a0Z=new A.n(!0,B.K,null,null,null,null,11,B.y,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.a53=new A.a7("AEMO Finance Admin",null,B.a0Z,null,null,null,null,null,null)
-B.R3=s([B.a6f,B.a53],t.p)
+B.R3=s([B.a6e,B.a53],t.p)
 B.R4=s(["Q1","Q2","Q3","Q4"],t.s)
 B.R5=s([-1,0,0,1,0,0,-1,0,1,0,0,0,-1,1,0,1,1,1,1,0],t.n)
 B.Gz=new A.Rp(2,"outer")
@@ -115760,9 +115760,9 @@ B.S3=s([B.Hm],t.G)
 B.S5=s([B.fM,B.dR,B.d2],A.ag("D<m4>"))
 B.S9=s([47,47,47,47,72,97,122,147],t.t)
 B.EW=new A.n(!0,B.a0,null,null,null,null,13,B.a7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6W=new A.a7("Current Status",null,B.EW,null,null,null,null,null,null)
+B.a6V=new A.a7("Current Status",null,B.EW,null,null,null,null,null,null)
 B.a6_=new A.a7("In Review - Pending Approval",null,B.cF,null,null,null,null,null,null)
-B.Sb=s([B.a6W,B.cD,B.a6_],t.p)
+B.Sb=s([B.a6V,B.cD,B.a6_],t.p)
 B.hs=s([B.dQ,B.d1,B.iA,B.iB,B.lH],t.QP)
 B.Gd=new A.xA(0,"count")
 B.Ge=new A.xA(1,"sum")
@@ -117275,20 +117275,20 @@ B.ZL=new A.n_(5,"timeout")
 B.ZM=new A.AE(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.a5k=new A.a7("Failed to generate agreement",null,null,null,null,null,null,null,null)
 B.ZN=new A.iZ(B.a5k,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
-B.a6N=new A.a7("Please enter a valid loan amount",null,null,null,null,null,null,null,null)
-B.ZO=new A.iZ(B.a6N,B.am,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
-B.a6i=new A.a7("Please upload at least one document",null,null,null,null,null,null,null,null)
-B.ZP=new A.iZ(B.a6i,B.am,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
+B.a6M=new A.a7("Please enter a valid loan amount",null,null,null,null,null,null,null,null)
+B.ZO=new A.iZ(B.a6M,B.am,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
+B.a6h=new A.a7("Please upload at least one document",null,null,null,null,null,null,null,null)
+B.ZP=new A.iZ(B.a6h,B.am,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
 B.a62=new A.a7("Please upload your loan agreement to proceed.",null,null,null,null,null,null,null,null)
 B.ZQ=new A.iZ(B.a62,B.am,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
 B.a75=new A.a7("Please enter your email to reset password",null,null,null,null,null,null,null,null)
 B.ZR=new A.iZ(B.a75,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
 B.a56=new A.a7("Password reset email sent. Please check your inbox.",null,null,null,null,null,null,null,null)
 B.ZS=new A.iZ(B.a56,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
-B.a6R=new A.a7("Failed to send password reset email. Please try again.",null,null,null,null,null,null,null,null)
-B.ZT=new A.iZ(B.a6R,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
-B.a6m=new A.a7("Password reset successful!",null,null,null,null,null,null,null,null)
-B.ZU=new A.iZ(B.a6m,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
+B.a6Q=new A.a7("Failed to send password reset email. Please try again.",null,null,null,null,null,null,null,null)
+B.ZT=new A.iZ(B.a6Q,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
+B.a6l=new A.a7("Password reset successful!",null,null,null,null,null,null,null,null)
+B.ZU=new A.iZ(B.a6l,null,null,null,null,null,null,null,null,null,null,null,null,B.cs,!1,null,null,null,B.H,null)
 B.Ep=new A.Jj(0,"permissive")
 B.ZV=new A.Jj(1,"normal")
 B.ZW=new A.Jj(2,"forced")
@@ -117821,60 +117821,60 @@ B.a6a=new A.a7("Reject",null,null,null,null,null,null,null,null)
 B.a6b=new A.a7("No Applications yet",null,B.id,null,null,null,null,null,null)
 B.a6c=new A.a7("Sign in",null,B.pe,null,null,null,null,null,null)
 B.a6d=new A.a7("DOCUMENT PREVIEW",null,B.be,null,null,null,null,null,null)
-B.a6e=new A.a7("Upload ID or Pay Stubs",null,B.ie,null,null,null,null,null,null)
-B.a6g=new A.a7("Transaction",null,B.ik,null,null,null,null,null,null)
-B.a6h=new A.a7("Loan Duration",null,B.ig,null,null,null,null,null,null)
+B.a6f=new A.a7("Transaction",null,B.ik,null,null,null,null,null,null)
+B.a6g=new A.a7("Loan Duration",null,B.ig,null,null,null,null,null,null)
 B.Fh=new A.a7("Withdrawals",null,B.ik,null,null,null,null,null,null)
 B.a3c=new A.n(!0,B.O,null,null,null,null,26,B.bk,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6j=new A.a7("Select bank account",null,B.a3c,null,null,null,null,null,null)
-B.a6k=new A.a7("Please verify your payout details and upload required documentation.",null,B.ii,null,null,null,null,null,null)
-B.a6l=new A.a7("Your Applications",null,B.pf,null,null,null,null,null,null)
+B.a6i=new A.a7("Select bank account",null,B.a3c,null,null,null,null,null,null)
+B.a6j=new A.a7("Please verify your payout details and upload required documentation.",null,B.ii,null,null,null,null,null,null)
+B.a6k=new A.a7("Your Applications",null,B.pf,null,null,null,null,null,null)
 B.Fi=new A.a7("PHOTO REQUIREMENTS",null,B.be,null,null,null,null,null,null)
 B.a1B=new A.n(!0,B.aD,null,null,null,null,9,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6n=new A.a7("Verified",null,B.a1B,null,null,null,null,null,null)
-B.a6o=new A.a7("Page Not Found",null,B.kS,null,null,null,null,null,null)
-B.a6p=new A.a7("Verification Submitted",null,B.Fc,B.bm,null,null,null,null,null)
-B.a6q=new A.a7("No applications yet",null,B.EZ,null,null,null,null,null,null)
-B.a6r=new A.a7("Take a photo",null,B.ie,null,null,null,null,null,null)
-B.a6s=new A.a7("Please provide your professional details to help us assess your eligibility.",null,B.ii,null,null,null,null,null,null)
-B.a6t=new A.a7("or upload from your files",null,B.es,null,null,null,null,null,null)
-B.a6u=new A.a7("Your request is being processed. We'll notify you via email once we're done.",null,B.ii,B.bm,null,null,null,null,null)
-B.a6v=new A.a7("Select a linked account or connect a new one to complete your withdrawal security check.",null,B.kX,null,null,null,null,null,null)
-B.a6w=new A.a7("Browse Files",null,B.pi,null,null,null,null,null,null)
-B.a6x=new A.a7("MOBILE NUMBER",null,B.ph,null,null,null,null,null,null)
-B.a6y=new A.a7("Transfer Portfolio",null,B.ER,null,null,null,null,null,null)
-B.a6z=new A.a7("PERSONAL INFORMATION",null,B.be,null,null,null,null,null,null)
-B.a6A=new A.a7("Applications",null,B.ik,null,null,null,null,null,null)
-B.a6B=new A.a7("Home",null,null,null,null,null,null,null,null)
-B.a6C=new A.a7("User Profile",null,null,null,null,null,null,null,null)
-B.a6D=new A.a7("Your application history will appear here",null,B.ih,null,null,null,null,null,null)
-B.a6E=new A.a7("Applications",null,B.l_,null,null,null,null,null,null)
+B.a6m=new A.a7("Verified",null,B.a1B,null,null,null,null,null,null)
+B.a6n=new A.a7("Page Not Found",null,B.kS,null,null,null,null,null,null)
+B.a6o=new A.a7("Verification Submitted",null,B.Fc,B.bm,null,null,null,null,null)
+B.a6p=new A.a7("No applications yet",null,B.EZ,null,null,null,null,null,null)
+B.a6q=new A.a7("Take a photo",null,B.ie,null,null,null,null,null,null)
+B.a6r=new A.a7("Please provide your professional details to help us assess your eligibility.",null,B.ii,null,null,null,null,null,null)
+B.a6s=new A.a7("or upload from your files",null,B.es,null,null,null,null,null,null)
+B.a6t=new A.a7("Your request is being processed. We'll notify you via email once we're done.",null,B.ii,B.bm,null,null,null,null,null)
+B.a6u=new A.a7("Select a linked account or connect a new one to complete your withdrawal security check.",null,B.kX,null,null,null,null,null,null)
+B.a6v=new A.a7("Browse Files",null,B.pi,null,null,null,null,null,null)
+B.a6w=new A.a7("MOBILE NUMBER",null,B.ph,null,null,null,null,null,null)
+B.a6x=new A.a7("Transfer Portfolio",null,B.ER,null,null,null,null,null,null)
+B.a6y=new A.a7("PERSONAL INFORMATION",null,B.be,null,null,null,null,null,null)
+B.a6z=new A.a7("Applications",null,B.ik,null,null,null,null,null,null)
+B.a6A=new A.a7("Home",null,null,null,null,null,null,null,null)
+B.a6B=new A.a7("User Profile",null,null,null,null,null,null,null,null)
+B.a6C=new A.a7("Your application history will appear here",null,B.ih,null,null,null,null,null,null)
+B.a6D=new A.a7("Applications",null,B.l_,null,null,null,null,null,null)
 B.a12=new A.n(!0,B.i,null,null,null,null,15,B.a7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6F=new A.a7("Go to Dashboard",null,B.a12,null,null,null,null,null,null)
-B.a6G=new A.a7("Registered Users",null,B.ik,null,null,null,null,null,null)
-B.a6H=new A.a7("Need Help?",null,B.ie,null,null,null,null,null,null)
-B.a6I=new A.a7("Please specify the amount and purpose of your loan. This helps us tailor the best rates for your financial goals.",null,B.ii,null,null,null,null,null,null)
+B.a6E=new A.a7("Go to Dashboard",null,B.a12,null,null,null,null,null,null)
+B.a6F=new A.a7("Registered Users",null,B.ik,null,null,null,null,null,null)
+B.a6G=new A.a7("Need Help?",null,B.ie,null,null,null,null,null,null)
+B.a6H=new A.a7("Please specify the amount and purpose of your loan. This helps us tailor the best rates for your financial goals.",null,B.ii,null,null,null,null,null,null)
 B.F9=new A.n(!0,B.b5,null,null,null,null,10,B.v,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Fj=new A.a7("AMOUNT",null,B.F9,null,null,null,null,null,null)
-B.a6J=new A.a7("Please upload a clear photo of your face for identity verification. Ensure good lighting and that your face is fully visible.",null,B.kR,null,null,null,null,null,null)
+B.a6I=new A.a7("Please upload a clear photo of your face for identity verification. Ensure good lighting and that your face is fully visible.",null,B.kR,null,null,null,null,null,null)
 B.Fk=new A.a7("Bank Name",null,B.F3,null,null,null,null,null,null)
-B.a6K=new A.a7("Country",null,B.ig,null,null,null,null,null,null)
-B.a6L=new A.a7("LINKED ACCOUNTS",null,B.l0,null,null,null,null,null,null)
+B.a6J=new A.a7("Country",null,B.ig,null,null,null,null,null,null)
+B.a6K=new A.a7("LINKED ACCOUNTS",null,B.l0,null,null,null,null,null,null)
 B.Fl=new A.a7("Identity Verification",null,B.ft,null,null,null,null,null,null)
-B.a6M=new A.a7("Bank & Documents",null,B.kT,null,null,null,null,null,null)
-B.a6O=new A.a7("Your withdrawal request has been successfully submitted and is now pending review. This process typically takes 1\u20132 business days.",null,B.kX,B.bm,null,null,null,null,null)
+B.a6L=new A.a7("Bank & Documents",null,B.kT,null,null,null,null,null,null)
+B.a6N=new A.a7("Your withdrawal request has been successfully submitted and is now pending review. This process typically takes 1\u20132 business days.",null,B.kX,B.bm,null,null,null,null,null)
 B.a2X=new A.n(!0,B.O,null,null,null,null,26,B.bk,null,null,null,null,1.2,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6P=new A.a7("Verification Required for Withdrawal",null,B.a2X,null,null,null,null,null,null)
-B.a6Q=new A.a7("RESIDENTIAL ADDRESS",null,B.ph,null,null,null,null,null,null)
-B.a6S=new A.a7("To ensure regulatory compliance and secure your funds, please review and upload your signed withdrawal agreement.",null,B.kX,null,null,null,null,null,null)
+B.a6O=new A.a7("Verification Required for Withdrawal",null,B.a2X,null,null,null,null,null,null)
+B.a6P=new A.a7("RESIDENTIAL ADDRESS",null,B.ph,null,null,null,null,null,null)
+B.a6R=new A.a7("To ensure regulatory compliance and secure your funds, please review and upload your signed withdrawal agreement.",null,B.kX,null,null,null,null,null,null)
 B.a3y=new A.n(!0,null,null,null,null,null,16,B.v,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6U=new A.a7("KYC Status",null,B.a3y,null,null,null,null,null,null)
-B.a6V=new A.a7("USER INFORMATION",null,B.be,null,null,null,null,null,null)
+B.a6T=new A.a7("KYC Status",null,B.a3y,null,null,null,null,null,null)
+B.a6U=new A.a7("USER INFORMATION",null,B.be,null,null,null,null,null,null)
 B.Fm=new A.a7("DESTINATION",null,B.F9,null,null,null,null,null,null)
 B.a3O=new A.n(!0,B.am,null,null,null,null,15,B.a7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a6X=new A.a7(" Log Out",null,B.a3O,null,null,null,null,null,null)
-B.a6Z=new A.a7("Select an option",null,B.ic,null,null,null,null,null,null)
-B.a70=new A.a7("Applications will appear here once submitted",null,B.bz,null,null,null,null,null,null)
+B.a6W=new A.a7(" Log Out",null,B.a3O,null,null,null,null,null,null)
+B.a6Y=new A.a7("Select an option",null,B.ic,null,null,null,null,null,null)
+B.a7_=new A.a7("Applications will appear here once submitted",null,B.bz,null,null,null,null,null,null)
+B.a70=new A.a7("Upload ID and Pay Stubs (You can upload multiple files)",null,B.ie,null,null,null,null,null,null)
 B.a71=new A.a7("Create one",null,B.pe,null,null,null,null,null,null)
 B.a0Y=new A.n(!0,null,null,null,null,null,null,B.a7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.a72=new A.a7("Approve KYC",null,B.a0Y,null,null,null,null,null,null)

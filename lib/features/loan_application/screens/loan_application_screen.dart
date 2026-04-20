@@ -1180,7 +1180,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'Upload ID or Pay Stubs',
+                          'Upload ID and Pay Stubs (You can upload multiple files)',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
