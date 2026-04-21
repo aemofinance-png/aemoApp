@@ -49,12 +49,8 @@ class LoanNotifier extends StateNotifier<LoanState> {
     this._userId,
     this._countryCode,
   ) : super(const LoanState()) {
-    print('LoanNotifier created — userId: $_userId'); // 👈 add
     if (_userId.isNotEmpty) {
-      print('Fetching applications...'); // 👈 add
       fetchApplications();
-    } else {
-      print('userId is empty — skipping fetch'); // 👈 add
     }
   }
 
@@ -73,29 +69,21 @@ class LoanNotifier extends StateNotifier<LoanState> {
     required String accountNumber,
     required List<PlatformFile> documents,
   }) async {
-    print('submitApplication called — userId: $_userId');
     state = state.copyWith(isLoading: true, error: null, isSuccess: false);
 
     try {
       final applicationId = const Uuid().v4();
-      print('Application ID: $applicationId');
 
       final documentUrls = <String>[];
       for (final document in documents) {
-        print('Uploading document: ${document.name}');
-        print('Document bytes: ${document.bytes?.length}');
-
         final url = await _storageService.uploadFile(
           userId: _userId,
           applicationId: applicationId,
           file: document,
         );
 
-        print('Upload complete: $url');
         documentUrls.add(url);
       }
-
-      print('All documents uploaded, saving to Firestore...');
 
       final application = LoanApplicationModel(
         id: applicationId,

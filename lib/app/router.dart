@@ -7,7 +7,7 @@ import 'package:aemo_loan_app/features/landing_page/landing_page_mobile.dart';
 import 'package:aemo_loan_app/features/landing_page/responsive_layout.dart';
 import 'package:aemo_loan_app/features/withdrawal/withdrawal_screen.dart';
 import 'package:aemo_loan_app/features/withdrawal/withdrawal_success_screen.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/providers/auth_provider.dart';
@@ -71,12 +71,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith(AppRoutes.calculator) ||
           location.startsWith(AppRoutes.applicationSubmitted) ||
           location.startsWith(AppRoutes.resetPassword);
-      print('location: $location');
 
       final isLoggedIn = authState.value != null;
       final isLoading = authState.isLoading;
-      print(
-          'location: $location | isLoading: $isLoading | isLoggedIn: $isLoggedIn | isPublicRoute: $isPublicRoute');
+
       if (isLoading) return null;
       // if (state.uri.path == '/') return AppRoutes.home;
 

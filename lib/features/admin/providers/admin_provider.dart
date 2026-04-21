@@ -53,7 +53,6 @@ class AdminNotifier extends StateNotifier<AdminState> {
       );
     } catch (e) {
       state = state.copyWith(error: e.toString());
-      debugPrint('Delete application error: $e');
     }
   }
 
@@ -78,7 +77,6 @@ class AdminNotifier extends StateNotifier<AdminState> {
       await _firestoreService.updateVerificationStatus(userId, status);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      debugPrint('KYC update error: $e');
     } finally {
       state = state.copyWith(isLoading: false);
     }

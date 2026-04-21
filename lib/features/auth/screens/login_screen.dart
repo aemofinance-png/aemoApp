@@ -74,7 +74,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-    print('Login success: $success');
     if (!success) return;
     if (!mounted) return;
 
@@ -88,10 +87,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (profile != null) break;
       await Future.delayed(const Duration(milliseconds: 500));
     }
-
-    // if (!mounted) return;
-
-    print('Profile role = "${profile?.role}"');
 
     if (profile?.role == 'admin') {
       context.go(AppRoutes.admin);

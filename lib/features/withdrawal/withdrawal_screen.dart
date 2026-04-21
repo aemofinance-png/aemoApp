@@ -1160,18 +1160,10 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
           onPressed: () async {
             if (_currentStep < 3 && _uploadedDocument != null) {
               setState(() {
-                try {
-                  print('First Print: $_currentStep');
-                  _currentStep++;
-                  print('Second Print: $_currentStep');
-                } catch (e, stack) {
-                  print('CAUGHT ERROR: $e');
-                  print(stack);
-                }
-                return;
+                _currentStep++;
               });
+              return;
             } else {
-              print(_currentStep);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content:

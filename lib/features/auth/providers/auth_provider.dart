@@ -21,14 +21,12 @@ final currentUserProvider = FutureProvider<UserModel?>((ref) async {
       if (user == null) return null;
       final firestoreService = ref.watch(firestoreServiceProvider);
       final result = await firestoreService.getUser(user.uid);
-      // 👈 add this
       return result;
     },
     loading: () {
       return null;
     },
     error: (e, _) {
-      print('Auth state error: $e'); // 👈 add this
       return null;
     },
   );

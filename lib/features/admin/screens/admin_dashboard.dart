@@ -18,14 +18,31 @@ class AdminDashboard extends ConsumerStatefulWidget {
   ConsumerState<AdminDashboard> createState() => _AdminDashboardState();
 }
 
-class _AdminDashboardState extends ConsumerState<AdminDashboard> {
+class _AdminDashboardState extends ConsumerState<AdminDashboard>
+    with SingleTickerProviderStateMixin {
   LoanStatus? _selectedFilter; // null = show all
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => ref.read(adminNotifierProvider.notifier).fetchAllApplications());
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    Future.microtask(() async {
+      await ref.read(adminNotifierProvider.notifier).fetchAllApplications();
+      // Remove direct animation forward from here, as it will be handled by the listener
+      // if (mounted) {
+      //   _animationController.forward();
+      // }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _handleLogout() async {
@@ -35,6 +52,19 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AdminState>(adminNotifierProvider, (previous, next) {
+      // Trigger animation if loading just finished, or if it's the first load with data
+      final finishedLoading =
+          previous?.isLoading == true && next.isLoading == false;
+      final initialDataArrival = previous == null &&
+          next.isLoading == false &&
+          next.applications.isNotEmpty;
+
+      if (finishedLoading || initialDataArrival) {
+        _animationController.reset();
+        _animationController.forward();
+      }
+    });
     final adminState = ref.watch(adminNotifierProvider);
     final currentUser = ref.watch(currentUserProvider).value;
     final applications = adminState.applications;
@@ -125,13 +155,13 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                               const Icon(Icons.account_balance_wallet_outlined),
                           label: const Text('Withdrawals'),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () => context.go(AppRoutes.adminUsers),
                           icon: const Icon(Icons.people_outline),
                           label: const Text('Registered Users'),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
                         // Filter tabs
                         _buildFilterTabs(),
@@ -142,9 +172,29 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                         filtered.isEmpty
                             ? _buildEmptyState()
                             : Column(
-                                children: filtered
-                                    .map((app) => _buildApplicationCard(app))
-                                    .toList(),
+                                children:
+                                    List.generate(filtered.length, (index) {
+                                  final app = filtered[index];
+                                  final animation = CurvedAnimation(
+                                    parent: _animationController,
+                                    curve: Interval(
+                                      (index * 0.1).clamp(0.0, 1.0),
+                                      ((index * 0.1) + 0.5).clamp(0.0, 1.0),
+                                      curve: Curves.easeOutCubic,
+                                    ),
+                                  );
+
+                                  return SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0.2, 0),
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: FadeTransition(
+                                      opacity: animation,
+                                      child: _buildApplicationCard(app),
+                                    ),
+                                  );
+                                }),
                               ),
                       ],
                     ),
@@ -248,6 +298,8 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
           } else if (label == 'Rejected') {
             _selectedFilter = LoanStatus.rejected;
           }
+          _animationController.reset();
+          _animationController.forward();
         });
       },
       child: Container(
@@ -314,7 +366,13 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
   Widget _buildFilterTab(String label, LoanStatus? status) {
     final isSelected = _selectedFilter == status;
     return GestureDetector(
-      onTap: () => setState(() => _selectedFilter = status),
+      onTap: () {
+        setState(() {
+          _selectedFilter = status;
+          _animationController.reset();
+          _animationController.forward();
+        });
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(

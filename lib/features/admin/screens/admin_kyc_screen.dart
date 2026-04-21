@@ -282,7 +282,6 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
                   GestureDetector(
                     onTap: currentDocUrl != null
                         ? () {
-                            debugPrint('Viewing document: $currentDocUrl');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -442,7 +441,6 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
                           toEmail: user.email,
                           toName: user.fullName,
                         );
-                        debugPrint("$VerificationStatus");
                         if (context.mounted) context.go(AppRoutes.admin);
                       }
                     : null,

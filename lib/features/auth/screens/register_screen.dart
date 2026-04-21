@@ -63,15 +63,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           countryCode: _selectedCountry,
         );
 
-    print('Register returned: $success');
-
     if (success && mounted) {
-      print('Registration successful, sending welcome email...');
       await EmailService.sendWelcomeEmail(
         toEmail: _emailController.text.trim(),
         toName: _fullNameController.text.trim().split(' ').first,
       );
-      print('Email sent');
       if (mounted) context.go(AppRoutes.dashboard);
     }
   }

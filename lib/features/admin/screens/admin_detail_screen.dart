@@ -79,8 +79,6 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
                       await ref
                           .read(adminNotifierProvider.notifier)
                           .approveApplication(applicationId: app.id);
-                      print('Sending approval email to: ${user?.email}');
-                      print('User: $user');
                       await EmailService.sendApprovalEmail(
                         duration: app.loanDuration,
                         repayment: Formatters.currency(
@@ -112,8 +110,6 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
                       await ref
                           .read(adminNotifierProvider.notifier)
                           .rejectApplication(applicationId: app.id);
-                      print('Sending rejection email to: ${user?.email}');
-                      print('User: $user');
                       await EmailService.sendRejectionEmail(
                         duration: app.loanDuration,
                         repayment: Formatters.currency(
@@ -269,7 +265,6 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
                       await ref
                           .read(adminNotifierProvider.notifier)
                           .deleteApplication(application.id);
-                      debugPrint('Deleted application ${application.id}');
                       if (context.mounted) {
                         context.go(AppRoutes.admin);
                       }
@@ -290,8 +285,6 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
 
                   ElevatedButton.icon(
                     onPressed: () {
-                      debugPrint('userId: ${application.userId}');
-                      debugPrint('applicationId: ${application.id}');
                       context.go(
                           '${AppRoutes.adminUserProfile}/${application.userId}');
                     },

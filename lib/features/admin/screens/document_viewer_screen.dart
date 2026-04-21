@@ -61,7 +61,6 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      debugPrint('Error: $e');
       setState(() {
         _pdfError = 'Error: $e';
         _isLoadingPdf = false;
@@ -77,9 +76,6 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('_isPdf: $_isPdf');
-    debugPrint('_isLoadingPdf: $_isLoadingPdf');
-    debugPrint('_localPdfPath: $_localPdfPath');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),

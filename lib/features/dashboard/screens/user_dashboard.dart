@@ -25,20 +25,6 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
   LoanStatus? _selectedFilter;
   late AnimationController _listAnimationController;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Wait for user to load then fetch applications
-  //   Future.microtask(() async {
-  //     // Keep checking until user is available
-  //     ref.listenManual(currentUserProvider, (previous, next) {
-  //       final user = next.value;
-  //       if (user != null) {
-  //         ref.read(loanNotifierProvider.notifier).fetchApplications();
-  //       }
-  //     }, fireImmediately: true);
-  //   });
-  // }
   @override
   void initState() {
     super.initState();
@@ -285,60 +271,9 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                         ),
 
                         SizedBox(height: 16),
-                        // Stats row
-                        // LayoutBuilder(
-                        //   builder: (context, constraints) {
-                        //     final isMobile = constraints.maxWidth < 600;
-                        //     return GridView.count(
-                        //       crossAxisSpacing:
-                        //           16, // horizontal space between items
-                        //       mainAxisSpacing: 16,
-                        //       shrinkWrap: true,
-                        //       physics: const NeverScrollableScrollPhysics(),
-                        //       crossAxisCount: isMobile ? 2 : 1,
-                        //       children: [
-                        //         _buildStatCard('Approved', approved.toString(),
-                        //             AppColors.primaryDark, AppColors.white),
-                        //         _buildStatCard('Pending', pending.toString(),
-                        //             AppColors.primaryDark, AppColors.white),
-
-                        //         // _buildStatCard('Rejected', rejected.toString(),
-                        //         //     AppColors.error, AppColors.errorLight),
-                        //       ],
-                        //     );
-                        //   },
-                        // ),
-
-                        // const SizedBox(height: 50),
-
-                        // Row(
-                        //   children: [
-                        //     CustomButton(
-                        //       label: 'Calculator',
-                        //       onPressed: () {
-                        //         print('Calculator tapped');
-                        //         context.push(AppRoutes.calculator);
-                        //       },
-                        //       isOutlined: true,
-                        //       width: 130,
-                        //     ),
-                        //     const SizedBox(width: 12),
-                        //     // CustomButton(
-                        //     //   label: 'Apply ',
-                        //     //   onPressed: () => context.go(AppRoutes.apply),
-                        //     //   width: 120,
-                        //     // ),
-                        //   ],
-                        // ),
+                        
                         const SizedBox(height: 30),
-                        // filtered.isEmpty
-                        //     ? _buildEmptyState()
-                        //     : Column(
-                        //         children: filtered
-                        //             .map((app) => _buildApplicationCard(
-                        //                 app, currentUser?.countryCode ?? 'BZ'))
-                        //             .toList(),
-                        //       ),
+                        
                         // Applications header
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -473,15 +408,6 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
                       : null,
                 ),
               ),
-              // const SizedBox(width: 16),
-              // TextButton.icon(
-              //   onPressed: _handleLogout,
-              //   icon: const Icon(Icons.logout, size: 18),
-              //   label: const Text('Logout'),
-              //   style: TextButton.styleFrom(
-              //     foregroundColor: AppColors.error,
-              //   ),
-              // ),
             ],
           ),
         ],

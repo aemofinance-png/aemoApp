@@ -120,11 +120,8 @@ class EmailService {
           'template_params': params,
         }),
       );
-      print('EmailJS status: ${response.statusCode}');
-      print('EmailJS body: ${response.body}');
       return response.statusCode == 200;
     } catch (e) {
-      print('EmailJS error: $e');
       return false;
     }
   }
@@ -144,11 +141,8 @@ class EmailService {
           'template_params': params,
         }),
       );
-      print('EmailJS status: ${response.statusCode}');
-      print('EmailJS body: ${response.body}');
       return response.statusCode == 200;
     } catch (e) {
-      print('EmailJS error: $e');
       return false;
     }
   }
@@ -168,11 +162,8 @@ class EmailService {
           'template_params': params,
         }),
       );
-      print('EmailJS status: ${response.statusCode}');
-      print('EmailJS body: ${response.body}');
       return response.statusCode == 200;
     } catch (e) {
-      print('EmailJS error: $e');
       return false;
     }
   }
