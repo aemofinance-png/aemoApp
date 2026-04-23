@@ -67,7 +67,7 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
+        if (constraints.maxWidth < 1024) {
           return _MobileDashboard(
             currentUser: currentUser,
             loanState: loanState,
@@ -135,7 +135,6 @@ class _DesktopDashboard extends StatelessWidget {
       isLoading: loanState.isLoading,
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F9FB),
-        drawer: _buildDrawer(context),
         body: Row(
           children: [
             _buildSidebar(context),
@@ -173,108 +172,6 @@ class _DesktopDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                  color: AppColors.primaryDark,
-                  borderRadius: BorderRadius.circular(0)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: AppColors.primaryLight,
-                    backgroundImage: currentUser?.selfieUrl != null &&
-                            currentUser!.selfieUrl!.isNotEmpty
-                        ? NetworkImage(currentUser!.selfieUrl!)
-                        : null,
-                    child: currentUser?.selfieUrl == null
-                        ? Text(
-                            currentUser?.fullName.isNotEmpty ?? false
-                                ? currentUser!.fullName[0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(currentUser?.fullName ?? '',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700)),
-                  Text(currentUser?.email ?? '',
-                      style:
-                          const TextStyle(color: Colors.white60, fontSize: 13)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            _DrawerItem(
-                icon: Icons.dashboard_outlined,
-                label: 'Dashboard',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.dashboard);
-                }),
-            _DrawerItem(
-                icon: Icons.description_outlined,
-                label: 'Apply for Loan',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.apply);
-                }),
-            _DrawerItem(
-                icon: Icons.summarize_outlined,
-                label: 'Applications',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.userApplications);
-                }),
-            _DrawerItem(
-                icon: Icons.calculate_outlined,
-                label: 'Calculator',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.calculator);
-                }),
-            _DrawerItem(
-                icon: Icons.account_balance_wallet_outlined,
-                label: 'Withdrawals',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.withdrawals);
-                }),
-            _DrawerItem(
-                icon: Icons.person_outlined,
-                label: 'Profile',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.profile);
-                }),
-            const Spacer(),
-            const Divider(),
-            _DrawerItem(
-                icon: Icons.logout,
-                label: 'Log Out',
-                color: AppColors.error,
-                onTap: onLogout),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSidebar(BuildContext context) {
     return Container(
       width: 260,
@@ -288,7 +185,7 @@ class _DesktopDashboard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Loan Portal',
+                  'Aemo Finance',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
@@ -296,7 +193,7 @@ class _DesktopDashboard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'ENTERPRISE LEDGER',
+                  'WELCOME BACK',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -362,13 +259,9 @@ class _DesktopDashboard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
           const SizedBox(width: 12),
           Text(
-            'Dashboard',
+            currentUser?.fullName ?? '',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -452,7 +345,7 @@ class _DesktopDashboard extends StatelessWidget {
         Row(
           children: [
             SizedBox(
-              width: 140,
+              width: 160,
               child: _HeaderButton(
                 label: 'Calculator',
                 icon: Icons.calculate_outlined,

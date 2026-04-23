@@ -83,6 +83,7 @@ class _AnimatedSectionState extends State<_AnimatedSection>
     return VisibilityDetector(
       key: Key('section_${widget.index}'),
       onVisibilityChanged: (info) {
+        if (!mounted) return;
         if (info.visibleFraction > 0.15) {
           _controller.forward();
         } else {
