@@ -1184,6 +1184,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                 final withdrawal = WithdrawalModel(
                   id: '',
                   userName: currentUser.fullName,
+                  countryCode: currentUser.countryCode,
                   userId: currentUser.id,
                   applicationId: widget.application?.id ?? '',
                   amount: widget.application?.loanAmount ?? 0,

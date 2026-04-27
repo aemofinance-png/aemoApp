@@ -7,6 +7,7 @@ class WithdrawalModel {
   final String userId;
   final String applicationId;
   final String userName; // ✅ add this
+  final String countryCode; // ✅ add this
   final double amount;
   final String bankName;
   final String accountNumber;
@@ -20,6 +21,7 @@ class WithdrawalModel {
     required this.userId,
     required this.applicationId,
     required this.userName, // ✅ add this
+    required this.countryCode, // ✅ add this
     required this.amount,
     required this.bankName,
     required this.accountNumber,
@@ -35,6 +37,7 @@ class WithdrawalModel {
       userId: map['userId'] ?? '',
       applicationId: map['applicationId'] ?? '',
       userName: map['userName'] ?? 'Unknown', // ✅ add this
+      countryCode: map['countryCode'] ?? 'BZ', // ✅ add this
       amount: (map['amount'] as num).toDouble(),
       bankName: map['bankName'] ?? '',
       accountNumber: map['accountNumber'] ?? '',
@@ -55,6 +58,7 @@ class WithdrawalModel {
       'userId': userId,
       'applicationId': applicationId,
       'userName': userName, // ✅ add this
+      'countryCode': countryCode, // ✅ add this
       'amount': amount,
       'bankName': bankName,
       'accountNumber': accountNumber,

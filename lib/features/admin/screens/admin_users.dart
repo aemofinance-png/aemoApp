@@ -44,17 +44,20 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           final filtered = users
               .where((u) => u.role != 'admin')
               .where((u) =>
-                  _statusFilter == null || u.verificationStatus == _statusFilter)
+                  _statusFilter == null ||
+                  u.verificationStatus == _statusFilter)
               .where((u) =>
                   _searchQuery.isEmpty ||
-                  u.fullName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                  u.fullName
+                      .toLowerCase()
+                      .contains(_searchQuery.toLowerCase()) ||
                   u.email.toLowerCase().contains(_searchQuery.toLowerCase()))
               .toList();
 
           return LayoutBuilder(
             builder: (context, constraints) {
               final isDesktop = constraints.maxWidth >= 1024;
-              
+
               return Row(
                 children: [
                   if (isDesktop) _buildSidebar(context),
@@ -69,9 +72,11 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                               // Header Section
                               Center(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isDesktop ? 1000 : 500),
+                                  constraints: BoxConstraints(
+                                      maxWidth: isDesktop ? 1000 : 500),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
                                     child: _buildHeaderSection(),
                                   ),
                                 ),
@@ -80,9 +85,11 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                               // Search & Filters
                               Center(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isDesktop ? 1000 : 500),
+                                  constraints: BoxConstraints(
+                                      maxWidth: isDesktop ? 1000 : 500),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
                                     child: _buildSearchAndFilters(),
                                   ),
                                 ),
@@ -91,16 +98,23 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                               // User List
                               Center(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isDesktop ? 1000 : 500),
+                                  constraints: BoxConstraints(
+                                      maxWidth: isDesktop ? 1000 : 500),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
                                     child: filtered.isEmpty
                                         ? _buildEmptyState()
                                         : Column(
-                                            children: filtered.asMap().entries.map((entry) {
+                                            children: filtered
+                                                .asMap()
+                                                .entries
+                                                .map((entry) {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 16),
-                                                child: _buildUserCard(context, entry.value, entry.key),
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 16),
+                                                child: _buildUserCard(context,
+                                                    entry.value, entry.key),
                                               );
                                             }).toList(),
                                           ),
@@ -111,10 +125,13 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                               // Footer
                               Center(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: isDesktop ? 1000 : 500),
+                                  constraints: BoxConstraints(
+                                      maxWidth: isDesktop ? 1000 : 500),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                                    child: _buildPaginationInfo(filtered.length, users.length),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
+                                    child: _buildPaginationInfo(
+                                        filtered.length, users.length),
                                   ),
                                 ),
                               ),
@@ -181,16 +198,6 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             isActive: true,
             onTap: () {},
           ),
-          _SidebarItem(
-            icon: Icons.analytics_outlined,
-            label: 'Reports',
-            onTap: () {},
-          ),
-          _SidebarItem(
-            icon: Icons.settings_outlined,
-            label: 'Settings',
-            onTap: () {},
-          ),
           const Spacer(),
           const Divider(),
           _SidebarItem(
@@ -223,7 +230,8 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           if (showLogo) ...[
             IconButton(
               onPressed: () => context.go(AppRoutes.admin),
-              icon: const Icon(Icons.menu_rounded, color: Color(0xFF001E40)),
+              icon: const Icon(Icons.arrow_back_rounded,
+                  color: Color(0xFF001E40)),
             ),
             const SizedBox(width: 8),
             Text(
@@ -259,7 +267,8 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             const SizedBox(width: 8),
             IconButton(
               onPressed: _handleLogout,
-              icon: const Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
+              icon: const Icon(Icons.logout_rounded,
+                  color: AppColors.error, size: 20),
             ),
           ],
         ],
@@ -401,12 +410,12 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        image: user.selfieUrl != null &&
-                                user.selfieUrl!.isNotEmpty
-                            ? DecorationImage(
-                                image: NetworkImage(user.selfieUrl!),
-                                fit: BoxFit.cover)
-                            : null,
+                        image:
+                            user.selfieUrl != null && user.selfieUrl!.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(user.selfieUrl!),
+                                    fit: BoxFit.cover)
+                                : null,
                         color: const Color(0xFFF2F4F6),
                       ),
                       child: user.selfieUrl == null || user.selfieUrl!.isEmpty
@@ -625,15 +634,21 @@ class _SidebarItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: isActive 
-                ? [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2))
+                  ]
                 : null,
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                color: color ?? (isActive ? AppColors.primary : AppColors.textSecondary),
+                color: color ??
+                    (isActive ? AppColors.primary : AppColors.textSecondary),
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -643,7 +658,10 @@ class _SidebarItem extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                    color: color ?? (isActive ? AppColors.primary : AppColors.textSecondary),
+                    color: color ??
+                        (isActive
+                            ? AppColors.primary
+                            : AppColors.textSecondary),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
