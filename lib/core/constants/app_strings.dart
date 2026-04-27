@@ -62,6 +62,14 @@ class AppStrings {
       'area': '+592',
     },
     {
+      'name': 'Nigeria',
+      'code': 'NG',
+      'currency': 'NGN',
+      'symbol': '₦',
+      'flag': '🇳🇬',
+      'area': '+234',
+    },
+    {
       'name': 'Jamaica',
       'code': 'JM',
       'currency': 'JMD',
@@ -86,6 +94,12 @@ class AppStrings {
       'Atlantic Bank',
       'Heritage Bank',
       'National Bank of Belize',
+    ],
+    'NG': [
+      'Access Bank',
+      'GTBank',
+      'Zenith Bank',
+      'First Bank of Nigeria',
     ],
     'OM': [
       'Bank Muscat',
