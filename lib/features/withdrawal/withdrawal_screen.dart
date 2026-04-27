@@ -736,7 +736,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
           ),
 
         SizedBox(height: 12),
-        // Account list
+        // Account listfl
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -1158,7 +1158,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () async {
-            if (_currentStep < 3 && _uploadedDocument != null) {
+            if (_currentStep < 2 && _uploadedDocument != null) {
               setState(() {
                 _currentStep++;
               });
@@ -1177,7 +1177,7 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
             //   });
             // }
 
-            if (_currentStep == 3) {
+            if (_currentStep == 2) {
               try {
                 final currentUser = ref.read(currentUserProvider).value;
                 if (currentUser == null || _selectedAccount == null) return;
