@@ -61,17 +61,6 @@ class _TopNavBar extends StatelessWidget {
           ),
           Row(
             children: [
-              _NavButton('Portfolio'),
-              const SizedBox(width: 30),
-              _NavButton('Insights'),
-              const SizedBox(width: 30),
-              _NavButton('Markets'),
-              const SizedBox(width: 30),
-              _NavButton('Reports'),
-            ],
-          ),
-          Row(
-            children: [
               TextButton(
                 onPressed: () => context.go(AppRoutes.login),
                 child: Text(
@@ -86,7 +75,7 @@ class _TopNavBar extends StatelessWidget {
               SizedBox(
                 width: 140,
                 child: ElevatedButton(
-                  onPressed: () => context.go(AppRoutes.login),
+                  onPressed: () => context.go(AppRoutes.register),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -141,7 +130,8 @@ class _HeroSection extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.05)),
+                    border:
+                        Border.all(color: AppColors.primary.withOpacity(0.05)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
@@ -324,13 +314,14 @@ class _HeroSection extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 800.ms, delay: 1200.ms)
-                      .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
+                  ).animate().fadeIn(duration: 800.ms, delay: 1200.ms).scale(
+                      begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
                 ),
               ],
-            ).animate().fadeIn(duration: 1000.ms, delay: 600.ms).slideX(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+            )
+                .animate()
+                .fadeIn(duration: 1000.ms, delay: 600.ms)
+                .slideX(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
           ),
         ],
       ),
@@ -355,7 +346,11 @@ class _WhyChooseSection extends StatelessWidget {
               color: AppColors.primary,
               letterSpacing: -1,
             ),
-          ).animate(onPlay: (controller) => controller.repeat(reverse: false)).fadeIn(duration: 800.ms).slideX(begin: -0.1),
+          )
+              .animate(
+                  onPlay: (controller) => controller.repeat(reverse: false))
+              .fadeIn(duration: 800.ms)
+              .slideX(begin: -0.1),
           const SizedBox(height: 16),
           Container(
             width: 80,
@@ -377,7 +372,10 @@ class _WhyChooseSection extends StatelessWidget {
                   title: 'Fully Online',
                   description:
                       'No physical branches, no paperwork queues. Access our entire lending suite from any device, anywhere in the world. Your time is valuable; we treat it that way.',
-                ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.1, end: 0),
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: 200.ms)
+                    .slideY(begin: 0.1, end: 0),
               ),
               const SizedBox(width: 24),
               Expanded(
@@ -388,7 +386,10 @@ class _WhyChooseSection extends StatelessWidget {
                   title: 'Quick Review',
                   description:
                       'Instant algorithmic analysis provides a decision in minutes, not days. Seamless execution is our standard.',
-                ).animate().fadeIn(duration: 800.ms, delay: 400.ms).slideY(begin: 0.1, end: 0),
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: 400.ms)
+                    .slideY(begin: 0.1, end: 0),
               ),
             ],
           ),
@@ -401,7 +402,10 @@ class _WhyChooseSection extends StatelessWidget {
                 'Bank-grade encryption and decentralized data protocols ensure your financial identity remains private and protected. We build the vault around your assets.',
             imageUrl:
                 'https://lh3.googleusercontent.com/aida-public/AB6AXuDWr-aUuGCUPgmzVRu4ltt0GihBQO4XuQX6dfRd-HFyaxvIVUfoSxZQEq_IK8JyDrg2wOn0fkrgjJyB2a82tYl-ukvlFRhE0NDrkJETW7NV6_EU9XCVOu0CH8_bmUGfeE2X208aXhbM-VNnvM-5C13FqvYYYEg1Q8I9x29s0rPafBdkHUq1eyno-bxR19hTnPiYP5RdBS3VT4yTWWkZxsPn46qGlpANrR81J54FErC6LGIvH-7wpTS0KTNob8S97ghI-lAzIafWHFVr',
-          ).animate().fadeIn(duration: 800.ms, delay: 600.ms).slideY(begin: 0.1, end: 0),
+          )
+              .animate()
+              .fadeIn(duration: 800.ms, delay: 600.ms)
+              .slideY(begin: 0.1, end: 0),
         ],
       ),
     );
@@ -635,7 +639,10 @@ class _HowItWorksSection extends StatelessWidget {
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
-          ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.2, end: 0),
+          )
+              .animate()
+              .fadeIn(duration: 800.ms, delay: 200.ms)
+              .slideY(begin: 0.2, end: 0),
           const SizedBox(height: 80),
           Stack(
             alignment: Alignment.center,
@@ -647,7 +654,9 @@ class _HowItWorksSection extends StatelessWidget {
                 child: Container(
                   height: 1,
                   color: AppColors.border,
-                ).animate().scaleX(begin: 0, end: 1, duration: 1000.ms, delay: 600.ms),
+                )
+                    .animate()
+                    .scaleX(begin: 0, end: 1, duration: 1000.ms, delay: 600.ms),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -806,7 +815,10 @@ class _FinalCTASection extends StatelessWidget {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 1000.ms).scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOut);
+    )
+        .animate()
+        .fadeIn(duration: 1000.ms)
+        .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOut);
   }
 }
 
