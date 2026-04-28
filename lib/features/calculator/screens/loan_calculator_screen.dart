@@ -722,6 +722,7 @@ class _DesktopCalculator extends StatelessWidget {
           _SidebarItem(
             icon: Icons.dashboard_outlined,
             label: 'Dashboard',
+            isActive: true,
             onTap: () => context.go(AppRoutes.dashboard),
           ),
           _SidebarItem(
@@ -730,10 +731,19 @@ class _DesktopCalculator extends StatelessWidget {
             onTap: () => context.go(AppRoutes.apply),
           ),
           _SidebarItem(
-            icon: Icons.calculate_rounded,
+            icon: Icons.summarize_outlined,
+            label: 'Applications',
+            onTap: () => context.go(AppRoutes.userApplications),
+          ),
+          _SidebarItem(
+            icon: Icons.calculate_outlined,
             label: 'Calculator',
-            isActive: true,
-            onTap: () {},
+            onTap: () => context.go(AppRoutes.calculator),
+          ),
+          _SidebarItem(
+            icon: Icons.account_balance_wallet_outlined,
+            label: 'Withdrawals',
+            onTap: () => context.go(AppRoutes.withdrawals),
           ),
           _SidebarItem(
             icon: Icons.person_outlined,
@@ -1033,7 +1043,7 @@ class _MobileCalculator extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         CustomTextField(
-          label: "Amount",
+          label: "",
           controller: amountController,
           hint: 'e.g. 50000',
           prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
