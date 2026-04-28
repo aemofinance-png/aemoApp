@@ -137,7 +137,7 @@ class _ApplicationStatusScreenState
         '${monthNames[now.month - 1]} ${now.day}, ${now.year}';
 
     try {
-      final currencySymbol = Formatters.getCurrencySymbol(currentUser.countryCode);
+      final currencySymbol = Formatters.getCurrencySymbol(currentUser.countryCode.isEmpty ? 'BZ' : currentUser.countryCode);
       final response = await http.post(
         Uri.parse(
             'https://loan-agreement-script.onrender.com/generate-agreement'),
