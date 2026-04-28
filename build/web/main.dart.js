@@ -56181,39 +56181,41 @@ r=A.an1(J.nT(o.d,new A.aDS(this)))
 if(r==null){if(o.a)return B.fT
 return A.d1(A.hg(q,q,q,q,q,q,B.Gp),q,B.Ki,q,q,q,q)}return A.ly(new A.aDT(this,r,s))},
 Bt(a,b,c){return this.akK(a,b,c)},
-akK(a1,a2,a3){var s=0,r=A.x(t.H),q=1,p=[],o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0
-var $async$Bt=A.t(function(a4,a5){if(a4===1){p.push(a5)
+akK(a3,a4,a5){var s=0,r=A.x(t.H),q=1,p=[],o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2
+var $async$Bt=A.t(function(a6,a7){if(a6===1){p.push(a7)
 s=q}for(;;)switch(s){case 0:o.N(new A.aDP(o))
-g=a2.ch
-f=g==null?null:g.AN(5184e9)
-if(f==null)f=new A.dl(Date.now(),0,!1).AN(5184e9)
-n=""+A.n4(f)+"-"+B.c.cR(B.l.j(A.ik(f)),2,"0")+"-"+B.c.cR(B.l.j(A.w0(f)),2,"0")
-e=new A.dl(Date.now(),0,!1)
-m=B.of[A.ik(e)-1]+" "+A.w0(e)+", "+A.n4(e)
+f=a4.ch
+e=f==null?null:f.AN(5184e9)
+if(e==null)e=new A.dl(Date.now(),0,!1).AN(5184e9)
+n=""+A.n4(e)+"-"+B.c.cR(B.l.j(A.ik(e)),2,"0")+"-"+B.c.cR(B.l.j(A.w0(e)),2,"0")
+d=new A.dl(Date.now(),0,!1)
+m=B.of[A.ik(d)-1]+" "+A.w0(d)+", "+A.n4(d)
 q=3
-g=a3.e
-l=A.b30(g.length===0?"BZ":g)
-g=A.d3("https://loan-agreement-script.onrender.com/generate-agreement",0,null)
-d=t.N
-c=A.au(["Content-Type","application/json"],d,d)
-b=a2.z
+c=a4.e
+if(!(c.length!==0)){f=a5.e
+c=f.length===0?"BZ":f}l=c
+k=A.b30(l)
+f=A.d3("https://loan-agreement-script.onrender.com/generate-agreement",0,null)
+b=t.N
+a=A.au(["Content-Type","application/json"],b,b)
+a0=a4.z
 s=6
-return A.y(A.aVC(g,B.cn.xY(A.au(["clientName",a3.b,"loanAmount",a2.x,"annualRatePct",B.bc.h(0,b),"loanTermMonths",b,"monthlyPayment",o.Ue(a2),"firstPaymentDate",n,"agreementDate",m,"referenceNo",a2.a,"currencySymbol",l],d,t.X),null),c),$async$Bt)
-case 6:k=a5
+return A.y(A.aVC(f,B.cn.xY(A.au(["clientName",a5.b,"loanAmount",a4.x,"annualRatePct",B.bc.h(0,a0),"loanTermMonths",a0,"monthlyPayment",o.Ue(a4),"firstPaymentDate",n,"agreementDate",m,"referenceNo",a4.a,"currencySymbol",k],b,t.X),null),a),$async$Bt)
+case 6:j=a7
 o.N(new A.aDQ(o))
-if(k.b===200){g=v.G
-j=new g.Blob(A.a([k.w],t.vs),{type:"application/pdf"})
-i=g.URL.createObjectURL(j)
-g.window.open(i,"_blank","")
-g.URL.revokeObjectURL(i)}else if(o.c!=null)a1.ah(t.Pu).f.kE(B.a15)
+if(j.b===200){f=v.G
+i=new f.Blob(A.a([j.w],t.vs),{type:"application/pdf"})
+h=f.URL.createObjectURL(i)
+f.window.open(h,"_blank","")
+f.URL.revokeObjectURL(h)}else if(o.c!=null)a3.ah(t.Pu).f.kE(B.a15)
 q=1
 s=5
 break
 case 3:q=2
-a0=p.pop()
-h=A.ab(a0)
+a2=p.pop()
+g=A.ab(a2)
 o.N(new A.aDR(o))
-if(o.c!=null)a1.ah(t.Pu).f.kE(A.ZP(null,null,null,null,null,B.L,null,A.m("Error: "+A.n(h),null,null,null,null,null,null),null,B.cN,null,null,null,null,null,null,null,null,null,null))
+if(o.c!=null)a3.ah(t.Pu).f.kE(A.ZP(null,null,null,null,null,B.L,null,A.m("Error: "+A.n(g),null,null,null,null,null,null),null,B.cN,null,null,null,null,null,null,null,null,null,null))
 s=5
 break
 case 2:s=1
