@@ -1,13 +1,11 @@
 import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:aemo_loan_app/features/admin/providers/admin_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../app/router.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/providers/service_providers.dart';
 
@@ -65,7 +63,7 @@ class AdminUserProfile extends ConsumerWidget {
                                   user.fullName.isNotEmpty
                                       ? user.fullName[0].toUpperCase()
                                       : '?',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 36,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.primary,
@@ -124,10 +122,10 @@ class AdminUserProfile extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
                                       horizontal: 20, vertical: 14),
-                                  child: const Text(
+                                  child: Text(
                                     'PERSONAL INFORMATION',
                                     style: TextStyle(
                                       fontSize: 11,
@@ -299,41 +297,65 @@ class AdminUserProfile extends ConsumerWidget {
                                                   fontSize: 12,
                                                   color:
                                                       AppColors.textSecondary)),
-                                          trailing: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: account
-                                                          .verificationStatus ==
-                                                      BankVerificationStatus
-                                                          .verified
-                                                  ? AppColors.successLight
-                                                  : account.verificationStatus ==
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: account
+                                                              .verificationStatus ==
                                                           BankVerificationStatus
-                                                              .pending
-                                                      ? AppColors.pendingLight
-                                                      : AppColors.errorLight,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              account.verificationStatus.name
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                                color: account
-                                                            .verificationStatus ==
-                                                        BankVerificationStatus
-                                                            .verified
-                                                    ? AppColors.success
-                                                    : account.verificationStatus ==
+                                                              .verified
+                                                      ? AppColors.successLight
+                                                      : account.verificationStatus ==
+                                                              BankVerificationStatus
+                                                                  .pending
+                                                          ? AppColors
+                                                              .pendingLight
+                                                          : AppColors
+                                                              .errorLight,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  account
+                                                      .verificationStatus.name
+                                                      .toUpperCase(),
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: account
+                                                                .verificationStatus ==
                                                             BankVerificationStatus
-                                                                .pending
-                                                        ? AppColors.pending
-                                                        : AppColors.error,
+                                                                .verified
+                                                        ? AppColors.success
+                                                        : account.verificationStatus ==
+                                                                BankVerificationStatus
+                                                                    .pending
+                                                            ? AppColors.pending
+                                                            : AppColors.error,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                onPressed: () =>
+                                                    _showAdminDeleteBankAccountDialog(
+                                                        context,
+                                                        account,
+                                                        user,
+                                                        ref),
+                                                icon: const Icon(
+                                                    Icons.delete_outline,
+                                                    color: AppColors.error,
+                                                    size: 20),
+                                                tooltip: 'Delete Account',
+                                              ),
+                                            ],
                                           ),
                                         ))
                                     .toList(),
@@ -341,9 +363,9 @@ class AdminUserProfile extends ConsumerWidget {
                             ),
 
                           // Version
-                          Text(
+                          const Text(
                             '${AppStrings.appName} — Secured with 256-bit encryption',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               color: AppColors.textHint,
                             ),
@@ -520,84 +542,204 @@ Widget _detailRow(
   );
 }
 
+void _showAdminDeleteBankAccountDialog(
+    BuildContext context, BankAccount account, UserModel user, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete Bank Account',
+          style: TextStyle(fontWeight: FontWeight.bold)),
+      content: Text(
+          'Are you sure you want to delete this bank account (${account.bankName} - ${account.accountNumber}) for user ${user.fullName}?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('CANCEL',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            // Show loading
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Deleting bank account...')),
+            );
+
+            try {
+              await ref
+                  .read(adminNotifierProvider.notifier)
+                  .deleteUserBankAccount(
+                    userId: user.id,
+                    bankAccountId: account.id,
+                  );
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Bank account deleted successfully'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error deleting bank account: $e'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            }
+          },
+          child: const Text('DELETE',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: AppColors.error)),
+        ),
+      ],
+    ),
+  );
+}
+
 void _showBankVerificationSheet(
     BuildContext context, BankAccount account, UserModel user, WidgetRef ref) {
   showModalBottomSheet(
     context: context,
-    builder: (context) {
-      return Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Bank Account Verification',
-                style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 16),
-            Text('Bank Name: ${account.bankName}'),
-            Text('Account Number: ${account.accountNumber}'),
-            Text('Account Name: ${account.accountName}'),
-            Text('Verification Status: ${account.verificationStatus.name}'),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed:
-                  account.verificationStatus == BankVerificationStatus.pending
-                      ? null
-                      : () async {
-                          await ref
-                              .read(adminNotifierProvider.notifier)
-                              .updateBankVerificationStatus(
-                                userId: user.id,
-                                bankAccountId: account.id,
-                                status: BankVerificationStatus.pending,
-                              );
-                          await EmailService.sendBankVerEmail(
-                            toEmail: user.email,
-                            toName: user.fullName,
-                          );
-                          ref.invalidate(userByIdProvider(user.id));
-                          if (context.mounted) Navigator.pop(context);
-                        },
-              child: const Text('Make Pending'),
-            ),
-            SizedBox(height: 12),
-            ElevatedButton(
-              onPressed:
-                  account.verificationStatus == BankVerificationStatus.verified
-                      ? null
-                      : () async {
-                          await ref
-                              .read(adminNotifierProvider.notifier)
-                              .updateBankVerificationStatus(
-                                userId: user.id,
-                                bankAccountId: account.id,
-                                status: BankVerificationStatus.verified,
-                              );
+    builder: (sheetContext) {
+      bool isSubmitting = false;
+      String? activeAction;
 
-                          ref.invalidate(userByIdProvider(user.id));
-                          if (context.mounted) Navigator.pop(context);
-                        },
-              child: const Text('Verify Account'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: account.verificationStatus ==
-                      BankVerificationStatus.unverified
-                  ? null
-                  : () async {
-                      await ref
-                          .read(adminNotifierProvider.notifier)
-                          .updateBankVerificationStatus(
-                            userId: user.id,
-                            bankAccountId: account.id,
-                            status: BankVerificationStatus.unverified,
+      return StatefulBuilder(
+        builder: (sheetContext, setModalState) {
+          Future<void> runAction({
+            required String actionKey,
+            required Future<void> Function() action,
+          }) async {
+            setModalState(() {
+              isSubmitting = true;
+              activeAction = actionKey;
+            });
+            try {
+              await action();
+              ref.invalidate(userByIdProvider(user.id));
+              if (sheetContext.mounted) Navigator.pop(sheetContext);
+            } finally {
+              if (sheetContext.mounted) {
+                setModalState(() {
+                  isSubmitting = false;
+                  activeAction = null;
+                });
+              }
+            }
+          }
+
+          Widget actionLabel(String actionKey, String text) {
+            final isLoading = isSubmitting && activeAction == actionKey;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isLoading) ...[
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(isLoading ? '$text...' : text),
+              ],
+            );
+          }
+
+          return Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Bank Account Verification',
+                    style: Theme.of(sheetContext).textTheme.headlineSmall),
+                const SizedBox(height: 16),
+                Text('Bank Name: ${account.bankName}'),
+                Text('Account Number: ${account.accountNumber}'),
+                Text('Account Name: ${account.accountName}'),
+                Text('Verification Status: ${account.verificationStatus.name}'),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: account.verificationStatus ==
+                              BankVerificationStatus.pending ||
+                          isSubmitting
+                      ? null
+                      : () async {
+                          await runAction(
+                            actionKey: 'pending',
+                            action: () async {
+                              await ref
+                                  .read(adminNotifierProvider.notifier)
+                                  .updateBankVerificationStatus(
+                                    userId: user.id,
+                                    bankAccountId: account.id,
+                                    status: BankVerificationStatus.pending,
+                                  );
+                              await EmailService.sendBankVerEmail(
+                                toEmail: user.email,
+                                toName: user.fullName,
+                              );
+                            },
                           );
-                      ref.invalidate(userByIdProvider(user.id));
-                      if (context.mounted) Navigator.pop(context);
-                    },
-              child: const Text('Unverify Account'),
+                        },
+                  child: actionLabel('pending', 'Make Pending'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: account.verificationStatus ==
+                              BankVerificationStatus.verified ||
+                          isSubmitting
+                      ? null
+                      : () async {
+                          await runAction(
+                            actionKey: 'verify',
+                            action: () async {
+                              await ref
+                                  .read(adminNotifierProvider.notifier)
+                                  .updateBankVerificationStatus(
+                                    userId: user.id,
+                                    bankAccountId: account.id,
+                                    status: BankVerificationStatus.verified,
+                                  );
+                            },
+                          );
+                        },
+                  child: actionLabel('verify', 'Verify Account'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: account.verificationStatus ==
+                              BankVerificationStatus.unverified ||
+                          isSubmitting
+                      ? null
+                      : () async {
+                          await runAction(
+                            actionKey: 'unverify',
+                            action: () async {
+                              await ref
+                                  .read(adminNotifierProvider.notifier)
+                                  .updateBankVerificationStatus(
+                                    userId: user.id,
+                                    bankAccountId: account.id,
+                                    status: BankVerificationStatus.unverified,
+                                  );
+                            },
+                          );
+                        },
+                  child: actionLabel('unverify', 'Unverify Account'),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       );
     },
   );

@@ -172,22 +172,93 @@ class AppStrings {
     'Business Owner',
   ];
 
-  // Loan Durations in months
-  static const Map<int, double> loanRates = {
-    3: 35.0,
-    6: 25.0,
-    12: 20.0,
-    18: 17.0,
-    24: 17.0,
-    36: 17.0,
-    48: 15.0,
-    60: 15.0,
-    72: 15.0,
-    84: 14.0,
-    96: 14.0,
-    108: 10.0,
-    120: 8.0,
+  // Default/Fallback Loan Rates (months: APR %)
+  static Map<int, double> get loanRates => defaultLoanRates;
+
+  static const Map<int, double> defaultLoanRates = {
+    3: 24.0,
+    6: 18.0,
+    12: 15.0,
+    18: 12.0,
+    24: 12.0,
+    36: 12.0,
+    48: 10.0,
+    60: 10.0,
+    72: 10.0,
+    84: 9.0,
+    96: 9.0,
+    108: 8.0,
+    120: 7.0,
   };
+
+  // Localized Loan Rates per Country
+  static const Map<String, Map<int, double>> localizedLoanRates = {
+    // Belize (BZD) - High inflation, higher rates
+    'BZ': {
+      3: 25.0,
+      6: 20.0,
+      12: 18.0,
+      18: 16.0,
+      24: 16.0,
+      36: 16.0,
+      48: 14.0,
+      60: 14.0,
+      120: 8.0,
+    },
+    // Panama (USD) - Low inflation, competitive rates
+    'PA': {
+      3: 12.0,
+      6: 10.0,
+      12: 8.5,
+      18: 8.0,
+      24: 8.0,
+      36: 7.5,
+      48: 7.0,
+      60: 7.0,
+      120: 5.5,
+    },
+    // South Africa (ZAR) - Medium inflation
+    'ZA': {
+      3: 28.0,
+      6: 22.0,
+      12: 18.0,
+      18: 15.0,
+      24: 15.0,
+      36: 14.0,
+      48: 12.0,
+      60: 12.0,
+      120: 9.0,
+    },
+    // Oman (OMR) - Low rates
+    'OM': {
+      3: 10.0,
+      6: 8.0,
+      12: 6.5,
+      18: 6.0,
+      24: 6.0,
+      36: 5.5,
+      48: 5.0,
+      60: 5.0,
+      120: 4.0,
+    },
+    // Nigeria (NGN) - Higher inflation
+    'NG': {
+      3: 35.0,
+      6: 30.0,
+      12: 25.0,
+      18: 20.0,
+      24: 20.0,
+      36: 18.0,
+      48: 15.0,
+      60: 15.0,
+      120: 10.0,
+    },
+  };
+
+  static Map<int, double> getLoanRates(String? countryCode) {
+    if (countryCode == null) return defaultLoanRates;
+    return localizedLoanRates[countryCode] ?? defaultLoanRates;
+  }
 
   static const Map<int, double> loanMinimums = {
     3: 0,

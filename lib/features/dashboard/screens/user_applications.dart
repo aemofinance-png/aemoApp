@@ -469,7 +469,7 @@ class _DesktopApplicationsView extends StatelessWidget {
           const SizedBox(height: 40),
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: AppColors.primaryLight, shape: BoxShape.circle),
             child: const Icon(Icons.description_outlined,
                 size: 48, color: AppColors.primary),
@@ -730,8 +730,8 @@ class _StatCard extends StatelessWidget {
   const _StatCard(
       {required this.label,
       required this.value,
-      this.trend,
       required this.icon,
+      this.trend,
       this.iconColor});
 
   @override
@@ -918,8 +918,9 @@ class _ApplicationListItem extends StatelessWidget {
   IconData _getPurposeIcon(String purpose) {
     final p = purpose.toLowerCase();
     if (p.contains('personal')) return Icons.person_rounded;
-    if (p.contains('vehicle') || p.contains('car'))
+    if (p.contains('vehicle') || p.contains('car')) {
       return Icons.directions_car_rounded;
+    }
     if (p.contains('business')) return Icons.business_center_rounded;
     return Icons.account_balance_rounded;
   }

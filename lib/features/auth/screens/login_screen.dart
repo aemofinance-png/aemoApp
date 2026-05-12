@@ -127,9 +127,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           const SizedBox(height: 16),
                           const SizedBox(height: 4),
-                          Text(
+                          const Text(
                             AppStrings.tagline,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),

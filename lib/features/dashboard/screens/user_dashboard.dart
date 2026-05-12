@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/loan_application_model.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -13,6 +12,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 import '../../../app/router.dart';
 import '../../../data/models/user_model.dart';
+import '../../../shared/widgets/skeleton.dart';
 
 class UserDashboard extends ConsumerStatefulWidget {
   const UserDashboard({super.key});
@@ -64,6 +64,12 @@ class _UserDashboardState extends ConsumerState<UserDashboard>
         applications.where((a) => a.status == LoanStatus.approved).length;
     final rejected =
         applications.where((a) => a.status == LoanStatus.rejected).length;
+
+    if (loanState.isLoading) {
+      return const Scaffold(
+        body: DashboardSkeleton(),
+      );
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -197,7 +203,7 @@ class _DesktopDashboard extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textSecondary.withOpacity(0.7),
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -254,7 +260,7 @@ class _DesktopDashboard extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: Row(
@@ -493,7 +499,7 @@ class _DesktopDashboard extends StatelessWidget {
         children: [
           const SizedBox(height: 40),
           Icon(Icons.description_outlined,
-              size: 64, color: AppColors.primary.withOpacity(0.2)),
+              size: 64, color: AppColors.primary.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             'No applications yet',
@@ -749,7 +755,7 @@ class _MobileDashboard extends StatelessWidget {
                                       position: slideAnimation,
                                       child: _buildApplicationCard(context, app,
                                           currentUser?.countryCode ?? 'BZ'));
-                                }).toList(),
+                                }),
                               ]),
                         Align(
                             alignment: Alignment.center,
@@ -1133,7 +1139,7 @@ class _StatCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 32,
                 offset: const Offset(0, 16))
           ]),
@@ -1164,7 +1170,7 @@ class _StatCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.05),
+                        color: AppColors.primary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8)),
                     child: Text(trend!,
                         style: GoogleFonts.plusJakartaSans(
@@ -1200,7 +1206,7 @@ class _FilterTab extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2))
                   ]
@@ -1244,7 +1250,7 @@ class _ApplicationListItem extends StatelessWidget {
             Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.05),
+                    color: AppColors.primary.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12)),
                 child: Icon(_getPurposeIcon(application.loanPurpose),
                     color: AppColors.primary)),
@@ -1297,8 +1303,9 @@ class _ApplicationListItem extends StatelessWidget {
   IconData _getPurposeIcon(String purpose) {
     final p = purpose.toLowerCase();
     if (p.contains('personal')) return Icons.person_rounded;
-    if (p.contains('vehicle') || p.contains('car'))
+    if (p.contains('vehicle') || p.contains('car')) {
       return Icons.directions_car_rounded;
+    }
     if (p.contains('business')) return Icons.business_center_rounded;
     return Icons.account_balance_rounded;
   }

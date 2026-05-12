@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
@@ -27,25 +26,24 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonColor = color ?? AppColors.primaryDark;
     final buttonWidth = width ?? double.infinity;
     final buttonHeight = height ?? 52.0;
 
+    // Use Theme-based styling with optional overrides
     if (isOutlined) {
       return SizedBox(
         width: buttonWidth,
         height: buttonHeight,
         child: OutlinedButton(
           onPressed: isLoading ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: buttonColor,
-            side: BorderSide(color: buttonColor),
-            minimumSize: const Size(double.infinity, 52),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          child: _buildChild(),
+          style: buttonStyle ??
+              (color != null
+                  ? OutlinedButton.styleFrom(
+                      foregroundColor: color,
+                      side: BorderSide(color: color!),
+                    )
+                  : null),
+          child: _buildChild(context),
         ),
       );
     }
@@ -56,27 +54,27 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: buttonStyle ??
-            ElevatedButton.styleFrom(
-              backgroundColor: buttonColor,
-              foregroundColor: AppColors.white,
-              minimumSize: const Size(double.infinity, 52),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-        child: _buildChild(),
+            (color != null
+                ? ElevatedButton.styleFrom(backgroundColor: color)
+                : null),
+        child: _buildChild(context),
       ),
     );
   }
 
-  Widget _buildChild() {
+  Widget _buildChild(BuildContext context) {
     if (isLoading) {
-      return const SizedBox(
+      final theme = Theme.of(context);
+      final indicatorColor = isOutlined
+          ? (color ?? theme.colorScheme.primary)
+          : (theme.colorScheme.onPrimary);
+
+      return SizedBox(
         height: 20,
         width: 20,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+          valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
         ),
       );
     }

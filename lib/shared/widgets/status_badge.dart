@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/loan_application_model.dart';
+import 'custom_badge.dart';
 
 class StatusBadge extends StatelessWidget {
   final LoanStatus status;
@@ -22,14 +23,8 @@ class StatusBadge extends StatelessWidget {
   }
 
   Color get _textColor {
-    switch (status) {
-      case LoanStatus.pending:
-        return AppColors.primaryDark;
-      case LoanStatus.approved:
-        return AppColors.primaryDark;
-      case LoanStatus.rejected:
-        return AppColors.primaryDark;
-    }
+    // These could also come from the theme if we define custom extensions
+    return AppColors.primaryDark;
   }
 
   String get _label {
@@ -45,23 +40,10 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 4,
-      ),
-      decoration: BoxDecoration(
-        color: _backgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        _label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: _textColor,
-        ),
-      ),
+    return CustomBadge(
+      label: _label,
+      backgroundColor: _backgroundColor,
+      textColor: _textColor,
     );
   }
 }

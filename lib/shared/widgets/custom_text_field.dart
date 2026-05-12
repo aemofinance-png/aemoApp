@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -31,16 +30,20 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
+          style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+              ) ??
+              const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -55,8 +58,8 @@ class CustomTextField extends StatelessWidget {
             hintText: hint,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: enabled ? AppColors.white : AppColors.background,
+            // Only override if specifically needed, otherwise use theme
+            fillColor: enabled ? null : theme.disabledColor.withValues(alpha: 0.1),
           ),
         ),
       ],

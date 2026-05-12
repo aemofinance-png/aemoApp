@@ -9,6 +9,7 @@ import '../../../data/models/withdrawal_model.dart';
 import '../../../data/providers/service_providers.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../shared/widgets/skeleton.dart';
 
 class AdminWithdrawalsScreen extends ConsumerStatefulWidget {
   const AdminWithdrawalsScreen({super.key});
@@ -24,10 +25,19 @@ class _AdminWithdrawalsScreenState
       FutureProvider.autoDispose<List<WithdrawalModel>>((ref) async {
     return ref.read(firestoreServiceProvider).getAllWithdrawals();
   });
+  String? _updatingWithdrawalId;
+  WithdrawalStatus? _updatingStatus;
+  bool _isLoggingOut = false;
 
   Future<void> _handleLogout() async {
-    await ref.read(authNotifierProvider.notifier).logout();
-    if (mounted) context.go(AppRoutes.login);
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).logout();
+      if (mounted) context.go(AppRoutes.login);
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
   }
 
   @override
@@ -38,7 +48,17 @@ class _AdminWithdrawalsScreenState
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FB),
       body: withdrawalsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: List.generate(
+                8,
+                (index) => const Padding(
+                      padding: EdgeInsets.only(bottom: 16),
+                      child: Skeleton(height: 80, borderRadius: 16),
+                    )),
+          ),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (withdrawals) {
           final pending = withdrawals
@@ -64,8 +84,13 @@ class _AdminWithdrawalsScreenState
                             currentUser?.fullName ?? 'Admin'),
                         Expanded(
                           child: RefreshIndicator(
-                            onRefresh: () async =>
-                                ref.invalidate(adminWithdrawalsProvider),
+                            onRefresh: () async {
+                              if (_updatingWithdrawalId != null ||
+                                  _isLoggingOut) {
+                                return;
+                              }
+                              ref.invalidate(adminWithdrawalsProvider);
+                            },
                             child: ListView(
                               padding: const EdgeInsets.symmetric(vertical: 24),
                               children: [
@@ -200,8 +225,9 @@ class _AdminWithdrawalsScreenState
           const Divider(),
           _SidebarItem(
             icon: Icons.logout_rounded,
-            label: 'Log Out',
+            label: _isLoggingOut ? 'Logging Out...' : 'Log Out',
             color: AppColors.error,
+            isLoading: _isLoggingOut,
             onTap: _handleLogout,
           ),
           const SizedBox(height: 32),
@@ -255,7 +281,9 @@ class _AdminWithdrawalsScreenState
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFF001E40), size: 20),
-            onPressed: () => ref.invalidate(adminWithdrawalsProvider),
+            onPressed: (_updatingWithdrawalId != null || _isLoggingOut)
+                ? null
+                : () => ref.invalidate(adminWithdrawalsProvider),
           ),
           const SizedBox(width: 12),
           Container(
@@ -274,9 +302,19 @@ class _AdminWithdrawalsScreenState
           if (showLogo) ...[
             const SizedBox(width: 8),
             IconButton(
-              onPressed: _handleLogout,
-              icon: const Icon(Icons.logout_rounded,
-                  color: AppColors.error, size: 20),
+              onPressed: _isLoggingOut ? null : _handleLogout,
+              icon: _isLoggingOut
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.error),
+                      ),
+                    )
+                  : const Icon(Icons.logout_rounded,
+                      color: AppColors.error, size: 20),
             ),
           ],
         ],
@@ -471,6 +509,8 @@ class _AdminWithdrawalsScreenState
     final last4 = w.accountNumber.length >= 4
         ? w.accountNumber.substring(w.accountNumber.length - 4)
         : w.accountNumber;
+    final isCardUpdating = _updatingWithdrawalId == w.id;
+    final disableActionButtons = _updatingWithdrawalId != null;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -589,7 +629,10 @@ class _AdminWithdrawalsScreenState
                         'Process',
                         const Color(0xFF1F477B),
                         const Color(0xFFD5E3FF),
-                        () => _updateStatus(w.id, WithdrawalStatus.processing)),
+                        () => _updateStatus(w.id, WithdrawalStatus.processing),
+                        isLoading: isCardUpdating &&
+                            _updatingStatus == WithdrawalStatus.processing,
+                        isDisabled: disableActionButtons),
                   ),
                 if (w.status == WithdrawalStatus.pending)
                   const SizedBox(width: 12),
@@ -598,7 +641,10 @@ class _AdminWithdrawalsScreenState
                       'Complete',
                       const Color(0xFF16A34A),
                       const Color(0xFFDCFCE7),
-                      () => _updateStatus(w.id, WithdrawalStatus.completed)),
+                      () => _updateStatus(w.id, WithdrawalStatus.completed),
+                      isLoading: isCardUpdating &&
+                          _updatingStatus == WithdrawalStatus.completed,
+                      isDisabled: disableActionButtons),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -606,7 +652,10 @@ class _AdminWithdrawalsScreenState
                       'Reject',
                       const Color(0xFFBA1A1A),
                       const Color(0xFFFFDAD6),
-                      () => _updateStatus(w.id, WithdrawalStatus.failed)),
+                      () => _updateStatus(w.id, WithdrawalStatus.failed),
+                      isLoading: isCardUpdating &&
+                          _updatingStatus == WithdrawalStatus.failed,
+                      isDisabled: disableActionButtons),
                 ),
               ],
             ),
@@ -616,33 +665,59 @@ class _AdminWithdrawalsScreenState
     );
   }
 
-  Widget _buildActionBtn(String label, Color fg, Color bg, VoidCallback onTap) {
+  Widget _buildActionBtn(String label, Color fg, Color bg, VoidCallback onTap,
+      {bool isLoading = false, bool isDisabled = false}) {
     return InkWell(
-      onTap: onTap,
+      onTap: isDisabled ? null : onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: bg,
+          color: isDisabled ? bg.withValues(alpha: 0.6) : bg,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(
-            label.toUpperCase(),
-            style: GoogleFonts.plusJakartaSans(
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: fg,
-                letterSpacing: 1),
-          ),
+          child: isLoading
+              ? SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(fg),
+                  ),
+                )
+              : Text(
+                  label.toUpperCase(),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: fg,
+                      letterSpacing: 1),
+                ),
         ),
       ),
     );
   }
 
   Future<void> _updateStatus(String id, WithdrawalStatus status) async {
-    await ref.read(firestoreServiceProvider).updateWithdrawalStatus(id, status);
-    ref.invalidate(adminWithdrawalsProvider);
+    if (_updatingWithdrawalId != null) return;
+    setState(() {
+      _updatingWithdrawalId = id;
+      _updatingStatus = status;
+    });
+    try {
+      await ref
+          .read(firestoreServiceProvider)
+          .updateWithdrawalStatus(id, status);
+      ref.invalidate(adminWithdrawalsProvider);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _updatingWithdrawalId = null;
+          _updatingStatus = null;
+        });
+      }
+    }
   }
 
   Widget _buildEmptyState() {
@@ -687,6 +762,7 @@ class _SidebarItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
   final Color? color;
+  final bool isLoading;
 
   const _SidebarItem({
     required this.icon,
@@ -694,6 +770,7 @@ class _SidebarItem extends StatelessWidget {
     this.isActive = false,
     required this.onTap,
     this.color,
+    this.isLoading = false,
   });
 
   @override
@@ -701,7 +778,7 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -719,12 +796,25 @@ class _SidebarItem extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: color ??
-                    (isActive ? AppColors.primary : AppColors.textSecondary),
-                size: 20,
-              ),
+              isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          color ?? AppColors.error,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      icon,
+                      color: color ??
+                          (isActive
+                              ? AppColors.primary
+                              : AppColors.textSecondary),
+                      size: 20,
+                    ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

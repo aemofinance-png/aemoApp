@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
-import '../../../shared/widgets/loading_overlay.dart';
-import '../providers/auth_provider.dart';
-import '../../../app/router.dart';
-
-import '../../../data/models/user_model.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String? oobCode;
@@ -28,6 +19,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = true;
+  bool _isSubmitting = false;
   bool _codeValid = false;
   String? _oobCode;
   String? _email;
@@ -67,6 +59,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Future<void> _resetPassword() async {
     if (!_formKey.currentState!.validate() || _oobCode == null) return;
 
+    setState(() => _isSubmitting = true);
+
     try {
       await FirebaseAuth.instance.confirmPasswordReset(
         code: _oobCode!,
@@ -80,9 +74,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         context.go('/login');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to reset password: $e')),
-      );
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to reset password: $e')),
+        );
+      }
     }
   }
 
@@ -155,6 +152,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 CustomButton(
                   label: 'Reset Password',
                   onPressed: _resetPassword,
+                  isLoading: _isSubmitting,
                 ),
               ],
             ),

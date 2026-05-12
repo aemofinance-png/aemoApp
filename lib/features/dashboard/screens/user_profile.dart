@@ -10,6 +10,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../../app/router.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/providers/service_providers.dart';
+import '../../../shared/widgets/skeleton.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -30,7 +31,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (user == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(24),
+          child: ProfileSkeleton(),
+        ),
       );
     }
 
@@ -160,7 +164,7 @@ class _DesktopProfileView extends StatelessWidget {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textSecondary.withOpacity(0.7),
+                  color: AppColors.textSecondary.withValues(alpha: 0.7),
                   letterSpacing: 1.5,
                 ),
               ),
@@ -216,7 +220,7 @@ class _DesktopProfileView extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.8),
+        color: AppColors.white.withValues(alpha: 0.8),
         border: const Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
@@ -332,21 +336,24 @@ class _DesktopProfileView extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 24),
-        SizedBox(
-          width: 160,
-          child: ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.edit_outlined, size: 18),
-            label: Text('Edit Profile',
-                style:
-                    GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryLight,
-              foregroundColor: AppColors.primary,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+        Consumer(
+          builder: (context, ref, _) => SizedBox(
+            width: 160,
+            child: ElevatedButton.icon(
+              onPressed: () => _showEditProfileSheet(context, ref, user),
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: Text('Edit Profile',
+                  style:
+                      GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryLight,
+                foregroundColor: AppColors.primary,
+                elevation: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ),
         ),
@@ -459,7 +466,7 @@ class _DesktopProfileView extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border.withOpacity(0.5)),
+              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
             ),
             child: Row(
               children: [
@@ -546,8 +553,18 @@ class _DesktopProfileView extends StatelessWidget {
                 builder: (context, ref, _) => SizedBox(
                   width: 120,
                   child: ElevatedButton.icon(
-                    onPressed: () =>
-                        _showAddBankAccountSheet(context, ref, user),
+                    onPressed: () {
+                      if (user.bankAccounts.length >= 3) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Maximum of 3 bank accounts allowed'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      } else {
+                        _showAddBankAccountSheet(context, ref, user);
+                      }
+                    },
                     icon: const Icon(Icons.add, size: 16),
                     label: const Text('LINK NEW',
                         style: TextStyle(
@@ -576,14 +593,17 @@ class _DesktopProfileView extends StatelessWidget {
                           color: AppColors.textSecondary, fontSize: 15))),
             )
           else
-            ...user.bankAccounts
-                .map((account) => _buildBankAccountItem(account)),
+            ...user.bankAccounts.map((account) => Consumer(
+                  builder: (context, ref, _) =>
+                      _buildBankAccountItem(context, ref, account),
+                )),
         ],
       ),
     );
   }
 
-  Widget _buildBankAccountItem(BankAccount account) {
+  Widget _buildBankAccountItem(
+      BuildContext context, WidgetRef ref, BankAccount account) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Container(
@@ -591,7 +611,7 @@ class _DesktopProfileView extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border.withOpacity(0.3)),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -629,6 +649,14 @@ class _DesktopProfileView extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             _buildStatusBadge(account.verificationStatus),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () =>
+                  _showDeleteBankAccountDialog(context, ref, user, account),
+              icon: const Icon(Icons.delete_outline,
+                  color: AppColors.error, size: 20),
+              tooltip: 'Delete Account',
+            ),
           ],
         ),
       ),
@@ -690,7 +718,7 @@ class _DesktopProfileView extends StatelessWidget {
             'Our dedicated support team is available 24/7 for premium account holders.',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 15,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               height: 1.6,
             ),
           ),
@@ -802,11 +830,11 @@ class _MobileProfileView extends StatelessWidget {
                       const SizedBox(height: 32),
                       _buildLogoutButton(context),
                       const SizedBox(height: 20),
-                      Center(
+                      const Center(
                         child: Text(
                           '${AppStrings.appName} — Secured with 256-bit encryption',
-                          style: const TextStyle(
-                              fontSize: 11, color: Color(0xFFCBD5E1)),
+                          style:
+                              TextStyle(fontSize: 11, color: Color(0xFFCBD5E1)),
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -862,7 +890,7 @@ class _MobileProfileView extends StatelessWidget {
                     border: Border.all(color: AppColors.border, width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 6,
                           offset: const Offset(0, 2))
                     ],
@@ -908,7 +936,7 @@ class _MobileProfileView extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () => _showEditProfileSheet(context, ref, user),
               icon: const Icon(Icons.edit_outlined,
                   size: 16, color: Colors.white),
               label: const Text('Edit Profile'),
@@ -974,10 +1002,10 @@ class _MobileProfileView extends StatelessWidget {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: AppColors.background,
                   borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(16))),
+                      BorderRadius.vertical(bottom: Radius.circular(16))),
               child: Row(
                 children: [
                   Container(
@@ -1109,7 +1137,18 @@ class _MobileProfileView extends StatelessWidget {
       children: [
         _sectionLabel('LINKED ACCOUNTS'),
         GestureDetector(
-          onTap: () => _showAddBankAccountSheet(context, ref, user),
+          onTap: () {
+            if (user.bankAccounts.length >= 3) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Maximum of 3 bank accounts allowed'),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            } else {
+              _showAddBankAccountSheet(context, ref, user);
+            }
+          },
           child: Container(
             width: 28,
             height: 28,
@@ -1168,6 +1207,17 @@ class _MobileProfileView extends StatelessWidget {
                       ),
                     ),
                     _mobileBankStatusBadge(account.verificationStatus),
+                    const SizedBox(width: 8),
+                    Consumer(
+                      builder: (context, ref, _) => IconButton(
+                        onPressed: () => _showDeleteBankAccountDialog(
+                            context, ref, user, account),
+                        icon: const Icon(Icons.delete_outline,
+                            color: AppColors.error, size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1312,7 +1362,7 @@ class _SidebarItem extends StatelessWidget {
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2))
                   ]
@@ -1507,7 +1557,424 @@ Widget _buildSharedDataField(String label, String value) {
   );
 }
 
+void _showEditProfileSheet(
+    BuildContext context, WidgetRef ref, UserModel user) {
+  final nameController = TextEditingController(text: user.fullName);
+  final phoneController = TextEditingController(text: user.phone);
+  final addressController = TextEditingController(text: user.streetAddress);
+  final cityController = TextEditingController(text: user.city);
+  final stateController = TextEditingController(text: user.state);
+  final zipController = TextEditingController(text: user.postalCode);
+  final formKey = GlobalKey<FormState>();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) {
+      bool isLoading = false;
+      return StatefulBuilder(
+        builder: (modalContext, setState) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+            ),
+            padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 32,
+                bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 32),
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.border,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Edit Profile',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Update your personal information below.',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    CustomTextField(
+                      label: 'Full Name',
+                      hint: 'Enter your full name',
+                      controller: nameController,
+                      prefixIcon: const Icon(Icons.person_outline),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Name is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'Phone Number',
+                      hint: 'Enter phone number',
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Phone is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'Street Address',
+                      hint: 'Enter street address',
+                      controller: addressController,
+                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Address is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            label: 'City',
+                            hint: 'City',
+                            controller: cityController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'City is required';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: CustomTextField(
+                            label: 'State',
+                            hint: 'State',
+                            controller: stateController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'State is required';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'Postal Code',
+                      hint: 'Enter postal code',
+                      controller: zipController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Postal code is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                if (!formKey.currentState!.validate()) return;
+                                setState(() => isLoading = true);
+
+                                final newName = nameController.text.trim();
+                                var status = user.verificationStatus;
+
+                                // If name changed, reset KYC status
+                                if (newName != user.fullName) {
+                                  status = VerificationStatus.unverified;
+                                }
+
+                                final updatedUser = user.copyWith(
+                                  fullName: newName,
+                                  phone: phoneController.text.trim(),
+                                  streetAddress: addressController.text.trim(),
+                                  city: cityController.text.trim(),
+                                  state: stateController.text.trim(),
+                                  postalCode: zipController.text.trim(),
+                                  verificationStatus: status,
+                                );
+
+                                try {
+                                  await ref
+                                      .read(firestoreServiceProvider)
+                                      .updateUser(updatedUser);
+
+                                  if (sheetContext.mounted && context.mounted) {
+                                    if (newName != user.fullName) {
+                                      _showThemedPopup(
+                                        context,
+                                        'Identity Verification Required',
+                                        'Since you changed your name, you must re-verify your identity to maintain account security.',
+                                        isWarning: true,
+                                        onClosed: () {
+                                          if (sheetContext.mounted) {
+                                            Navigator.pop(sheetContext);
+                                          }
+                                          ref.invalidate(currentUserProvider);
+                                        },
+                                      );
+                                    } else {
+                                      _showThemedPopup(
+                                        context,
+                                        'Profile Updated',
+                                        'Your personal information has been successfully updated.',
+                                        onClosed: () {
+                                          if (sheetContext.mounted) {
+                                            Navigator.pop(sheetContext);
+                                          }
+                                          ref.invalidate(currentUserProvider);
+                                        },
+                                      );
+                                    }
+                                  }
+                                } catch (e) {
+                                  if (sheetContext.mounted) {
+                                    setState(() => isLoading = false);
+                                    _showThemedPopup(
+                                      sheetContext,
+                                      'Update Failed',
+                                      'We encountered an error while saving your profile: $e',
+                                      isWarning: true,
+                                    );
+                                  }
+                                }                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryDark,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          elevation: 0,
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                ),
+                              )
+                            : Text(
+                                'SAVE CHANGES',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _showThemedPopup(BuildContext context, String title, String message,
+    {bool isWarning = false, VoidCallback? onClosed}) {
+  showDialog(
+    context: context,
+    useRootNavigator: true,
+    barrierDismissible: false,
+    builder: (dialogContext) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isWarning
+                    ? AppColors.warning.withValues(alpha: 0.1)
+                    : AppColors.success.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isWarning
+                    ? Icons.warning_amber_rounded
+                    : Icons.check_circle_outline_rounded,
+                color: isWarning ? AppColors.warning : AppColors.success,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryDark,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  if (onClosed != null) onClosed();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryDark,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: Text(
+                  isWarning ? 'UNDERSTOOD' : 'DONE',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 // ── Add Bank Account Sheet ────────────────────────────────────────────────────
+
+void _showDeleteBankAccountDialog(
+    BuildContext context, WidgetRef ref, UserModel user, BankAccount account) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      bool isDeleting = false;
+      return StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Delete Bank Account',
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold)),
+          content: Text(
+              'Are you sure you want to delete this bank account (${account.bankName} - ${account.accountNumber})?',
+              style: GoogleFonts.plusJakartaSans()),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(context),
+              child: Text('CANCEL',
+                  style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      setDialogState(() => isDeleting = true);
+
+                      try {
+                        await ref
+                            .read(firestoreServiceProvider)
+                            .deleteBankAccount(
+                              userId: user.id,
+                              bankAccountId: account.id,
+                            );
+                        // Refresh user data
+                        ref.invalidate(currentUserProvider);
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('Bank account deleted successfully'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setDialogState(() => isDeleting = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error deleting bank account: $e'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: isDeleting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.error),
+                    )
+                  : Text('DELETE',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.bold, color: AppColors.error)),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
 void _showAddBankAccountSheet(
     BuildContext context, WidgetRef ref, UserModel user) {
@@ -1519,115 +1986,222 @@ void _showAddBankAccountSheet(
   final countryCode = currentUser?.countryCode ?? 'BZ';
   final banks = AppStrings.banksByCountry[countryCode] ?? [];
   String selectedBank = banks.isNotEmpty ? banks.first : '';
+  bool isSubmitting = false;
 
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    builder: (context) => Padding(
+    backgroundColor: Colors.transparent,
+    builder: (context) => Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
       padding: EdgeInsets.only(
           left: 24,
           right: 24,
-          top: 24,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24),
-      child: StatefulBuilder(
-        builder: (context, setModalState) => Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Add Bank Account',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryDark)),
-              const SizedBox(height: 20),
-              const Text('Bank Name',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: selectedBank.isEmpty ? null : selectedBank,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: AppColors.border)),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: AppColors.border)),
-                ),
-                items: banks
-                    .map((bank) =>
-                        DropdownMenuItem(value: bank, child: Text(bank)))
-                    .toList(),
-                onChanged: (value) =>
-                    setModalState(() => selectedBank = value!),
-                validator: (value) =>
-                    value == null ? 'Please select a bank' : null,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Account Number',
-                hint: 'Enter account number',
-                controller: accountNumberController,
-                keyboardType: TextInputType.number,
-                prefixIcon: const Icon(Icons.credit_card_outlined),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Account number is required';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Account Name',
-                hint: 'Enter account name',
-                controller: accountNameController,
-                prefixIcon: const Icon(Icons.person_outlined),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Account name is required';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
-                    final newAccount = BankAccount(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      bankName: selectedBank,
-                      accountNumber: accountNumberController.text.trim(),
-                      accountName: accountNameController.text.trim(),
-                      verificationStatus: BankVerificationStatus.pending,
-                    );
-                    final updatedAccounts = [...user.bankAccounts, newAccount];
-                    final updatedUser =
-                        user.copyWith(bankAccounts: updatedAccounts);
-                    await ref
-                        .read(firestoreServiceProvider)
-                        .updateUser(updatedUser);
-                    if (context.mounted) Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryDark,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+          top: 32,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 32),
+      child: SingleChildScrollView(
+        child: StatefulBuilder(
+          builder: (context, setModalState) {
+            return Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                  child: const Text('Save Account'),
-                ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Add Bank Account',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Link your account to receive disbursements.',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'Bank Name',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedBank.isEmpty ? null : selectedBank,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppColors.textPrimary,
+                      fontSize: 15,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: AppColors.border)),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: AppColors.border)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: AppColors.primary, width: 2)),
+                    ),
+                    items: banks
+                        .map((bank) => DropdownMenuItem(
+                              value: bank,
+                              child: Text(bank,
+                                  style: GoogleFonts.plusJakartaSans()),
+                            ))
+                        .toList(),
+                    onChanged: isSubmitting
+                        ? null
+                        : (value) => setModalState(() => selectedBank = value!),
+                    validator: (value) =>
+                        value == null ? 'Please select a bank' : null,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    label: 'Account Number',
+                    hint: 'Enter account number',
+                    controller: accountNumberController,
+                    keyboardType: TextInputType.number,
+                    prefixIcon: const Icon(Icons.credit_card_outlined),
+                    enabled: !isSubmitting,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Account number is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    label: 'Account Name',
+                    hint: 'Enter account name',
+                    controller: accountNameController,
+                    prefixIcon: const Icon(Icons.person_outlined),
+                    enabled: !isSubmitting,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Account name is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isSubmitting
+                          ? null
+                          : () async {
+                              if (!formKey.currentState!.validate()) return;
+                              setModalState(() => isSubmitting = true);
+
+                              final newAccount = BankAccount(
+                                id: DateTime.now()
+                                    .millisecondsSinceEpoch
+                                    .toString(),
+                                bankName: selectedBank,
+                                accountNumber:
+                                    accountNumberController.text.trim(),
+                                accountName: accountNameController.text.trim(),
+                                verificationStatus:
+                                    BankVerificationStatus.pending,
+                              );
+                              final updatedAccounts = [
+                                ...user.bankAccounts,
+                                newAccount
+                              ];
+                              final updatedUser =
+                                  user.copyWith(bankAccounts: updatedAccounts);
+                              try {
+                                await ref
+                                    .read(firestoreServiceProvider)
+                                    .updateUser(updatedUser);
+                                ref.invalidate(currentUserProvider);
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Bank account linked successfully'),
+                                      backgroundColor: AppColors.success,
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  setModalState(() => isSubmitting = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                          Text('Error linking bank account: $e'),
+                                      backgroundColor: AppColors.error,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryDark,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                      ),
+                      child: isSubmitting
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'LINK ACCOUNT',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     ),
   );
 }
+

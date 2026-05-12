@@ -1,12 +1,12 @@
 import 'package:aemo_loan_app/data/models/withdrawal_model.dart';
 import 'package:aemo_loan_app/features/admin/screens/admin_users.dart';
 import 'package:aemo_loan_app/features/admin/screens/admin_withdrawal_screen.dart';
-import 'package:aemo_loan_app/features/withdrawal/user_withdrawals_screen.dart';
-import 'package:aemo_loan_app/features/landing_page/landing_page_desktop.dart';
-import 'package:aemo_loan_app/features/landing_page/landing_page_mobile.dart';
-import 'package:aemo_loan_app/features/landing_page/responsive_layout.dart';
-import 'package:aemo_loan_app/features/withdrawal/withdrawal_screen.dart';
-import 'package:aemo_loan_app/features/withdrawal/withdrawal_success_screen.dart';
+import 'package:aemo_loan_app/features/withdrawal/screens/user_withdrawals_screen.dart';
+import 'package:aemo_loan_app/features/landing_page/screens/landing_page_desktop.dart';
+import 'package:aemo_loan_app/features/landing_page/screens/landing_page_mobile.dart';
+import 'package:aemo_loan_app/shared/layouts/responsive_layout.dart';
+import 'package:aemo_loan_app/features/withdrawal/screens/withdrawal_screen.dart';
+import 'package:aemo_loan_app/features/withdrawal/screens/withdrawal_success_screen.dart';
 // import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -147,7 +147,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.adminWithdrawals,
-        builder: (context, state) => AdminWithdrawalsScreen(),
+        builder: (context, state) => const AdminWithdrawalsScreen(),
       ),
       GoRoute(
         path: AppRoutes.kyc,
@@ -178,7 +178,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.profile,
-        builder: (context, state) => ProfileScreen(),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,

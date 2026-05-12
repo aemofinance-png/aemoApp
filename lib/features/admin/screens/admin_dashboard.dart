@@ -4,11 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/loan_application_model.dart';
 import '../../../shared/widgets/loading_overlay.dart';
-import '../../../shared/widgets/status_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/admin_provider.dart';
 import '../../../app/router.dart';
@@ -24,6 +22,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
     with SingleTickerProviderStateMixin {
   LoanStatus? _selectedFilter;
   late AnimationController _animationController;
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -44,8 +43,14 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
   }
 
   Future<void> _handleLogout() async {
-    await ref.read(authNotifierProvider.notifier).logout();
-    if (mounted) context.go(AppRoutes.login);
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).logout();
+      if (mounted) context.go(AppRoutes.login);
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
   }
 
   @override
@@ -80,7 +85,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
         applications.where((a) => a.status == LoanStatus.rejected).length;
 
     return LoadingOverlay(
-      isLoading: adminState.isLoading,
+      isLoading: adminState.isLoading || _isLoggingOut,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= 1024;
@@ -214,8 +219,9 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
           const Divider(),
           _SidebarItem(
             icon: Icons.logout_rounded,
-            label: 'Log Out',
+            label: _isLoggingOut ? 'Logging Out...' : 'Log Out',
             color: AppColors.error,
+            isLoading: _isLoggingOut,
             onTap: _handleLogout,
           ),
           const SizedBox(height: 32),
@@ -274,10 +280,10 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
           Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.primaryLight,
-              image: const DecorationImage(
+              image: DecorationImage(
                 image: NetworkImage(
                     'https://lh3.googleusercontent.com/aida-public/AB6AXuDIDOdrZZ0PfNtfEq5E0gWtpAQY4CZh4v3RN5pE8X6aMNzdBvohTTHgvhWTLQRYGBkXCwSCDj6uEGjKqAotrVWWX-CXd-MVQ409twRnThfdDjNzgH3oXa_nYdFSSFoqc-ILBDp_L1fDbpcq3-Q5lw4zVlxuxUPpcjV63bMvcDqseD_0u7enU08KHF3QxHXjcDtIUFjSfUYtET2LLLLb3Lca3PekdsC05nuY9VwDPgHnW8nqID_ZkJbxi_5fYVYLHkPMSgbB3VsyjOxV'),
                 fit: BoxFit.cover,
@@ -287,9 +293,19 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
           if (showLogo) ...[
             const SizedBox(width: 8),
             IconButton(
-              onPressed: _handleLogout,
-              icon: const Icon(Icons.logout_rounded,
-                  color: AppColors.error, size: 20),
+              onPressed: _isLoggingOut ? null : _handleLogout,
+              icon: _isLoggingOut
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.error),
+                      ),
+                    )
+                  : const Icon(Icons.logout_rounded,
+                      color: AppColors.error, size: 20),
             ),
           ],
         ],
@@ -752,6 +768,7 @@ class _SidebarItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
   final Color? color;
+  final bool isLoading;
 
   const _SidebarItem({
     required this.icon,
@@ -759,6 +776,7 @@ class _SidebarItem extends StatelessWidget {
     this.isActive = false,
     required this.onTap,
     this.color,
+    this.isLoading = false,
   });
 
   @override
@@ -766,7 +784,7 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -784,12 +802,25 @@ class _SidebarItem extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: color ??
-                    (isActive ? AppColors.primary : AppColors.textSecondary),
-                size: 20,
-              ),
+              isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          color ?? AppColors.error,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      icon,
+                      color: color ??
+                          (isActive
+                              ? AppColors.primary
+                              : AppColors.textSecondary),
+                      size: 20,
+                    ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

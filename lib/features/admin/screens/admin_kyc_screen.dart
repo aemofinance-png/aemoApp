@@ -4,10 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/user_model.dart';
-import '../../../data/providers/service_providers.dart';
 import '../providers/admin_provider.dart';
-import '../../../data/models/user_model.dart';
-import '../../../data/providers/service_providers.dart';
 import '../screens/admin_user_profile.dart';
 import '../screens/document_viewer_screen.dart';
 import '../../../app/router.dart';
@@ -51,8 +48,10 @@ class _KycApprovalContent extends ConsumerStatefulWidget {
 class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
   // Toggle between document types if multiple exist
   int _selectedDocIndex = 0;
+  bool _isApproving = false;
+  bool _isDeclining = false;
 
-  final List<String> _docLabels = ['PASSPORT', 'ID CARD', 'SELFIE'];
+  bool get _isUpdating => _isApproving || _isDeclining;
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +76,9 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go(AppRoutes.admin),
         ),
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'KYC Approval',
               style: TextStyle(
@@ -393,24 +392,41 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
             // Decline button
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () async {
-                  await ref
-                      .read(adminNotifierProvider.notifier)
-                      .updateKycStatus(
-                        userId: user.id,
-                        status: VerificationStatus.unverified,
-                      );
+                onPressed: _isUpdating
+                    ? null
+                    : () async {
+                        setState(() => _isDeclining = true);
+                        try {
+                          await ref
+                              .read(adminNotifierProvider.notifier)
+                              .updateKycStatus(
+                                userId: user.id,
+                                status: VerificationStatus.unverified,
+                              );
 
-                  await EmailService.sendKycRejectionEmail(
-                    toEmail: user.email,
-                    toName: user.fullName,
-                  );
-                  if (context.mounted) context.go(AppRoutes.admin);
-                },
-                icon: const Icon(Icons.close, size: 18, color: AppColors.error),
-                label: const Text(
-                  'Decline',
-                  style: TextStyle(
+                          await EmailService.sendKycRejectionEmail(
+                            toEmail: user.email,
+                            toName: user.fullName,
+                          );
+                          if (context.mounted) context.go(AppRoutes.admin);
+                        } finally {
+                          if (mounted) setState(() => _isDeclining = false);
+                        }
+                      },
+                icon: _isDeclining
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.error),
+                        ),
+                      )
+                    : const Icon(Icons.close, size: 18, color: AppColors.error),
+                label: Text(
+                  _isDeclining ? 'Declining...' : 'Decline',
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.error,
                   ),
@@ -429,25 +445,42 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
             Expanded(
               flex: 2,
               child: ElevatedButton.icon(
-                onPressed: user.verificationStatus == VerificationStatus.pending
-                    ? () async {
-                        await ref
-                            .read(adminNotifierProvider.notifier)
-                            .updateKycStatus(
-                              userId: user.id,
-                              status: VerificationStatus.verified,
-                            );
-                        await EmailService.sendKycApprovalEmail(
-                          toEmail: user.email,
-                          toName: user.fullName,
-                        );
-                        if (context.mounted) context.go(AppRoutes.admin);
-                      }
-                    : null,
-                icon: const Icon(Icons.check_circle_outline, size: 18),
-                label: const Text(
-                  'Approve KYC',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                onPressed:
+                    user.verificationStatus == VerificationStatus.pending &&
+                            !_isUpdating
+                        ? () async {
+                            setState(() => _isApproving = true);
+                            try {
+                              await ref
+                                  .read(adminNotifierProvider.notifier)
+                                  .updateKycStatus(
+                                    userId: user.id,
+                                    status: VerificationStatus.verified,
+                                  );
+                              await EmailService.sendKycApprovalEmail(
+                                toEmail: user.email,
+                                toName: user.fullName,
+                              );
+                              if (context.mounted) context.go(AppRoutes.admin);
+                            } finally {
+                              if (mounted) setState(() => _isApproving = false);
+                            }
+                          }
+                        : null,
+                icon: _isApproving
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.check_circle_outline, size: 18),
+                label: Text(
+                  _isApproving ? 'Approving...' : 'Approve KYC',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:

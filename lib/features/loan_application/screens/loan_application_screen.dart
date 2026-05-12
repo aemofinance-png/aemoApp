@@ -1,17 +1,22 @@
-import 'package:aemo_loan_app/data/models/user_model.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/utils/formatters.dart';
-import '../../../data/providers/service_providers.dart';
-import '../../../shared/widgets/loading_overlay.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../providers/loan_provider.dart';
-import '../../../app/router.dart';
+import 'package:aemo_loan_app/core/constants/app_colors.dart';
+import 'package:aemo_loan_app/core/constants/app_strings.dart';
+import 'package:aemo_loan_app/core/utils/formatters.dart';
+import 'package:aemo_loan_app/data/providers/service_providers.dart';
+import 'package:aemo_loan_app/shared/widgets/loading_overlay.dart';
+import 'package:aemo_loan_app/features/auth/providers/auth_provider.dart';
+import 'package:aemo_loan_app/features/loan_application/providers/loan_provider.dart';
+import 'package:aemo_loan_app/app/router.dart';
+import 'package:aemo_loan_app/data/models/user_model.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:math';
+
+import '../widgets/personal_info_step.dart';
+import '../widgets/employment_step.dart';
+import '../widgets/loan_details_step.dart';
+import '../widgets/bank_and_documents_step.dart';
 
 class LoanApplicationScreen extends ConsumerStatefulWidget {
   const LoanApplicationScreen({super.key});
@@ -41,29 +46,34 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
   String _selectedEmploymentStatus = AppStrings.employmentStatuses.first;
   String _selectedLoanPurpose = AppStrings.loanPurposes.first;
-  int _selectedDuration = AppStrings.loanRates.keys.first;
-  String _selectedBank = '';
+  late int _selectedDuration;
+  String? _selectedBank;
   final List<PlatformFile> _documents = [];
 
   double? _monthlyPayment;
   double? _totalPayment;
-  double? _totalInterest;
+
+  String get _countryCode =>
+      ref.read(currentUserProvider).value?.countryCode ?? 'BZ';
+
+  Map<int, double> get _currentRates => AppStrings.getLoanRates(_countryCode);
 
   Map<int, double> get _availableRates {
     final amount = double.tryParse(_loanAmountController.text.trim()) ?? 0;
     return Map.fromEntries(
-      AppStrings.loanRates.entries.where((entry) {
+      _currentRates.entries.where((entry) {
         final minimum = AppStrings.loanMinimums[entry.key] ?? 0;
         return amount >= minimum;
       }),
     );
   }
 
-  double get _interestRate => AppStrings.loanRates[_selectedDuration] ?? 0.0;
+  double get _interestRate => _currentRates[_selectedDuration] ?? 0.0;
 
   @override
   void initState() {
     super.initState();
+    _selectedDuration = AppStrings.getLoanRates(null).keys.first;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentUser = ref.read(currentUserProvider).value;
       final countryCode = currentUser?.countryCode ?? 'BZ';
@@ -98,7 +108,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     setState(() {
       _monthlyPayment = monthly.toDouble();
       _totalPayment = monthly * months;
-      _totalInterest = (monthly * months) - amount;
     });
   }
 
@@ -157,7 +166,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
       if (!alreadySaved && _accountNumberController.text.isNotEmpty) {
         final newAccount = BankAccount(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          bankName: _selectedBank,
+          bankName: _selectedBank ?? '',
           accountNumber: _accountNumberController.text.trim(),
           accountName: currentUser.fullName,
         );
@@ -178,7 +187,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               loanAmount: double.parse(_loanAmountController.text.trim()),
               loanPurpose: _selectedLoanPurpose,
               loanDuration: _selectedDuration,
-              bankName: _selectedBank,
+              bankName: _selectedBank ?? '',
               accountNumber: _accountNumberController.text.trim(),
               documents: _documents,
             );
@@ -200,6 +209,9 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
   @override
   Widget build(BuildContext context) {
     final loanState = ref.watch(loanNotifierProvider);
+    final currentUser = ref.watch(currentUserProvider).value;
+    final countryCode = currentUser?.countryCode ?? 'BZ';
+    final currencyCode = Formatters.getCurrencyCode(countryCode);
     final progress = (_currentStep + 1) / _totalSteps;
     final stepNames = [
       'Personal Info',
@@ -229,26 +241,10 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
               color: AppColors.textPrimary,
             ),
           ),
-          // actions: [
-          //   Padding(
-          //     padding: const EdgeInsets.only(right: 16),
-          //     child: Center(
-          //       child: Text(
-          //         'STEP ${_currentStep + 1} OF $_totalSteps',
-          //         style: const TextStyle(
-          //           fontSize: 12,
-          //           fontWeight: FontWeight.w600,
-          //           color: AppColors.textSecondary,
-          //           letterSpacing: 0.5,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ],
         ),
         body: Column(
           children: [
-            // Progress bar + step label
+            // Progress Header
             Container(
               color: AppColors.white,
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
@@ -268,7 +264,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                       ),
                       Text(
                         stepNames[_currentStep],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -296,1136 +292,101 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildStep1(),
-                  _buildStep2(),
-                  _buildStep3(),
-                  _buildStep4(),
+                  PersonalInfoStep(
+                    formKey: _step1Key,
+                    fullNameController: _fullNameController,
+                    phoneController: _phoneController,
+                  ),
+                  EmploymentStep(
+                    formKey: _step2Key,
+                    selectedEmploymentStatus: _selectedEmploymentStatus,
+                    employerController: _employerController,
+                    monthlyIncomeController: _monthlyIncomeController,
+                    currencyCode: currencyCode,
+                    onEmploymentStatusChanged: (v) =>
+                        setState(() => _selectedEmploymentStatus = v!),
+                  ),
+                  LoanDetailsStep(
+                    formKey: _step3Key,
+                    loanAmountController: _loanAmountController,
+                    selectedLoanPurpose: _selectedLoanPurpose,
+                    selectedDuration: _selectedDuration,
+                    availableRates: _availableRates,
+                    interestRate: _interestRate,
+                    monthlyPayment: _monthlyPayment,
+                    totalPayment: _totalPayment,
+                    countryCode: countryCode,
+                    onPurposeChanged: (v) =>
+                        setState(() => _selectedLoanPurpose = v!),
+                    onDurationChanged: (v) {
+                      setState(() => _selectedDuration = v!);
+                      _calculate();
+                    },
+                    onAmountChanged: (v) => _calculate(),
+                  ),
+                  BankAndDocumentsStep(
+                    formKey: _step4Key,
+                    selectedBank: _selectedBank,
+                    accountNumberController: _accountNumberController,
+                    documents: _documents,
+                    currentUser: currentUser,
+                    countryCode: countryCode,
+                    onBankChanged: (v) => setState(() => _selectedBank = v),
+                    onPickDocument: _pickDocument,
+                    onRemoveDocument: _removeDocument,
+                  ),
                 ],
               ),
             ),
 
-            // Bottom nav
-            _buildBottomNav(loanState),
+            // Navigation
+            _buildBottomNav(),
           ],
         ),
       ),
     );
   }
 
-  // ── Bottom Nav ───────────────────────────────────────────
-  Widget _buildBottomNav(LoanState loanState) {
+  Widget _buildBottomNav() {
     final isLastStep = _currentStep == _totalSteps - 1;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-        // border: Border(top: BorderSide(color: AppColors.border)),
-      ),
       child: Row(
         children: [
-          // Back button
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: GestureDetector(
-              onTap: _currentStep > 0
-                  ? _previousStep
-                  : () => context.go(AppRoutes.dashboard),
-              child: Row(
-                children: const [
-                  Icon(Icons.arrow_back,
-                      size: 16, color: AppColors.textSecondary),
-                  SizedBox(width: 4),
-                  // Text(
-                  //   'BACK',
-                  //   style: TextStyle(
-                  //     fontSize: 13,
-                  //     fontWeight: FontWeight.w600,
-                  //     color: AppColors.textSecondary,
-                  //     letterSpacing: 0.5,
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
+          IconButton(
+            onPressed: _currentStep > 0
+                ? _previousStep
+                : () => context.go(AppRoutes.dashboard),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary),
           ),
-
           const Spacer(),
-
-          // ✅ No SizedBox with double.infinity inside a Row
-          ElevatedButton(
-            onPressed: isLastStep ? _handleSubmit : _nextStep,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryDark,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+          SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: isLastStep ? _handleSubmit : _nextStep,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryDark,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                minimumSize: const Size(120, 52),
               ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isLastStep ? 'SUBMIT APPLICATION' : 'CONTINUE',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward, size: 18),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Step 1: Personal Info ────────────────────────────────
-  Widget _buildStep1() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Form(
-            key: _step1Key,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                // const Text(
-                //   "Let's get started.",
-                //   style: TextStyle(
-                //     fontSize: 28,
-                //     fontWeight: FontWeight.w800,
-                //     color: AppColors.textPrimary,
-                //   ),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Let\'s get started.',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    // Step dots
-                    Row(
-                      children: List.generate(
-                          4,
-                          (i) => Container(
-                                width: i == 0 ? 24 : 8,
-                                height: 8,
-                                margin: const EdgeInsets.only(left: 4),
-                                decoration: BoxDecoration(
-                                  color: i == 0
-                                      ? AppColors.primaryDark
-                                      : AppColors.border,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              )),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Tell us a bit about yourself to help us build your personalized loan offer.',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      height: 1.5),
-                ),
-                const SizedBox(height: 24),
-
-                // Security badge
-
-                const SizedBox(height: 28),
-
-                _buildFieldLabel('FULL NAME'),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _fullNameController,
-                  hint: 'e.g. Julian Montgomery',
-                  icon: Icons.person_outline,
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Full name is required' : null,
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildFieldLabel('PHONE NUMBER'),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _phoneController,
-                  hint: '+1 (555) 000-0000',
-                  icon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => v == null || v.isEmpty
-                      ? 'Phone number is required'
-                      : null,
-                ),
-
-                const SizedBox(height: 28),
-
-                _buildInfoBadge(
-                  icon: Icons.shield_outlined,
-                  title: 'SECURE TRANSMISSION',
-                  subtitle: 'Your data is encrypted with bank-grade security.',
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Step 2: Employment ───────────────────────────────────
-  Widget _buildStep2() {
-    final currentUser = ref.read(currentUserProvider).value;
-    final countryCode = currentUser?.countryCode ?? 'BZ';
-    final currencyCode = Formatters.getCurrencyCode(countryCode);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Form(
-            key: _step2Key,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                // const Text(
-                //   'Employment & Income',
-                //   style: TextStyle(
-                //     fontSize: 28,
-                //     fontWeight: FontWeight.w800,
-                //     color: AppColors.textPrimary,
-                //   ),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Employment & Income',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    // Step dots
-                    Row(
-                      children: List.generate(
-                          4,
-                          (i) => Container(
-                                width: i == 1 ? 24 : 8,
-                                height: 8,
-                                margin: const EdgeInsets.only(left: 4),
-                                decoration: BoxDecoration(
-                                  color: i == 1
-                                      ? AppColors.primaryDark
-                                      : AppColors.border,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              )),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Please provide your professional details to help us assess your eligibility.',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      height: 1.5),
-                ),
-                const SizedBox(height: 28),
-                _buildFieldLabel('EMPLOYMENT STATUS'),
-                const SizedBox(height: 8),
-                _buildDropdown(
-                  value: _selectedEmploymentStatus,
-                  hint: 'Select status',
-                  items: AppStrings.employmentStatuses,
-                  onChanged: (v) =>
-                      setState(() => _selectedEmploymentStatus = v!),
-                ),
-                const SizedBox(height: 20),
-                _buildFieldLabel('EMPLOYER NAME'),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _employerController,
-                  hint: 'e.g. Acme Corporation',
-                  icon: Icons.business_outlined,
-                  validator: (v) => v == null || v.isEmpty
-                      ? 'Employer name is required'
-                      : null,
-                ),
-                const SizedBox(height: 20),
-                _buildFieldLabel('NETT MONTHLY INCOME'),
-                const SizedBox(height: 8),
-                // _buildTextField(
-                //   controller: _monthlyIncomeController,
-                //   hint: '0.00',
-                //    prefixText: '$currencyCode  ',
-                //   keyboardType: TextInputType.number,
-                //   validator: (v) {
-                //     if (v == null || v.isEmpty)
-                //       return 'Monthly income is required';
-                //     if (double.tryParse(v) == null)
-                //       return 'Enter a valid amount';
-                //     if (double.parse(v) <= 0)
-                //       return 'Income must be greater than 0';
-                //     return null;
-                //   },
-                // ),
-                TextFormField(
-                  controller: _monthlyIncomeController,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.background,
-                    prefixText: '$currencyCode  ',
-                    prefixStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    ),
-                    hintText: '0.00',
-                    hintStyle: const TextStyle(color: AppColors.textHint),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 18),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                _buildInfoBadge(
-                  icon: Icons.security_outlined,
-                  title: 'Data Privacy',
-                  subtitle:
-                      'Your income details are encrypted and only used for credit assessment purposes.',
-                  titleBold: true,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Step 3: Loan Details ─────────────────────────────────
-  Widget _buildStep3() {
-    final currentUser = ref.read(currentUserProvider).value;
-    final countryCode = currentUser?.countryCode ?? 'BZ';
-    final currencyCode = Formatters.getCurrencyCode(countryCode);
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Form(
-            key: _step3Key,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Loan Details',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    // Step dots
-                    Row(
-                      children: List.generate(
-                          4,
-                          (i) => Container(
-                                width: i == 2 ? 24 : 8,
-                                height: 8,
-                                margin: const EdgeInsets.only(left: 4),
-                                decoration: BoxDecoration(
-                                  color: i == 2
-                                      ? AppColors.primaryDark
-                                      : AppColors.border,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              )),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Please specify the amount and purpose of your loan. This helps us tailor the best rates for your financial goals.',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      height: 1.5),
-                ),
-                const SizedBox(height: 28),
-
-                _buildFieldLabel('DESIRED LOAN AMOUNT'),
-                const SizedBox(height: 8),
-
-                // Amount field with currency prefix
-                TextFormField(
-                  controller: _loanAmountController,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.background,
-                    prefixText: '$currencyCode  ',
-                    prefixStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    ),
-                    hintText: '0.00',
-                    hintStyle: const TextStyle(color: AppColors.textHint),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 18),
-                  ),
-                  onChanged: (_) {
-                    _calculate();
-                    setState(() {
-                      final available = _availableRates;
-                      if (!available.containsKey(_selectedDuration) &&
-                          available.isNotEmpty) {
-                        _selectedDuration = available.keys.first;
-                      }
-                    });
-                  },
-                  validator: (v) {
-                    if (v == null || v.isEmpty)
-                      return 'Loan amount is required';
-                    if (double.tryParse(v) == null)
-                      return 'Enter a valid amount';
-                    if (double.parse(v) < 100)
-                      return 'Minimum loan amount is 100';
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Min: $currencyCode 1,000',
-                        style: const TextStyle(
-                            fontSize: 11, color: AppColors.textHint)),
-                    Text('Max: $currencyCode 2,000,000',
-                        style: const TextStyle(
-                            fontSize: 11, color: AppColors.textHint)),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildFieldLabel('LOAN PURPOSE'),
-                const SizedBox(height: 8),
-                _buildDropdown(
-                  value: _selectedLoanPurpose,
-                  hint: 'Select an option',
-                  items: AppStrings.loanPurposes,
-                  onChanged: (v) => setState(() => _selectedLoanPurpose = v!),
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildFieldLabel('LOAN DURATION'),
-                const SizedBox(height: 12),
-                // Replace _buildDropdown with a direct DropdownButtonFormField for duration:
-                DropdownButtonFormField<int>(
-                  value: _selectedDuration,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.background,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 18),
-                  ),
-                  hint: const Text('Select an option',
-                      style: TextStyle(color: AppColors.textHint)),
-                  items: _availableRates.keys
-                      .map((months) => DropdownMenuItem<int>(
-                            value: months,
-                            child: Text(
-                              '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
-                            ),
-                          ))
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                    _selectedDuration = value!;
-                    _calculate();
-                  }),
-                ),
-                // Duration grid
-                // GridView.count(
-                //   crossAxisCount: 2,
-                //   shrinkWrap: true,
-                //   physics: const NeverScrollableScrollPhysics(),
-                //   crossAxisSpacing: 12,
-                //   mainAxisSpacing: 12,
-                //   childAspectRatio: 1.8,
-                //   children: _availableRates.entries.map((entry) {
-                //     final months = entry.key;
-                //     final rate = entry.value;
-                //     final isSelected = _selectedDuration == months;
-                //     return GestureDetector(
-                //       onTap: () => setState(() {
-                //         _selectedDuration = months;
-                //         _calculate();
-                //       }),
-                //       child: Container(
-                //         padding: const EdgeInsets.all(14),
-                //         decoration: BoxDecoration(
-                //           color: isSelected
-                //               ? Colors.transparent
-                //               : AppColors.background,
-                //           borderRadius: BorderRadius.circular(10),
-                //           border: Border.all(
-                //             color: isSelected
-                //                 ? AppColors.primaryDark
-                //                 : AppColors.border,
-                //             width: isSelected ? 2 : 1,
-                //           ),
-                //         ),
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           children: [
-                //             Text(
-                //               '${Formatters.duration(months).toUpperCase()}',
-                //               style: TextStyle(
-                //                 fontSize: 11,
-                //                 fontWeight: FontWeight.w600,
-                //                 color: isSelected
-                //                     ? AppColors.primaryDark
-                //                     : AppColors.textSecondary,
-                //                 letterSpacing: 0.5,
-                //               ),
-                //             ),
-                //             const SizedBox(height: 4),
-                //             Text(
-                //               '$rate% APR',
-                //               style: TextStyle(
-                //                 fontSize: 18,
-                //                 fontWeight: FontWeight.w800,
-                //                 color: isSelected
-                //                     ? AppColors.primaryDark
-                //                     : AppColors.textPrimary,
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     );
-                //   }).toList(),
-                // ),
-
-                if (_monthlyPayment != null) ...[
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.info_outline,
-                              color: AppColors.primary, size: 18),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Monthly Payment',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              Text(
-                                '${Formatters.currency(_monthlyPayment!, countryCode)} / month • Total: ${Formatters.currency(_totalPayment!, countryCode)}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isLastStep ? 'SUBMIT APPLICATION' : 'CONTINUE',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward, size: 18),
                 ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Step 4: Bank & Documents ─────────────────────────────
-  Widget _buildStep4() {
-    final currentUser = ref.read(currentUserProvider).value;
-    final countryCode = currentUser?.countryCode ?? 'BZ';
-    final banks = AppStrings.banksByCountry[countryCode] ?? [];
-    final savedAccounts = currentUser?.bankAccounts ?? [];
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Form(
-            key: _step4Key,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                // const Text(
-                //   'Bank & Documents',
-                //   style: TextStyle(
-                //     fontSize: 28,
-                //     fontWeight: FontWeight.w800,
-                //     color: AppColors.textPrimary,
-                //   ),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Bank & Documents',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    // Step dots
-                    Row(
-                      children: List.generate(
-                          4,
-                          (i) => Container(
-                                width: i == 3 ? 24 : 8,
-                                height: 8,
-                                margin: const EdgeInsets.only(left: 4),
-                                decoration: BoxDecoration(
-                                  color: i == 3
-                                      ? AppColors.primaryDark
-                                      : AppColors.border,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              )),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Please verify your payout details and upload required documentation.',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                      height: 1.5),
-                ),
-                const SizedBox(height: 28),
-
-                // Saved accounts
-                if (savedAccounts.isNotEmpty) ...[
-                  _buildFieldLabel('SAVED ACCOUNTS'),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      children: savedAccounts.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final account = entry.value;
-                        final isSelected = _selectedBank == account.bankName &&
-                            _accountNumberController.text ==
-                                account.accountNumber;
-                        final isLast = index == savedAccounts.length - 1;
-                        return Column(
-                          children: [
-                            InkWell(
-                              onTap: () => setState(() {
-                                _selectedBank = account.bankName;
-                                _accountNumberController.text =
-                                    account.accountNumber;
-                              }),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryLight,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: const Icon(
-                                          Icons.account_balance_outlined,
-                                          color: AppColors.primary,
-                                          size: 20),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(account.bankName,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 14,
-                                                color: AppColors.textPrimary,
-                                              )),
-                                          Text(
-                                            '•••• ${account.accountNumber.length >= 4 ? account.accountNumber.substring(account.accountNumber.length - 4) : account.accountNumber}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: AppColors.textSecondary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // Verification badge
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: account.verificationStatus ==
-                                                BankVerificationStatus.verified
-                                            ? AppColors.primaryLight
-                                            : AppColors.background,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          if (account.verificationStatus ==
-                                              BankVerificationStatus.verified)
-                                            const Icon(Icons.check_circle,
-                                                color: AppColors.primary,
-                                                size: 14),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            account.verificationStatus.name
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700,
-                                              color:
-                                                  account.verificationStatus ==
-                                                          BankVerificationStatus
-                                                              .verified
-                                                      ? AppColors.primary
-                                                      : AppColors.textSecondary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (!isLast) const Divider(height: 1),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Manual entry
-                _buildFieldLabel('ADD NEW ACCOUNT'),
-                const SizedBox(height: 15),
-
-                _buildFieldLabel('BANK NAME'),
-                const SizedBox(height: 8),
-
-                _buildDropdown(
-                  value: _selectedBank,
-                  hint: 'Select bank',
-                  items: AppStrings.banksByCountry[countryCode] ?? [],
-                  onChanged: (v) => setState(() => _selectedBank = v!),
-                ),
-
-                const SizedBox(height: 16),
-
-                _buildFieldLabel('ACCOUNT NUMBER'),
-                const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _accountNumberController,
-                  hint: '• • • • • • • • • • • •',
-                  keyboardType: TextInputType.number,
-                  validator: (v) => v == null || v.isEmpty
-                      ? 'Account number is required'
-                      : null,
-                ),
-
-                const SizedBox(height: 28),
-
-                // Documents
-                _buildFieldLabel('SUPPORTING DOCUMENTS'),
-                const SizedBox(height: 12),
-
-                // Upload area
-                GestureDetector(
-                  onTap: _pickDocument,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 32),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border, width: 1.5),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.upload_file_outlined,
-                              color: AppColors.textSecondary, size: 24),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Upload ID and Pay Stubs or Bank Statments',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const Text(
-                          '(You can upload multiple files)',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'PDF, PNG or JPG (Max 10MB)',
-                          style: TextStyle(
-                              fontSize: 12, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Browse Files',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Uploaded files
-                if (_documents.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  ..._documents.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final file = entry.value;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.insert_drive_file_outlined,
-                              color: AppColors.primary, size: 20),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  file.name,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                LinearProgressIndicator(
-                                  value: 1.0,
-                                  backgroundColor: AppColors.border,
-                                  color: AppColors.primaryDark,
-                                  minHeight: 2,
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('100%',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary)),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _removeDocument(index),
-                            child: const Icon(Icons.close,
-                                color: AppColors.textSecondary, size: 18),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Helpers ──────────────────────────────────────────────
-
-  Widget _buildFieldLabel(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textSecondary,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    IconData? icon,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    void Function(String)? onChanged,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      onChanged: onChanged,
-      validator: validator,
-      style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: AppColors.background,
-        hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textHint),
-        prefixIcon: icon != null
-            ? Icon(icon, color: AppColors.textHint, size: 20)
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      ),
-    );
-  }
-
-  Widget _buildDropdown({
-    final int? duration,
-    final String? value,
-    required String hint,
-    required List<String> items,
-    required void Function(String?) onChanged,
-  }) {
-    return DropdownButtonFormField<String>(
-      value: value?.isEmpty ?? true ? null : value,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: AppColors.background,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      ),
-      hint: Text(hint, style: const TextStyle(color: AppColors.textHint)),
-      items: items
-          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-          .toList(),
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildInfoBadge({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    bool titleBold = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: titleBold ? FontWeight.w700 : FontWeight.w600,
-                    color: AppColors.textPrimary,
-                    letterSpacing: titleBold ? 0 : 0.5,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],

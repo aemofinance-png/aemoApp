@@ -9,6 +9,7 @@ import '../../../data/models/user_model.dart';
 import '../../../data/providers/service_providers.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../shared/widgets/skeleton.dart';
 
 final allUsersProvider =
     FutureProvider.autoDispose<List<UserModel>>((ref) async {
@@ -25,10 +26,17 @@ class AdminUsersScreen extends ConsumerStatefulWidget {
 class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   String _searchQuery = '';
   VerificationStatus? _statusFilter;
+  bool _isLoggingOut = false;
 
   Future<void> _handleLogout() async {
-    await ref.read(authNotifierProvider.notifier).logout();
-    if (mounted) context.go(AppRoutes.login);
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).logout();
+      if (mounted) context.go(AppRoutes.login);
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
   }
 
   @override
@@ -38,7 +46,17 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FB),
       body: usersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: List.generate(
+                8,
+                (index) => const Padding(
+                      padding: EdgeInsets.only(bottom: 16),
+                      child: Skeleton(height: 80, borderRadius: 16),
+                    )),
+          ),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (users) {
           final filtered = users
@@ -202,8 +220,9 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           const Divider(),
           _SidebarItem(
             icon: Icons.logout_rounded,
-            label: 'Log Out',
+            label: _isLoggingOut ? 'Logging Out...' : 'Log Out',
             color: AppColors.error,
+            isLoading: _isLoggingOut,
             onTap: _handleLogout,
           ),
           const SizedBox(height: 32),
@@ -247,7 +266,8 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFF001E40), size: 20),
-            onPressed: () => ref.invalidate(allUsersProvider),
+            onPressed:
+                _isLoggingOut ? null : () => ref.invalidate(allUsersProvider),
           ),
           const SizedBox(width: 8),
           Container(
@@ -266,9 +286,19 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           if (showLogo) ...[
             const SizedBox(width: 8),
             IconButton(
-              onPressed: _handleLogout,
-              icon: const Icon(Icons.logout_rounded,
-                  color: AppColors.error, size: 20),
+              onPressed: _isLoggingOut ? null : _handleLogout,
+              icon: _isLoggingOut
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.error),
+                      ),
+                    )
+                  : const Icon(Icons.logout_rounded,
+                      color: AppColors.error, size: 20),
             ),
           ],
         ],
@@ -613,6 +643,7 @@ class _SidebarItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
   final Color? color;
+  final bool isLoading;
 
   const _SidebarItem({
     required this.icon,
@@ -620,6 +651,7 @@ class _SidebarItem extends StatelessWidget {
     this.isActive = false,
     required this.onTap,
     this.color,
+    this.isLoading = false,
   });
 
   @override
@@ -627,7 +659,7 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -645,12 +677,25 @@ class _SidebarItem extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: color ??
-                    (isActive ? AppColors.primary : AppColors.textSecondary),
-                size: 20,
-              ),
+              isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          color ?? AppColors.error,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      icon,
+                      color: color ??
+                          (isActive
+                              ? AppColors.primary
+                              : AppColors.textSecondary),
+                      size: 20,
+                    ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

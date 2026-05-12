@@ -7,10 +7,10 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/loan_application_model.dart';
-import '../../../shared/widgets/status_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../loan_application/providers/loan_provider.dart';
 import '../../../app/router.dart';
+import '../../../shared/widgets/skeleton.dart';
 import 'dart:math';
 import '../../admin/screens/document_viewer_screen.dart';
 import 'package:web/web.dart' as web;
@@ -33,8 +33,10 @@ class ApplicationStatusScreen extends ConsumerStatefulWidget {
 
 class _ApplicationStatusScreenState
     extends ConsumerState<ApplicationStatusScreen> {
-  bool _isLoading = false;
-  bool _isLoading2 = false;
+  bool _isPreGenerating = false;
+  String? _preGeneratedUrl;
+  bool _userWaitingForAgreement = false;
+  final bool _isLoading2 = false;
 
   @override
   void initState() {
@@ -43,10 +45,18 @@ class _ApplicationStatusScreenState
         () => ref.read(loanNotifierProvider.notifier).fetchApplications());
   }
 
+  @override
+  void dispose() {
+    if (_preGeneratedUrl != null) {
+      web.URL.revokeObjectURL(_preGeneratedUrl!);
+    }
+    super.dispose();
+  }
+
   double _calculateMonthlyRepayment(LoanApplicationModel application) {
     final double principal = application.loanAmount;
     final double annualRate =
-        AppStrings.loanRates[application.loanDuration] ?? 0;
+        AppStrings.getLoanRates(application.countryCode)[application.loanDuration] ?? 0;
     final int months = application.loanDuration;
     if (annualRate == 0) return principal / months;
     final double r = annualRate / 12 / 100;
@@ -70,7 +80,17 @@ class _ApplicationStatusScreenState
 
     if (application == null) {
       if (loanState.isLoading) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        return Scaffold(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: const StatusSkeleton(),
+              ),
+            ),
+          ),
+        );
       }
       return Scaffold(
         appBar: AppBar(title: const Text('Application not found')),
@@ -81,40 +101,67 @@ class _ApplicationStatusScreenState
       );
     }
 
+    // Trigger pre-generation if approved
+    if (application.status == LoanStatus.approved &&
+        currentUser != null &&
+        !_isPreGenerating &&
+        _preGeneratedUrl == null) {
+      Future.microtask(
+          () => _startAgreementGeneration(application, currentUser));
+    }
+
+    final isAgreementLoading = _isPreGenerating && _userWaitingForAgreement;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 1024) {
           return _MobileStatusView(
             application: application,
             currentUser: currentUser,
-            isLoading: _isLoading,
+            isLoading: isAgreementLoading,
             isLoading2: _isLoading2,
             calculateMonthlyRepayment: _calculateMonthlyRepayment,
-            generateAgreement: _generateAgreement,
+            generateAgreement: _handleViewAgreement,
           );
         }
         return _DesktopStatusView(
           application: application,
           currentUser: currentUser,
-          isLoading: _isLoading,
+          isLoading: isAgreementLoading,
           isLoading2: _isLoading2,
           calculateMonthlyRepayment: _calculateMonthlyRepayment,
-          generateAgreement: _generateAgreement,
+          generateAgreement: _handleViewAgreement,
           onLogout: _handleLogout,
         );
       },
     );
   }
 
-  Future<void> _generateAgreement(
+  void _handleViewAgreement(
     BuildContext context,
     LoanApplicationModel application,
     UserModel currentUser,
-  ) async {
-    setState(() => _isLoading = true);
+  ) {
+    if (_preGeneratedUrl != null) {
+      web.window.open(_preGeneratedUrl!, '_blank', '');
+    } else {
+      setState(() => _userWaitingForAgreement = true);
+      if (!_isPreGenerating) {
+        _startAgreementGeneration(application, currentUser);
+      }
+    }
+  }
 
-    final firstPayment = application.reviewedAt?.add(const Duration(days: 60)) ??
-        DateTime.now().add(const Duration(days: 60));
+  Future<void> _startAgreementGeneration(
+    LoanApplicationModel application,
+    UserModel currentUser,
+  ) async {
+    if (_isPreGenerating) return;
+    setState(() => _isPreGenerating = true);
+
+    final firstPayment =
+        application.reviewedAt?.add(const Duration(days: 60)) ??
+            DateTime.now().add(const Duration(days: 60));
     final firstPaymentDate =
         '${firstPayment.year}-${firstPayment.month.toString().padLeft(2, '0')}-${firstPayment.day.toString().padLeft(2, '0')}';
 
@@ -148,7 +195,7 @@ class _ApplicationStatusScreenState
         body: jsonEncode({
           'clientName': currentUser.fullName,
           'loanAmount': application.loanAmount,
-          'annualRatePct': AppStrings.loanRates[application.loanDuration],
+          'annualRatePct': AppStrings.getLoanRates(application.countryCode)[application.loanDuration],
           'loanTermMonths': application.loanDuration,
           'monthlyPayment': _calculateMonthlyRepayment(application),
           'firstPaymentDate': firstPaymentDate,
@@ -158,27 +205,46 @@ class _ApplicationStatusScreenState
         }),
       );
 
-      setState(() => _isLoading = false);
-
       if (response.statusCode == 200) {
         final blob = web.Blob([response.bodyBytes.toJS].toJS,
             web.BlobPropertyBag(type: 'application/pdf'));
         final url = web.URL.createObjectURL(blob);
-        web.window.open(url, '_blank', '');
-        web.URL.revokeObjectURL(url);
+
+        if (mounted) {
+          setState(() {
+            _preGeneratedUrl = url;
+            _isPreGenerating = false;
+          });
+
+          if (_userWaitingForAgreement) {
+            web.window.open(url, '_blank', '');
+            setState(() => _userWaitingForAgreement = false);
+          }
+        }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to generate agreement')),
-          );
+          setState(() {
+            _isPreGenerating = false;
+            if (_userWaitingForAgreement) {
+              _userWaitingForAgreement = false;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to generate agreement')),
+              );
+            }
+          });
         }
       }
     } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        setState(() {
+          _isPreGenerating = false;
+          if (_userWaitingForAgreement) {
+            _userWaitingForAgreement = false;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $e')),
+            );
+          }
+        });
       }
     }
   }
@@ -190,7 +256,8 @@ class _DesktopStatusView extends StatelessWidget {
   final bool isLoading;
   final bool isLoading2;
   final double Function(LoanApplicationModel) calculateMonthlyRepayment;
-  final Function(BuildContext, LoanApplicationModel, UserModel) generateAgreement;
+  final Function(BuildContext, LoanApplicationModel, UserModel)
+      generateAgreement;
   final VoidCallback onLogout;
 
   const _DesktopStatusView({
@@ -222,7 +289,8 @@ class _DesktopStatusView extends StatelessWidget {
                 _buildTopNavBar(context),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 48, vertical: 40),
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 1200),
@@ -238,9 +306,11 @@ class _DesktopStatusView extends StatelessWidget {
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      _buildMainLoanInfoCard(context, countryCode),
+                                      _buildMainLoanInfoCard(
+                                          context, countryCode),
                                       const SizedBox(height: 32),
                                       _buildDocumentsSection(context),
                                     ],
@@ -255,7 +325,9 @@ class _DesktopStatusView extends StatelessWidget {
                                       _buildAssistanceCard(context),
                                       const SizedBox(height: 32),
                                       _buildRoadmapCard(context),
-                                      if (canVerify || application.status == LoanStatus.approved) ...[
+                                      if (canVerify ||
+                                          application.status ==
+                                              LoanStatus.approved) ...[
                                         const SizedBox(height: 32),
                                         _buildActionsCard(context, canVerify),
                                       ],
@@ -298,15 +370,6 @@ class _DesktopStatusView extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: AppColors.primary,
-                  ),
-                ),
-                Text(
-                  'ENTERPRISE LEDGER',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
-                    letterSpacing: 1.5,
                   ),
                 ),
               ],
@@ -435,7 +498,8 @@ class _DesktopStatusView extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(4),
@@ -576,11 +640,14 @@ class _DesktopStatusView extends StatelessWidget {
           const SizedBox(height: 48),
           Row(
             children: [
-              _buildLargeStat('REQUESTED AMOUNT', Formatters.currency(application.loanAmount, countryCode)),
+              _buildLargeStat('REQUESTED AMOUNT',
+                  Formatters.currency(application.loanAmount, countryCode)),
               const SizedBox(width: 80),
-              _buildLargeStat('TERM LENGTH', '${application.loanDuration} Months'),
+              _buildLargeStat(
+                  'TERM LENGTH', '${application.loanDuration} Months'),
               const SizedBox(width: 80),
-              _buildLargeStat('INTEREST (APR)', '${AppStrings.loanRates[application.loanDuration]}%'),
+              _buildLargeStat('INTEREST (APR)',
+                  '${AppStrings.getLoanRates(application.countryCode)[application.loanDuration]}%'),
             ],
           ),
           const SizedBox(height: 64),
@@ -611,7 +678,8 @@ class _DesktopStatusView extends StatelessWidget {
                             color: const Color(0xFFF2F4F6),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.business_center_outlined, color: AppColors.primary, size: 24),
+                          child: const Icon(Icons.business_center_outlined,
+                              color: AppColors.primary, size: 24),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -665,7 +733,8 @@ class _DesktopStatusView extends StatelessWidget {
                             color: const Color(0xFFF2F4F6),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.account_balance_outlined, color: AppColors.primary, size: 24),
+                          child: const Icon(Icons.account_balance_outlined,
+                              color: AppColors.primary, size: 24),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -752,7 +821,9 @@ class _DesktopStatusView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           if (application.documentUrls.isEmpty)
-            Text('No documents submitted', style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary))
+            Text('No documents submitted',
+                style:
+                    GoogleFonts.plusJakartaSans(color: AppColors.textSecondary))
           else
             Wrap(
               spacing: 24,
@@ -783,7 +854,8 @@ class _DesktopStatusView extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.description_outlined, color: AppColors.error, size: 20),
+            child: const Icon(Icons.description_outlined,
+                color: AppColors.error, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -811,7 +883,8 @@ class _DesktopStatusView extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.open_in_new_rounded, size: 18, color: AppColors.textSecondary),
+            icon: const Icon(Icons.open_in_new_rounded,
+                size: 18, color: AppColors.textSecondary),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -870,8 +943,10 @@ class _DesktopStatusView extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: AppColors.primaryDark,
               minimumSize: const Size(double.infinity, 64),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              textStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 15),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              textStyle: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800, fontSize: 15),
             ),
           ),
           const SizedBox(height: 32),
@@ -879,7 +954,8 @@ class _DesktopStatusView extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage('https://i.pravatar.cc/100?img=12'),
+                backgroundImage:
+                    NetworkImage('https://i.pravatar.cc/100?img=12'),
               ),
               const SizedBox(width: 16),
               Column(
@@ -958,7 +1034,8 @@ class _DesktopStatusView extends StatelessWidget {
     );
   }
 
-  Widget _buildRoadmapStep(String title, String subtitle, {bool isCompleted = false, bool isActive = false, bool isLast = false}) {
+  Widget _buildRoadmapStep(String title, String subtitle,
+      {bool isCompleted = false, bool isActive = false, bool isLast = false}) {
     return IntrinsicHeight(
       child: Row(
         children: [
@@ -968,13 +1045,23 @@ class _DesktopStatusView extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: isCompleted ? AppColors.success : (isActive ? AppColors.primary : const Color(0xFFF2F4F6)),
+                  color: isCompleted
+                      ? AppColors.success
+                      : (isActive
+                          ? AppColors.primary
+                          : const Color(0xFFF2F4F6)),
                   shape: BoxShape.circle,
-                  border: isCompleted || isActive ? null : Border.all(color: AppColors.border),
+                  border: isCompleted || isActive
+                      ? null
+                      : Border.all(color: AppColors.border),
                 ),
                 child: Icon(
-                  isCompleted ? Icons.check : (isActive ? Icons.access_time : Icons.lock_outline),
-                  color: isCompleted || isActive ? Colors.white : AppColors.textHint,
+                  isCompleted
+                      ? Icons.check
+                      : (isActive ? Icons.access_time : Icons.lock_outline),
+                  color: isCompleted || isActive
+                      ? Colors.white
+                      : AppColors.textHint,
                   size: 16,
                 ),
               ),
@@ -996,8 +1083,12 @@ class _DesktopStatusView extends StatelessWidget {
                   title,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
-                    fontWeight: isCompleted || isActive ? FontWeight.w800 : FontWeight.w600,
-                    color: isCompleted || isActive ? AppColors.primary : AppColors.textHint,
+                    fontWeight: isCompleted || isActive
+                        ? FontWeight.w800
+                        : FontWeight.w600,
+                    color: isCompleted || isActive
+                        ? AppColors.primary
+                        : AppColors.textHint,
                   ),
                 ),
                 Text(
@@ -1027,7 +1118,8 @@ class _DesktopStatusView extends StatelessWidget {
       child: Column(
         children: [
           if (canVerify)
-            _buildActionBtn('PROCEED TO KYC', Icons.perm_identity, () => context.go(AppRoutes.kyc)),
+            _buildActionBtn('PROCEED TO KYC', Icons.perm_identity,
+                () => context.go(AppRoutes.kyc)),
           if (application.status == LoanStatus.approved) ...[
             if (canVerify) const SizedBox(height: 16),
             _buildActionBtn(
@@ -1040,7 +1132,8 @@ class _DesktopStatusView extends StatelessWidget {
             _buildActionBtn(
               isLoading2 ? 'LOADING...' : 'PROCEED TO WITHDRAWAL',
               Icons.account_balance_outlined,
-              () => context.go('${AppRoutes.withdrawal}/${application.id}', extra: application),
+              () => context.go('${AppRoutes.withdrawal}/${application.id}',
+                  extra: application),
               loading: isLoading2,
             ),
           ],
@@ -1049,22 +1142,29 @@ class _DesktopStatusView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionBtn(String label, IconData icon, VoidCallback onPressed, {bool loading = false}) {
+  Widget _buildActionBtn(String label, IconData icon, VoidCallback onPressed,
+      {bool loading = false}) {
     return SizedBox(
       width: double.infinity,
       height: 60,
       child: ElevatedButton.icon(
         onPressed: loading ? null : onPressed,
         icon: loading
-            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white))
             : Icon(icon, size: 20),
         label: Text(label),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryDark,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1),
         ),
       ),
     );
@@ -1080,15 +1180,23 @@ class _DesktopStatusView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.lightbulb_outline, color: AppColors.primary, size: 24),
+          const Icon(Icons.lightbulb_outline,
+              color: AppColors.primary, size: 24),
           const SizedBox(width: 20),
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.textSecondary, height: 1.5),
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13, color: AppColors.textSecondary, height: 1.5),
                 children: [
-                  TextSpan(text: 'Pro Tip: ', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, color: AppColors.primary)),
-                  const TextSpan(text: 'Keeping your linked bank accounts active helps speed up the final automated verification phase.'),
+                  TextSpan(
+                      text: 'Pro Tip: ',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary)),
+                  const TextSpan(
+                      text:
+                          'Keeping your linked bank accounts active helps speed up the final automated verification phase.'),
                 ],
               ),
             ),
@@ -1105,7 +1213,8 @@ class _MobileStatusView extends StatelessWidget {
   final bool isLoading;
   final bool isLoading2;
   final double Function(LoanApplicationModel) calculateMonthlyRepayment;
-  final Function(BuildContext, LoanApplicationModel, UserModel) generateAgreement;
+  final Function(BuildContext, LoanApplicationModel, UserModel)
+      generateAgreement;
 
   const _MobileStatusView({
     required this.application,
@@ -1182,14 +1291,17 @@ class _MobileStatusView extends StatelessWidget {
                 label: isLoading ? 'Preparing...' : 'View Loan Agreement',
                 icon: Icons.picture_as_pdf,
                 isLoading: isLoading,
-                onPressed: () => generateAgreement(context, application, currentUser!),
+                onPressed: () =>
+                    generateAgreement(context, application, currentUser!),
               ),
               const SizedBox(height: 12),
               _buildActionButton(
                 label: isLoading2 ? 'Loading...' : 'Proceed to Withdrawal',
                 icon: Icons.account_balance_outlined,
                 isLoading: isLoading2,
-                onPressed: () => context.go('${AppRoutes.withdrawal}/${application.id}', extra: application),
+                onPressed: () => context.go(
+                    '${AppRoutes.withdrawal}/${application.id}',
+                    extra: application),
               ),
             ],
             const SizedBox(height: 32),
@@ -1206,15 +1318,18 @@ class _MobileStatusView extends StatelessWidget {
     switch (application.status) {
       case LoanStatus.pending:
         statusTitle = 'Pending Review';
-        statusMessage = 'Our team is currently reviewing your application. Estimated completion: 1-3 business days.';
+        statusMessage =
+            'Our team is currently reviewing your application. Estimated completion: 1-3 business days.';
         break;
       case LoanStatus.approved:
         statusTitle = 'Approved!';
-        statusMessage = 'Congratulations! Your loan has been approved. View your agreement below.';
+        statusMessage =
+            'Congratulations! Your loan has been approved. View your agreement below.';
         break;
       case LoanStatus.rejected:
         statusTitle = 'Not Approved';
-        statusMessage = 'Unfortunately your application was not approved at this time.';
+        statusMessage =
+            'Unfortunately your application was not approved at this time.';
         break;
     }
 
@@ -1230,19 +1345,32 @@ class _MobileStatusView extends StatelessWidget {
         children: [
           Text(
             'APPLICATION REFERENCE: #${application.id.substring(0, 8).toUpperCase()}',
-            style: const TextStyle(fontSize: 11, color: Colors.white54, letterSpacing: 1.2, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+                fontSize: 11,
+                color: Colors.white54,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
-          Text(statusTitle, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+          Text(statusTitle,
+              style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white)),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12)),
             child: Row(
               children: [
                 const Icon(Icons.info_outline, color: Colors.white, size: 18),
                 const SizedBox(width: 12),
-                Expanded(child: Text(statusMessage, style: const TextStyle(fontSize: 13, color: Colors.white, height: 1.5))),
+                Expanded(
+                    child: Text(statusMessage,
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.white, height: 1.5))),
               ],
             ),
           ),
@@ -1252,23 +1380,38 @@ class _MobileStatusView extends StatelessWidget {
   }
 
   Widget _buildSectionLabel(String label) {
-    return Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary, letterSpacing: 1.4));
+    return Text(label,
+        style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textSecondary,
+            letterSpacing: 1.4));
   }
 
-  Widget _buildLoanDetailsCard(LoanApplicationModel application, String countryCode) {
+  Widget _buildLoanDetailsCard(
+      LoanApplicationModel application, String countryCode) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          _detailRow('Requested Amount', Formatters.currency(application.loanAmount, countryCode), isBold: true),
+          _detailRow('Requested Amount',
+              Formatters.currency(application.loanAmount, countryCode),
+              isBold: true),
           const Divider(height: 24),
-          _detailRow('Loan Term', Formatters.duration(application.loanDuration), isBold: true),
+          _detailRow('Loan Term', Formatters.duration(application.loanDuration),
+              isBold: true),
           const Divider(height: 24),
-          _detailRow('Interest Rate (Est.)', '${AppStrings.loanRates[application.loanDuration]}% APR', isBold: true),
+          _detailRow('Interest Rate (Est.)',
+              '${AppStrings.getLoanRates(application.countryCode)[application.loanDuration]}% APR',
+              isBold: true),
           const Divider(height: 24),
-          _detailRow('Monthly Repayment', Formatters.currency(calculateMonthlyRepayment(application), countryCode), isBold: true),
+          _detailRow(
+              'Monthly Repayment',
+              Formatters.currency(
+                  calculateMonthlyRepayment(application), countryCode),
+              isBold: true),
           const Divider(height: 24),
           _detailRow('Applied On', Formatters.date(application.createdAt)),
         ],
@@ -1276,7 +1419,8 @@ class _MobileStatusView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmploymentCard(LoanApplicationModel application, String countryCode) {
+  Widget _buildEmploymentCard(
+      LoanApplicationModel application, String countryCode) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -1286,14 +1430,19 @@ class _MobileStatusView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.business_outlined, color: AppColors.primary, size: 22),
+              const Icon(Icons.business_outlined,
+                  color: AppColors.primary, size: 22),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(application.employer, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                    Text(application.employmentStatus, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                    Text(application.employer,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w700)),
+                    Text(application.employmentStatus,
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
                   ],
                 ),
               ),
@@ -1302,9 +1451,16 @@ class _MobileStatusView extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 16),
-          const Text('MONTHLY INCOME', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary, letterSpacing: 1.2)),
+          const Text('MONTHLY INCOME',
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textSecondary,
+                  letterSpacing: 1.2)),
           const SizedBox(height: 4),
-          Text(Formatters.currency(application.monthlyIncome, countryCode), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          Text(Formatters.currency(application.monthlyIncome, countryCode),
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -1317,14 +1473,20 @@ class _MobileStatusView extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          const Icon(Icons.account_balance_outlined, color: AppColors.primary, size: 22),
+          const Icon(Icons.account_balance_outlined,
+              color: AppColors.primary, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(application.bankName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                Text('Ending in •••• ${application.accountNumber.length >= 4 ? application.accountNumber.substring(application.accountNumber.length - 4) : application.accountNumber}', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                Text(application.bankName,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700)),
+                Text(
+                    'Ending in •••• ${application.accountNumber.length >= 4 ? application.accountNumber.substring(application.accountNumber.length - 4) : application.accountNumber}',
+                    style: const TextStyle(
+                        fontSize: 13, color: AppColors.textSecondary)),
               ],
             ),
           ),
@@ -1333,7 +1495,8 @@ class _MobileStatusView extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentsCard(BuildContext context, LoanApplicationModel application) {
+  Widget _buildDocumentsCard(
+      BuildContext context, LoanApplicationModel application) {
     if (application.documentUrls.isEmpty) return const SizedBox();
     return Container(
       width: double.infinity,
@@ -1344,10 +1507,19 @@ class _MobileStatusView extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DocumentViewerScreen(imageUrl: entry.value, title: 'Document ${entry.key + 1}'))),
-                leading: const Icon(Icons.insert_drive_file_outlined, color: AppColors.primary, size: 18),
-                title: Text('Document ${entry.key + 1}.pdf', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                trailing: const Icon(Icons.download_outlined, color: AppColors.textSecondary, size: 20),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => DocumentViewerScreen(
+                            imageUrl: entry.value,
+                            title: 'Document ${entry.key + 1}'))),
+                leading: const Icon(Icons.insert_drive_file_outlined,
+                    color: AppColors.primary, size: 18),
+                title: Text('Document ${entry.key + 1}.pdf',
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
+                trailing: const Icon(Icons.download_outlined,
+                    color: AppColors.textSecondary, size: 20),
               ),
               if (!isLast) const Divider(height: 1),
             ],
@@ -1364,12 +1536,18 @@ class _MobileStatusView extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          _detailRow('Decision', application.status == LoanStatus.approved ? 'Approved' : 'Rejected', isBold: true),
+          _detailRow(
+              'Decision',
+              application.status == LoanStatus.approved
+                  ? 'Approved'
+                  : 'Rejected',
+              isBold: true),
           if (application.reviewedAt != null) ...[
             const Divider(height: 24),
             _detailRow('Reviewed On', Formatters.date(application.reviewedAt!)),
           ],
-          if (application.adminNote != null && application.adminNote!.isNotEmpty) ...[
+          if (application.adminNote != null &&
+              application.adminNote!.isNotEmpty) ...[
             const Divider(height: 24),
             _detailRow('Note', application.adminNote!),
           ],
@@ -1382,24 +1560,41 @@ class _MobileStatusView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
-        Text(value, style: TextStyle(fontSize: 14, fontWeight: isBold ? FontWeight.w700 : FontWeight.w500, color: AppColors.textPrimary)),
+        Text(label,
+            style:
+                const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+                color: AppColors.textPrimary)),
       ],
     );
   }
 
-  Widget _buildActionButton({required String label, required IconData icon, required VoidCallback onPressed, bool isLoading = false}) {
+  Widget _buildActionButton(
+      {required String label,
+      required IconData icon,
+      required VoidCallback onPressed,
+      bool isLoading = false}) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
         onPressed: isLoading ? null : onPressed,
-        icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Icon(icon),
+        icon: isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                    color: Colors.white, strokeWidth: 2))
+            : Icon(icon),
         label: Text(label),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryDark,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
@@ -1407,7 +1602,10 @@ class _MobileStatusView extends StatelessWidget {
   }
 
   BoxDecoration _cardDecoration() {
-    return BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.border));
+    return BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border));
   }
 }
 
@@ -1420,7 +1618,12 @@ class _SidebarItem extends StatelessWidget {
   final VoidCallback onTap;
   final Color? color;
 
-  const _SidebarItem({required this.icon, required this.label, this.isActive = false, required this.onTap, this.color});
+  const _SidebarItem(
+      {required this.icon,
+      required this.label,
+      this.isActive = false,
+      required this.onTap,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -1434,11 +1637,21 @@ class _SidebarItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: isActive ? [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))] : null,
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2))
+                  ]
+                : null,
           ),
           child: Row(
             children: [
-              Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textSecondary), size: 20),
+              Icon(icon,
+                  color: color ??
+                      (isActive ? AppColors.primary : AppColors.textSecondary),
+                  size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -1446,7 +1659,10 @@ class _SidebarItem extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-                    color: color ?? (isActive ? AppColors.primary : AppColors.textSecondary),
+                    color: color ??
+                        (isActive
+                            ? AppColors.primary
+                            : AppColors.textSecondary),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1466,19 +1682,33 @@ class _DrawerItem extends StatelessWidget {
   final Color? color;
   final bool isActive;
 
-  const _DrawerItem({required this.icon, required this.label, required this.onTap, this.color, this.isActive = false});
+  const _DrawerItem(
+      {required this.icon,
+      required this.label,
+      required this.onTap,
+      this.color,
+      this.isActive = false});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textPrimary), size: 22),
-      title: Text(label, style: TextStyle(fontSize: 15, fontWeight: isActive ? FontWeight.bold : FontWeight.w500, color: color ?? (isActive ? AppColors.primary : AppColors.textPrimary))),
+      leading: Icon(icon,
+          color:
+              color ?? (isActive ? AppColors.primary : AppColors.textPrimary),
+          size: 22),
+      title: Text(label,
+          style: TextStyle(
+              fontSize: 15,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              color: color ??
+                  (isActive ? AppColors.primary : AppColors.textPrimary))),
       onTap: onTap,
     );
   }
 }
 
-Widget _buildSharedDrawer(BuildContext context, UserModel? user, VoidCallback onLogout) {
+Widget _buildSharedDrawer(
+    BuildContext context, UserModel? user, VoidCallback onLogout) {
   return Drawer(
     child: SafeArea(
       child: Column(
@@ -1493,29 +1723,83 @@ Widget _buildSharedDrawer(BuildContext context, UserModel? user, VoidCallback on
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: AppColors.primaryLight,
-                  backgroundImage: user?.selfieUrl != null && user!.selfieUrl!.isNotEmpty
-                      ? NetworkImage(user.selfieUrl!)
-                      : null,
+                  backgroundImage:
+                      user?.selfieUrl != null && user!.selfieUrl!.isNotEmpty
+                          ? NetworkImage(user.selfieUrl!)
+                          : null,
                   child: user?.selfieUrl == null || user!.selfieUrl!.isEmpty
-                      ? Text(user?.fullName.isNotEmpty ?? false ? user!.fullName[0].toUpperCase() : '?', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary))
+                      ? Text(
+                          user?.fullName.isNotEmpty ?? false
+                              ? user!.fullName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary))
                       : null,
                 ),
                 const SizedBox(height: 12),
-                Text(user?.fullName ?? '', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-                Text(user?.email ?? '', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                Text(user?.fullName ?? '',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700)),
+                Text(user?.email ?? '',
+                    style:
+                        const TextStyle(color: Colors.white60, fontSize: 13)),
               ],
             ),
           ),
           const SizedBox(height: 8),
-          _DrawerItem(icon: Icons.dashboard_outlined, label: 'Dashboard', onTap: () { Navigator.pop(context); context.go(AppRoutes.dashboard); }),
-          _DrawerItem(icon: Icons.description_outlined, label: 'Apply for Loan', onTap: () { Navigator.pop(context); context.go(AppRoutes.apply); }),
-          _DrawerItem(icon: Icons.summarize_outlined, label: 'Applications', onTap: () { Navigator.pop(context); context.go(AppRoutes.userApplications); }),
-          _DrawerItem(icon: Icons.calculate_outlined, label: 'Calculator', onTap: () { Navigator.pop(context); context.go(AppRoutes.calculator); }),
-          _DrawerItem(icon: Icons.account_balance_wallet_outlined, label: 'Withdrawals', onTap: () { Navigator.pop(context); context.go(AppRoutes.withdrawals); }),
-          _DrawerItem(icon: Icons.person_outlined, label: 'Profile', onTap: () { Navigator.pop(context); context.go(AppRoutes.profile); }),
+          _DrawerItem(
+              icon: Icons.dashboard_outlined,
+              label: 'Dashboard',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.dashboard);
+              }),
+          _DrawerItem(
+              icon: Icons.description_outlined,
+              label: 'Apply for Loan',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.apply);
+              }),
+          _DrawerItem(
+              icon: Icons.summarize_outlined,
+              label: 'Applications',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.userApplications);
+              }),
+          _DrawerItem(
+              icon: Icons.calculate_outlined,
+              label: 'Calculator',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.calculator);
+              }),
+          _DrawerItem(
+              icon: Icons.account_balance_wallet_outlined,
+              label: 'Withdrawals',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.withdrawals);
+              }),
+          _DrawerItem(
+              icon: Icons.person_outlined,
+              label: 'Profile',
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.profile);
+              }),
           const Spacer(),
           const Divider(),
-          _DrawerItem(icon: Icons.logout, label: 'Log Out', color: AppColors.error, onTap: onLogout),
+          _DrawerItem(
+              icon: Icons.logout,
+              label: 'Log Out',
+              color: AppColors.error,
+              onTap: onLogout),
           const SizedBox(height: 16),
         ],
       ),

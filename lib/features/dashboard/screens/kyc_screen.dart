@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../../../app/router.dart';
@@ -214,14 +212,14 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.successLight.withOpacity(0.3),
+                      color: AppColors.successLight.withValues(alpha: 0.3),
                       shape: BoxShape.circle,
                     ),
                   ),
                   Container(
                     width: 90,
                     height: 90,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.successLight,
                       shape: BoxShape.circle,
                     ),
@@ -261,14 +259,14 @@ class _KycScreenState extends ConsumerState<KycScreen> {
             // Description with highlighted text
             RichText(
               textAlign: TextAlign.center,
-              text: TextSpan(
-                style: const TextStyle(
+              text: const TextSpan(
+                style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   height: 1.6,
                 ),
                 children: [
-                  const TextSpan(
+                  TextSpan(
                       text:
                           'Your documents are being reviewed. This process usually takes about '),
                   TextSpan(
@@ -278,7 +276,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const TextSpan(text: " We'll notify you once it's complete."),
+                  TextSpan(text: " We'll notify you once it's complete."),
                 ],
               ),
             ),
@@ -307,9 +305,9 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                         color: AppColors.primary, size: 18),
                   ),
                   const SizedBox(width: 12),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Current Status',
                         style: TextStyle(
@@ -393,7 +391,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
 
   Widget _buildStep2() {
     final canContinue = _selfieFile != null;
-    Future<void> _submitKyc() async {
+    Future<void> submitKyc() async {
       final user = ref.read(currentUserProvider).value;
       if (user == null || _idFile == null || _selfieFile == null) return;
 
@@ -505,7 +503,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                           user.id,
                           VerificationStatus.pending,
                         );
-                        _submitKyc();
+                        submitKyc();
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
@@ -669,10 +667,10 @@ class _KycScreenState extends ConsumerState<KycScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'STEP 2 OF 4',
               style: TextStyle(
                 fontSize: 12,
@@ -683,7 +681,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
             ),
             Text(
               '50% Complete',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -693,7 +691,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
+          child: const LinearProgressIndicator(
             value: 0.5,
             minHeight: 6,
             backgroundColor: AppColors.border,
@@ -753,7 +751,9 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight : Color(0xFFF0F2F5),
+                color: isSelected
+                    ? AppColors.primaryLight
+                    : const Color(0xFFF0F2F5),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -772,7 +772,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                 children: [
                   Text(
                     doc.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -817,7 +817,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       color: AppColors.success, size: 40),
                   const SizedBox(height: 12),
                   Text(
-                    file!.name,
+                    file.name,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -831,12 +831,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                   ),
                 ],
               )
-            : Column(
+            : const Column(
                 children: [
                   Icon(Icons.add_a_photo_outlined,
                       color: AppColors.primary, size: 36),
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     'Take a photo',
                     style: TextStyle(
                       fontSize: 15,
@@ -844,8 +844,8 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
+                  SizedBox(height: 4),
+                  Text(
                     'or upload from your files',
                     style: TextStyle(
                       fontSize: 13,

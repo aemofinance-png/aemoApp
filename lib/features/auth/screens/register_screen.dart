@@ -104,9 +104,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Image.asset('assets/images/aemo-logo.png'),
                           const SizedBox(height: 16),
                           const SizedBox(height: 4),
-                          Text(
+                          const Text(
                             AppStrings.tagline,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -300,7 +300,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value: _selectedCountry,
+                          initialValue: _selectedCountry,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.white,

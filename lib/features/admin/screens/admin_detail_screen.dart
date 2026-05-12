@@ -4,7 +4,6 @@ import 'package:aemo_loan_app/core/constants/app_strings.dart';
 import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:aemo_loan_app/data/models/user_model.dart';
 import 'package:aemo_loan_app/features/admin/screens/admin_user_profile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +17,6 @@ import '../providers/admin_provider.dart';
 import '../screens/document_viewer_screen.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../loan_application/providers/loan_provider.dart';
 
 class AdminDetailScreen extends ConsumerStatefulWidget {
   const AdminDetailScreen({
@@ -34,6 +32,11 @@ class AdminDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
+  bool _isApproving = false;
+  bool _isRejecting = false;
+  bool _isDeleting = false;
+
+  bool get _isActionLoading => _isApproving || _isRejecting || _isDeleting;
   @override
   void initState() {
     super.initState();
@@ -50,7 +53,6 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
     final application = adminState.applications
         .where((a) => a.id == widget.applicationId)
         .firstOrNull;
-    final loanState = ref.watch(loanNotifierProvider);
     final currentUser = ref.watch(currentUserProvider).value;
     final countryCode = currentUser?.countryCode ?? 'BZ';
 
@@ -61,10 +63,10 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
         ),
       );
     }
-    final applicantAsync = ref.watch(userByIdProvider(application!.userId));
+    final applicantAsync = ref.watch(userByIdProvider(application.userId));
     final applicant = applicantAsync.value;
 
-    Widget _buildActionButtons(
+    Widget buildActionButtons(
       BuildContext context,
       WidgetRef ref,
       LoanApplicationModel app,
@@ -74,62 +76,97 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: app.status == LoanStatus.pending
+              onPressed: app.status == LoanStatus.pending && !_isActionLoading
                   ? () async {
-                      await ref
-                          .read(adminNotifierProvider.notifier)
-                          .approveApplication(applicationId: app.id);
-                      await EmailService.sendApprovalEmail(
-                        duration: app.loanDuration,
-                        repayment: Formatters.currency(
-                            _calculateMonthlyRepayment(app), user.countryCode),
-                        toEmail: applicant?.email ?? '',
-                        toName: applicant!.fullName,
-                        loanAmount: Formatters.currency(
-                            app.loanAmount, user.countryCode),
-                        referenceNo: app.id,
-                        // date: app.createdAt);
-                      );
-
-                      if (context.mounted) {
-                        context.go(AppRoutes.admin);
+                      setState(() => _isApproving = true);
+                      try {
+                        final approved = await ref
+                            .read(adminNotifierProvider.notifier)
+                            .approveApplication(applicationId: app.id);
+                        if (!approved) return;
+                        await EmailService.sendApprovalEmail(
+                          duration: app.loanDuration,
+                          repayment: Formatters.currency(
+                              _calculateMonthlyRepayment(app),
+                              user.countryCode),
+                          toEmail: applicant?.email ?? '',
+                          toName: applicant!.fullName,
+                          loanAmount: Formatters.currency(
+                              app.loanAmount, user.countryCode),
+                          referenceNo: app.id,
+                          // date: app.createdAt);
+                        );
+                        if (context.mounted) {
+                          context.go(AppRoutes.admin);
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() => _isApproving = false);
+                        }
                       }
                     }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.success,
               ),
-              child: const Text('Approve'),
+              child: _isApproving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Approve'),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton(
-              onPressed: app.status == LoanStatus.pending
+              onPressed: app.status == LoanStatus.pending && !_isActionLoading
                   ? () async {
-                      await ref
-                          .read(adminNotifierProvider.notifier)
-                          .rejectApplication(applicationId: app.id);
-                      await EmailService.sendRejectionEmail(
-                        duration: app.loanDuration,
-                        repayment: Formatters.currency(
-                            _calculateMonthlyRepayment(app), user.countryCode),
-                        toEmail: applicant?.email ?? '',
-                        toName: applicant!.fullName,
-                        loanAmount: Formatters.currency(
-                            app.loanAmount, user.countryCode),
-                        referenceNo: app.id,
-                        // date: app.createdAt);
-                      );
-                      if (context.mounted) {
-                        context.go(AppRoutes.admin);
+                      setState(() => _isRejecting = true);
+                      try {
+                        final rejected = await ref
+                            .read(adminNotifierProvider.notifier)
+                            .rejectApplication(applicationId: app.id);
+                        if (!rejected) return;
+                        await EmailService.sendRejectionEmail(
+                          duration: app.loanDuration,
+                          repayment: Formatters.currency(
+                              _calculateMonthlyRepayment(app),
+                              user.countryCode),
+                          toEmail: applicant?.email ?? '',
+                          toName: applicant!.fullName,
+                          loanAmount: Formatters.currency(
+                              app.loanAmount, user.countryCode),
+                          referenceNo: app.id,
+                          // date: app.createdAt);
+                        );
+                        if (context.mounted) {
+                          context.go(AppRoutes.admin);
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() => _isRejecting = false);
+                        }
                       }
                     }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,
               ),
-              child: const Text('Reject'),
+              child: _isRejecting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Reject'),
             ),
           ),
         ],
@@ -137,7 +174,7 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
     }
 
     return LoadingOverlay(
-        isLoading: adminState.isLoading,
+        isLoading: adminState.isLoading && !_isActionLoading,
         child: Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
@@ -256,21 +293,42 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
 
                   const SizedBox(height: 32),
 // Action buttons (only show if pending)
-                  _buildActionButtons(context, ref, application, applicant!),
+                  buildActionButtons(context, ref, application, applicant!),
 
                   const SizedBox(height: 32),
 
                   ElevatedButton.icon(
-                    onPressed: () async {
-                      await ref
-                          .read(adminNotifierProvider.notifier)
-                          .deleteApplication(application.id);
-                      if (context.mounted) {
-                        context.go(AppRoutes.admin);
-                      }
-                    },
-                    icon: const Icon(Icons.delete_outline),
-                    label: const Text('Delete Application'),
+                    onPressed: _isActionLoading
+                        ? null
+                        : () async {
+                            setState(() => _isDeleting = true);
+                            try {
+                              await ref
+                                  .read(adminNotifierProvider.notifier)
+                                  .deleteApplication(application.id);
+                              if (context.mounted) {
+                                context.go(AppRoutes.admin);
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isDeleting = false);
+                              }
+                            }
+                          },
+                    icon: _isDeleting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.delete_outline),
+                    label: Text(_isDeleting
+                        ? 'Deleting Application...'
+                        : 'Delete Application'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.errorButton,
                       foregroundColor: AppColors.white,
@@ -284,10 +342,12 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
                   const SizedBox(height: 32),
 
                   ElevatedButton.icon(
-                    onPressed: () {
-                      context.go(
-                          '${AppRoutes.adminUserProfile}/${application.userId}');
-                    },
+                    onPressed: _isActionLoading
+                        ? null
+                        : () {
+                            context.go(
+                                '${AppRoutes.adminUserProfile}/${application.userId}');
+                          },
                     icon: const Icon(Icons.person),
                     label: const Text('User Profile'),
                     style: ElevatedButton.styleFrom(
@@ -303,7 +363,9 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
 
                   const SizedBox(height: 32),
                   ElevatedButton.icon(
-                    onPressed: () => context.go(AppRoutes.admin),
+                    onPressed: _isActionLoading
+                        ? null
+                        : () => context.go(AppRoutes.admin),
                     icon: const Icon(Icons.arrow_back),
                     label: const Text('Back to Dashboard'),
                     style: ElevatedButton.styleFrom(
@@ -542,7 +604,8 @@ Widget _buildSection({
 
 double _calculateMonthlyRepayment(LoanApplicationModel application) {
   final double principal = application.loanAmount;
-  final double annualRate = AppStrings.loanRates[application.loanDuration] ?? 0;
+  final double annualRate =
+      AppStrings.getLoanRates(application.countryCode)[application.loanDuration] ?? 0;
   final int months = application.loanDuration;
 
   if (annualRate == 0) return principal / months;

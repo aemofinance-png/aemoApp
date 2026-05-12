@@ -33,6 +33,8 @@ dependencies:
   visibility_detector: ^0.4.0
   flutter_animate: ^4.5.2
 
+  flutter_web_plugins:
+    sdk: flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter

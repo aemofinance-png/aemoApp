@@ -54,8 +54,9 @@ class _ApplicationSubmittedScreenState
 
   double _calculateMonthlyRepayment() {
     final double principal = widget.application.loanAmount;
-    final double annualRate =
-        AppStrings.loanRates[widget.application.loanDuration] ?? 0;
+    final double annualRate = AppStrings.getLoanRates(widget.application.countryCode)[
+            widget.application.loanDuration] ??
+        0;
     final int months = widget.application.loanDuration;
     if (annualRate == 0) return principal / months;
     final double r = annualRate / 12 / 100;
@@ -156,7 +157,7 @@ class _ApplicationSubmittedScreenState
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withValues(alpha: 0.06),
                                 blurRadius: 20,
                                 offset: const Offset(0, 4),
                               ),
@@ -268,8 +269,8 @@ class _ApplicationSubmittedScreenState
                         // Receipt button
                         GestureDetector(
                           onTap: () {},
-                          child: Row(
-                            children: const [
+                          child: const Row(
+                            children: [
                               Icon(Icons.receipt_long_outlined,
                                   color: AppColors.textSecondary, size: 18),
                               SizedBox(width: 6),
@@ -302,9 +303,9 @@ class _ApplicationSubmittedScreenState
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text(
                                 'CONTINUE',
                                 style: TextStyle(

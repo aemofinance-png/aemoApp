@@ -1,10 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:photo_view/photo_view.dart';
-import 'dart:html' as html;
 import 'package:web/web.dart' as web;
 
 class DocumentViewerScreen extends StatefulWidget {
@@ -33,8 +29,8 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   String? _localPdfPath;
   bool _isLoadingPdf = true;
   String? _pdfError;
-  int _totalPages = 0;
-  int _currentPage = 0;
+  final int _totalPages = 0;
+  final int _currentPage = 0;
   bool _isPdf = false;
   @override
   void initState() {

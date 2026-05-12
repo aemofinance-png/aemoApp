@@ -40,6 +40,26 @@ class FirestoreService {
         .update(updatedUser.toMap());
   }
 
+  Future<void> deleteBankAccount({
+    required String userId,
+    required String bankAccountId,
+  }) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) return;
+
+    final user = UserModel.fromMap(userDoc.data()!);
+
+    final updatedAccounts = user.bankAccounts
+        .where((account) => account.id != bankAccountId)
+        .toList();
+
+    final updatedUser = user.copyWith(bankAccounts: updatedAccounts);
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .update(updatedUser.toMap());
+  }
+
   Future<List<UserModel>> getAllUsers() async {
     final snapshot = await _firestore
         .collection('users')

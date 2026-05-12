@@ -99,7 +99,8 @@ class ApplicationsMobile extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
+          icon: const Icon(Icons.notifications_outlined,
+              color: AppColors.textPrimary),
           onPressed: () {},
         ),
         Padding(
@@ -109,13 +110,20 @@ class ApplicationsMobile extends StatelessWidget {
             child: CircleAvatar(
               radius: 14,
               backgroundColor: AppColors.primaryLight,
-              backgroundImage: currentUser?.selfieUrl != null && currentUser!.selfieUrl!.isNotEmpty
+              backgroundImage: currentUser?.selfieUrl != null &&
+                      currentUser!.selfieUrl!.isNotEmpty
                   ? NetworkImage(currentUser!.selfieUrl!)
                   : null,
-              child: currentUser?.selfieUrl == null || currentUser!.selfieUrl!.isEmpty
+              child: currentUser?.selfieUrl == null ||
+                      currentUser!.selfieUrl!.isEmpty
                   ? Text(
-                      currentUser?.fullName.isNotEmpty ?? false ? currentUser!.fullName[0].toUpperCase() : '?',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      currentUser?.fullName.isNotEmpty ?? false
+                          ? currentUser!.fullName[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary),
                     )
                   : null,
             ),
@@ -140,32 +148,85 @@ class ApplicationsMobile extends StatelessWidget {
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: AppColors.primaryLight,
-                    backgroundImage: currentUser?.selfieUrl != null && currentUser!.selfieUrl!.isNotEmpty
+                    backgroundImage: currentUser?.selfieUrl != null &&
+                            currentUser!.selfieUrl!.isNotEmpty
                         ? NetworkImage(currentUser!.selfieUrl!)
                         : null,
-                    child: currentUser?.selfieUrl == null || currentUser!.selfieUrl!.isEmpty
+                    child: currentUser?.selfieUrl == null ||
+                            currentUser!.selfieUrl!.isEmpty
                         ? Text(
-                            currentUser?.fullName.isNotEmpty ?? false ? currentUser!.fullName[0].toUpperCase() : '?',
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
+                            currentUser?.fullName.isNotEmpty ?? false
+                                ? currentUser!.fullName[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary),
                           )
                         : null,
                   ),
                   const SizedBox(height: 12),
-                  Text(currentUser?.fullName ?? '', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-                  Text(currentUser?.email ?? '', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                  Text(currentUser?.fullName ?? '',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700)),
+                  Text(currentUser?.email ?? '',
+                      style:
+                          const TextStyle(color: Colors.white60, fontSize: 13)),
                 ],
               ),
             ),
             const SizedBox(height: 8),
-            _DrawerItem(icon: Icons.dashboard_outlined, label: 'Dashboard', onTap: () { Navigator.pop(context); context.go(AppRoutes.dashboard); }),
-            _DrawerItem(icon: Icons.description_outlined, label: 'Apply for Loan', onTap: () { Navigator.pop(context); context.go(AppRoutes.apply); }),
-            _DrawerItem(icon: Icons.summarize_outlined, label: 'Applications', isActive: true, onTap: () { Navigator.pop(context); }),
-            _DrawerItem(icon: Icons.calculate_outlined, label: 'Calculator', onTap: () { Navigator.pop(context); context.go(AppRoutes.calculator); }),
-            _DrawerItem(icon: Icons.account_balance_wallet_outlined, label: 'Withdrawals', onTap: () { Navigator.pop(context); context.go(AppRoutes.withdrawals); }),
-            _DrawerItem(icon: Icons.person_outlined, label: 'Profile', onTap: () { Navigator.pop(context); context.go(AppRoutes.profile); }),
+            _DrawerItem(
+                icon: Icons.dashboard_outlined,
+                label: 'Dashboard',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.dashboard);
+                }),
+            _DrawerItem(
+                icon: Icons.description_outlined,
+                label: 'Apply for Loan',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.apply);
+                }),
+            _DrawerItem(
+                icon: Icons.summarize_outlined,
+                label: 'Applications',
+                isActive: true,
+                onTap: () {
+                  Navigator.pop(context);
+                }),
+            _DrawerItem(
+                icon: Icons.calculate_outlined,
+                label: 'Calculator',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.calculator);
+                }),
+            _DrawerItem(
+                icon: Icons.account_balance_wallet_outlined,
+                label: 'Withdrawals',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.withdrawals);
+                }),
+            _DrawerItem(
+                icon: Icons.person_outlined,
+                label: 'Profile',
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.profile);
+                }),
             const Spacer(),
             const Divider(),
-            _DrawerItem(icon: Icons.logout, label: 'Log Out', color: AppColors.error, onTap: onLogout),
+            _DrawerItem(
+                icon: Icons.logout,
+                label: 'Log Out',
+                color: AppColors.error,
+                onTap: onLogout),
             const SizedBox(height: 16),
           ],
         ),
@@ -192,7 +253,7 @@ class ApplicationsMobile extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary.withOpacity(0.7),
+            color: AppColors.textSecondary.withValues(alpha: 0.7),
             letterSpacing: 1.2,
           ),
         ),
@@ -205,13 +266,25 @@ class ApplicationsMobile extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _FilterTab(label: 'ALL', isSelected: selectedFilter == null, onTap: () => onFilterChanged(null)),
+          _FilterTab(
+              label: 'ALL',
+              isSelected: selectedFilter == null,
+              onTap: () => onFilterChanged(null)),
           const SizedBox(width: 8),
-          _FilterTab(label: 'PENDING', isSelected: selectedFilter == LoanStatus.pending, onTap: () => onFilterChanged(LoanStatus.pending)),
+          _FilterTab(
+              label: 'PENDING',
+              isSelected: selectedFilter == LoanStatus.pending,
+              onTap: () => onFilterChanged(LoanStatus.pending)),
           const SizedBox(width: 8),
-          _FilterTab(label: 'APPROVED', isSelected: selectedFilter == LoanStatus.approved, onTap: () => onFilterChanged(LoanStatus.approved)),
+          _FilterTab(
+              label: 'APPROVED',
+              isSelected: selectedFilter == LoanStatus.approved,
+              onTap: () => onFilterChanged(LoanStatus.approved)),
           const SizedBox(width: 8),
-          _FilterTab(label: 'REJECTED', isSelected: selectedFilter == LoanStatus.rejected, onTap: () => onFilterChanged(LoanStatus.rejected)),
+          _FilterTab(
+              label: 'REJECTED',
+              isSelected: selectedFilter == LoanStatus.rejected,
+              onTap: () => onFilterChanged(LoanStatus.rejected)),
         ],
       ),
     );
@@ -227,10 +300,11 @@ class ApplicationsMobile extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight.withOpacity(0.5),
+                color: AppColors.primaryLight.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.description_outlined, color: AppColors.primary, size: 32),
+              child: const Icon(Icons.description_outlined,
+                  color: AppColors.primary, size: 32),
             ),
             const SizedBox(height: 24),
             Text(
@@ -282,7 +356,7 @@ class _ApplicationCard extends StatelessWidget {
           border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -299,7 +373,7 @@ class _ApplicationCard extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textSecondary.withOpacity(0.6),
+                    color: AppColors.textSecondary.withValues(alpha: 0.6),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -327,7 +401,7 @@ class _ApplicationCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary.withOpacity(0.6),
+                        color: AppColors.textSecondary.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -349,7 +423,7 @@ class _ApplicationCard extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary.withOpacity(0.6),
+                        color: AppColors.textSecondary.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -368,10 +442,13 @@ class _ApplicationCard extends StatelessWidget {
           ],
         ),
       ),
-    ).animate().fadeIn(
+    )
+        .animate()
+        .fadeIn(
           duration: 400.ms,
           delay: (index * 100).ms,
-        ).slideY(begin: 0.1, end: 0);
+        )
+        .slideY(begin: 0.1, end: 0);
   }
 }
 
@@ -431,18 +508,22 @@ class _DrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textPrimary), size: 22),
+      leading: Icon(icon,
+          color:
+              color ?? (isActive ? AppColors.primary : AppColors.textPrimary),
+          size: 22),
       title: Text(
         label,
         style: TextStyle(
           fontSize: 15,
           fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-          color: color ?? (isActive ? AppColors.primary : AppColors.textPrimary),
+          color:
+              color ?? (isActive ? AppColors.primary : AppColors.textPrimary),
         ),
       ),
       onTap: onTap,
       selected: isActive,
-      selectedTileColor: AppColors.primaryLight.withOpacity(0.1),
+      selectedTileColor: AppColors.primaryLight.withValues(alpha: 0.1),
     );
   }
 }

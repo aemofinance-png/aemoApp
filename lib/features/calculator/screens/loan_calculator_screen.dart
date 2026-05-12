@@ -22,17 +22,23 @@ class LoanCalculatorScreen extends ConsumerStatefulWidget {
 
 class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
   final _amountController = TextEditingController();
-  int _selectedDuration = AppStrings.loanRates.keys.first;
+  late int _selectedDuration;
 
   double? _monthlyPayment;
   double? _totalPayment;
   double? _totalInterest;
 
-  double get _interestRate => AppStrings.loanRates[_selectedDuration] ?? 0.0;
+  String get _countryCode =>
+      ref.read(currentUserProvider).value?.countryCode ?? 'BZ';
+
+  Map<int, double> get _currentRates => AppStrings.getLoanRates(_countryCode);
+
+  double get _interestRate => _currentRates[_selectedDuration] ?? 0.0;
 
   @override
   void initState() {
     super.initState();
+    _selectedDuration = AppStrings.getLoanRates(null).keys.first;
     // Calculate automatically as user types
     _amountController.addListener(_calculate);
   }
@@ -47,7 +53,7 @@ class _LoanCalculatorScreenState extends ConsumerState<LoanCalculatorScreen> {
   Map<int, double> get _availableRates {
     final amount = double.tryParse(_amountController.text.trim()) ?? 0;
     return Map.fromEntries(
-      AppStrings.loanRates.entries.where((entry) {
+      _currentRates.entries.where((entry) {
         final minimum = AppStrings.loanMinimums[entry.key] ?? 0;
         return amount >= minimum;
       }),
@@ -243,7 +249,7 @@ class _DesktopCalculator extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -391,16 +397,16 @@ class _DesktopCalculator extends StatelessWidget {
       return Container(
         height: 400,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.05),
+          color: AppColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.calculate_outlined,
-                  size: 64, color: AppColors.primary.withOpacity(0.2)),
+                  size: 64, color: AppColors.primary.withValues(alpha: 0.2)),
               const SizedBox(height: 16),
               Text(
                 'Enter an amount to see your projection',
@@ -424,7 +430,7 @@ class _DesktopCalculator extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -441,7 +447,7 @@ class _DesktopCalculator extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -449,7 +455,7 @@ class _DesktopCalculator extends StatelessWidget {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       letterSpacing: 1,
                     ),
                   ),
@@ -474,7 +480,7 @@ class _DesktopCalculator extends StatelessWidget {
                 Text(
                   'Your estimated monthly repayment based on current interest rates.',
                   style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     height: 1.5,
                   ),
                 ),
@@ -545,7 +551,7 @@ class _DesktopCalculator extends StatelessWidget {
           style: GoogleFonts.plusJakartaSans(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
             letterSpacing: 0.5,
           ),
         ),
@@ -597,11 +603,11 @@ class _DesktopCalculator extends StatelessWidget {
             return DropdownMenuItem<int>(
               value: months,
               child: Text(
-                '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}% p.a.',
+                '${Formatters.duration(months)} — ${availableRates[months]}% p.a.',
               ),
             );
           }).toList(),
-          onChanged: (value) => onDurationChanged(value!),
+          onChanged: (val) => onDurationChanged(val!),
         ),
       ),
     );
@@ -649,7 +655,7 @@ class _DesktopCalculator extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
+                color: AppColors.primary.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 20, color: AppColors.primary),
@@ -707,15 +713,6 @@ class _DesktopCalculator extends StatelessWidget {
                     color: AppColors.primary,
                   ),
                 ),
-                Text(
-                  'ENTERPRISE LEDGER',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textSecondary.withOpacity(0.7),
-                    letterSpacing: 1.5,
-                  ),
-                ),
               ],
             ),
           ),
@@ -769,7 +766,7 @@ class _DesktopCalculator extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: Row(
@@ -924,7 +921,7 @@ class _MobileCalculator extends StatelessWidget {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               letterSpacing: 0.5,
             ),
           ),
@@ -960,7 +957,7 @@ class _MobileCalculator extends StatelessWidget {
               //     style: GoogleFonts.plusJakartaSans(
               //       fontSize: 18,
               //       fontWeight: FontWeight.w600,
-              //       color: Colors.white.withOpacity(0.5),
+              //       color: Colors.white.withValues(alpha: 0.5),
               //     ),
               //   ),
               // ),
@@ -978,7 +975,7 @@ class _MobileCalculator extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1004,7 +1001,7 @@ class _MobileCalculator extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1117,7 +1114,7 @@ class _MobileCalculator extends StatelessWidget {
             return DropdownMenuItem<int>(
               value: months,
               child: Text(
-                '${Formatters.duration(months)} — ${AppStrings.loanRates[months]}%',
+                '${Formatters.duration(months)} — ${availableRates[months]}%',
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

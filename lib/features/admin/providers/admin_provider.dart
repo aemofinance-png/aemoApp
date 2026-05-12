@@ -5,7 +5,6 @@ import '../../../../data/providers/service_providers.dart';
 import '../../../../data/services/firestore_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../../data/models/user_model.dart';
-import 'package:flutter/foundation.dart';
 
 // Admin state
 class AdminState {
@@ -65,6 +64,16 @@ class AdminNotifier extends StateNotifier<AdminState> {
       userId: userId,
       bankAccountId: bankAccountId,
       status: status,
+    );
+  }
+
+  Future<void> deleteUserBankAccount({
+    required String userId,
+    required String bankAccountId,
+  }) async {
+    await _firestoreService.deleteBankAccount(
+      userId: userId,
+      bankAccountId: bankAccountId,
     );
   }
 
