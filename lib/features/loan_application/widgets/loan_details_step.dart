@@ -219,7 +219,7 @@ class _LoanDetailsStepState extends ConsumerState<LoanDetailsStep> {
     String Function(T)? itemLabelBuilder,
   }) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       hint: Text(hint),
       onChanged: onChanged,
       items: items.map((item) {

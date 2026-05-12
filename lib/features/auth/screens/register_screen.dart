@@ -1,6 +1,5 @@
 import 'package:aemo_loan_app/core/constants/app_assets.dart';
 import 'package:aemo_loan_app/core/utils/email_service.dart';
-import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -175,14 +174,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                       ),
 
-                    // Full Name
+                    // Full name
                     CustomTextField(
                       label: 'Full Name',
                       hint: 'Enter your full name',
                       controller: _fullNameController,
-                      prefixIcon: const Icon(Icons.person_outline),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Required' : null,
+                      prefixIcon: const Icon(Icons.person_outlined),
+                      onChanged: (_) =>
+                          ref.read(authNotifierProvider.notifier).clearError(),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Full name is required';
+                        }
+                        if (value.trim().split(' ').length < 2) {
+                          return 'Please enter your first and last name';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -194,9 +202,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: const Icon(Icons.email_outlined),
+                      onChanged: (_) =>
+                          ref.read(authNotifierProvider.notifier).clearError(),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        if (!value.contains('@')) return 'Invalid email';
+                        if (value == null || value.isEmpty) {
+                          return 'Email is required';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Enter a valid email address';
+                        }
                         return null;
                       },
                     ),
@@ -210,8 +224,121 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       prefixIcon: const Icon(Icons.phone_outlined),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Required' : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Phone number is required';
+                        }
+                        if (value.length < 5) {
+                          return 'Enter a valid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    CustomTextField(
+                      label: 'Street Address',
+                      hint: 'Enter your street address',
+                      controller: _streetAddressController,
+                      prefixIcon: const Icon(Icons.home_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Street address is required';
+                        }
+                        if (value.length < 5) {
+                          return 'Enter a valid street address';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      label: 'City',
+                      hint: 'Enter your city',
+                      controller: _cityController,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'City is required';
+                        }
+                        if (value.length < 4) {
+                          return 'Enter a valid city';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      label: 'State',
+                      hint: 'Enter your state',
+                      controller: _stateController,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'State is required';
+                        }
+                        if (value.length < 4) {
+                          return 'Enter a valid state';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Country selector
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Country',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue: _selectedCountry,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: AppColors.white,
+                            prefixIcon: const Icon(Icons.flag_outlined),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  const BorderSide(color: AppColors.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 2),
+                            ),
+                          ),
+                          items: AppStrings.supportedCountries.map((country) {
+                            return DropdownMenuItem<String>(
+                              value: country['code'],
+                              child: Text(
+                                '${country['flag']}  ${country['name']} (${country['currency']})',
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _selectedCountry = value);
+                            }
+                          },
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 16),
@@ -228,68 +355,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           _showPassword
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
+                          color: AppColors.textSecondary,
                         ),
                         onPressed: () =>
                             setState(() => _showPassword = !_showPassword),
                       ),
-                      validator: (value) =>
-                          value == null || value.length < 6 ? 'Min 6 chars' : null,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Confirm Password
-                    CustomTextField(
-                      label: 'Confirm Password',
-                      hint: 'Repeat your password',
-                      controller: _confirmPasswordController,
-                      obscureText: !_showConfirmPassword,
-                      prefixIcon: const Icon(Icons.lock_reset_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _showConfirmPassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                        ),
-                        onPressed: () => setState(
-                            () => _showConfirmPassword = !_showConfirmPassword),
-                      ),
                       validator: (value) {
-                        if (value != _passwordController.text) {
-                          return 'Passwords do not match';
+                        if (value == null || value.isEmpty) {
+                          return 'Password is required';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
                         }
                         return null;
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-                    // Country Selection
-                    const Text(
-                      'Country',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedCountry,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.public_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    // Confirm password
+                    CustomTextField(
+                      label: 'Confirm Password',
+                      hint: 'Re-enter your password',
+                      controller: _confirmPasswordController,
+                      obscureText: !_showConfirmPassword,
+                      prefixIcon: const Icon(Icons.lock_outlined),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _showConfirmPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: AppColors.textSecondary,
                         ),
+                        onPressed: () => setState(
+                            () => _showConfirmPassword = !_showConfirmPassword),
                       ),
-                      items: AppStrings.supportedCountries.map((country) {
-                        return DropdownMenuItem(
-                          value: country['code'],
-                          child: Text(country['name']!),
-                        );
-                      }).toList(),
-                      onChanged: (value) =>
-                          setState(() => _selectedCountry = value!),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 24),
@@ -301,14 +410,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       isLoading: authState.isLoading,
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
                     // Login link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "Already have an account? ",
+                          'Already have an account? ',
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14,
@@ -317,7 +426,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         GestureDetector(
                           onTap: () => context.go(AppRoutes.login),
                           child: const Text(
-                            'Sign In',
+                            'Sign in',
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14,

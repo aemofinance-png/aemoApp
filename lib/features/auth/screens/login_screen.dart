@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/core/constants/app_assets.dart';
 import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,19 +55,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .read(authNotifierProvider.notifier)
         .sendPasswordResetEmail(email);
     if (success) {
-      CustomPopup.show(
-        context,
-        title: 'Success',
-        message: 'Password reset email sent. Please check your inbox.',
-        isWarning: false,
-      );
+      if (mounted) {
+        CustomPopup.show(
+          context,
+          title: 'Success',
+          message: 'Password reset email sent. Please check your inbox.',
+          isWarning: false,
+        );
+      }
     } else {
-      CustomPopup.show(
-        context,
-        title: 'Error',
-        message: 'Failed to send password reset email. Please try again.',
-        isWarning: true,
-      );
+      if (mounted) {
+        CustomPopup.show(
+          context,
+          title: 'Error',
+          message: 'Failed to send password reset email. Please try again.',
+          isWarning: true,
+        );
+      }
     }
   }
 
@@ -94,9 +99,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     if (profile?.role == 'admin') {
-      context.go(AppRoutes.admin);
+      if (mounted) context.go(AppRoutes.admin);
     } else {
-      context.go(AppRoutes.dashboard);
+      if (mounted) context.go(AppRoutes.dashboard);
     }
   }
 
@@ -128,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Column(
                         children: [
                           Image.asset(
-                            'assets/images/aemo-logo.png',
+                            AppAssets.logo,
                           ),
                           const SizedBox(height: 16),
                           const SizedBox(height: 4),

@@ -14,10 +14,10 @@ import '../../../app/router.dart';
 import '../../../shared/widgets/skeleton.dart';
 import 'dart:math';
 import '../../admin/screens/document_viewer_screen.dart';
-import 'package:web/web.dart' as web;
+import 'package:aemo_loan_app/core/utils/stub_web.dart' if (dart.library.js_interop) 'package:aemo_loan_app/core/utils/platform_web.dart' as web;
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:js_interop';
+import 'package:http/http.dart' as http;
 
 class ApplicationStatusScreen extends ConsumerStatefulWidget {
   final String applicationId;
@@ -141,13 +141,13 @@ class _ApplicationStatusScreenState
   void _handleViewAgreement(
     BuildContext context,
     LoanApplicationModel application,
-    UserModel currentUser,
+    UserModel? currentUser,
   ) {
     if (_preGeneratedUrl != null) {
       web.window.open(_preGeneratedUrl!, '_blank', '');
     } else {
       setState(() => _userWaitingForAgreement = true);
-      if (!_isPreGenerating) {
+      if (!_isPreGenerating && currentUser != null) {
         _startAgreementGeneration(application, currentUser);
       }
     }
@@ -207,8 +207,7 @@ class _ApplicationStatusScreenState
       );
 
       if (response.statusCode == 200) {
-        final blob = web.Blob([response.bodyBytes.toJS].toJS,
-            web.BlobPropertyBag(type: 'application/pdf'));
+        final blob = web.Blob([response.bodyBytes.toJS].toJS);
         final url = web.URL.createObjectURL(blob);
 
         if (mounted) {

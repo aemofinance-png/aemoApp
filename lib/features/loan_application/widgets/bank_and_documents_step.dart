@@ -266,7 +266,7 @@ class _BankAndDocumentsStepState extends ConsumerState<BankAndDocumentsStep> {
     required void Function(String?) onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       hint: Text(hint),
       onChanged: onChanged,
       items: items.map((item) {

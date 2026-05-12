@@ -10,8 +10,7 @@ import '../../../data/providers/service_providers.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../shared/widgets/skeleton.dart';
-import '../../../shared/widgets/custom_popup.dart';
-import 'package:web/web.dart' as web;
+import 'package:aemo_loan_app/core/utils/stub_web.dart' if (dart.library.js_interop) 'package:aemo_loan_app/core/utils/platform_web.dart' as web;
 
 class AdminWithdrawalsScreen extends ConsumerStatefulWidget {
   const AdminWithdrawalsScreen({super.key});

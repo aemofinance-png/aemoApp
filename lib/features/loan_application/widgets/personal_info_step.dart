@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aemo_loan_app/core/constants/app_colors.dart';
 import 'package:aemo_loan_app/core/theme/theme_extensions.dart';
 import 'package:aemo_loan_app/shared/widgets/custom_text_field.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../providers/loan_form_provider.dart';
 
 class PersonalInfoStep extends ConsumerStatefulWidget {
@@ -27,6 +28,25 @@ class _PersonalInfoStepState extends ConsumerState<PersonalInfoStep> {
     final state = ref.read(loanFormProvider);
     _fullNameController = TextEditingController(text: state.fullName);
     _phoneController = TextEditingController(text: state.phone);
+    
+    // If provider is empty, try to get from currentUserProvider
+    if (state.fullName.isEmpty || state.phone.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final user = ref.read(currentUserProvider).value;
+        if (user != null) {
+          final notifier = ref.read(loanFormProvider.notifier);
+          if (_fullNameController.text.isEmpty && user.fullName.isNotEmpty) {
+            _fullNameController.text = user.fullName;
+            notifier.updateFullName(user.fullName);
+          }
+          if (_phoneController.text.isEmpty && user.phone.isNotEmpty) {
+            _phoneController.text = user.phone;
+            notifier.updatePhone(user.phone);
+          }
+        }
+      });
+    }
   }
 
   @override

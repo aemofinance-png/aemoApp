@@ -5,6 +5,7 @@ import 'package:aemo_loan_app/core/constants/app_colors.dart';
 import 'package:aemo_loan_app/core/utils/formatters.dart';
 import 'package:aemo_loan_app/data/providers/service_providers.dart';
 import 'package:aemo_loan_app/shared/widgets/loading_overlay.dart';
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:aemo_loan_app/features/auth/providers/auth_provider.dart';
 import 'package:aemo_loan_app/features/loan_application/providers/loan_provider.dart';
 import 'package:aemo_loan_app/app/router.dart';
@@ -44,7 +45,6 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
         notifier.updateFullName(currentUser.fullName);
         notifier.updatePhone(currentUser.phone ?? '');
         
-        final countryCode = currentUser.countryCode ?? 'BZ';
         final banks = ref.read(loanFormProvider).selectedBank;
         if (banks.isEmpty) {
           // Initialize with first bank if not set
@@ -102,10 +102,12 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     
     final formState = ref.read(loanFormProvider);
     if (formState.documents.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please upload at least one document'),
-            backgroundColor: AppColors.error),
+      CustomPopup.show(
+        context,
+        title: 'Documents Required',
+        message:
+            'Please upload at least one document to proceed with your application.',
+        isWarning: true,
       );
       return;
     }

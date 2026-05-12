@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/core/constants/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -173,7 +174,7 @@ class LandingPageMobile extends ConsumerWidget {
                 // ── Logo (no animation) ──────────────────
                 Align(
                   alignment: Alignment.center,
-                  child: Image.asset('assets/images/aemo-logo.png', height: 80),
+                  child: Image.asset(AppAssets.logo, height: 80),
                 ),
 
                 const SizedBox(height: 24),
