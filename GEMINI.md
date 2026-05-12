@@ -66,7 +66,13 @@ Navigation is managed via `go_router` in `lib/app/router.dart`. Key routes inclu
 - **Run Tests:** `flutter test`
 
 ### Deployment (Web)
-- **Build Web:** `flutter build web --release`
+- **Mandatory Build:** ALWAYS run `flutter build web --release` before pushing changes to ensure the production-ready assets are up to date.
+- **Source Control:** The `build/web` folder MUST be staged and pushed to git for deployment purposes.
 
----
-*Note: This file is intended for use by Gemini CLI to maintain project context. Updates should be made as the architecture evolves.*
+### Development Commands
+- **Install Dependencies:** `flutter pub get`
+- **Generate Code:** `dart run build_runner build --delete-conflicting-outputs` (Required for Riverpod annotations and other generated files).
+- **Build Web:** `flutter build web --release`
+- **Run App:** `flutter run -d <device_id>`
+- **Analyze Code:** `flutter analyze`
+- **Run Tests:** `flutter test`
