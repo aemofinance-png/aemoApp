@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -68,16 +69,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       // Optionally, sign the user in or redirect to login
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset successful!')),
+        CustomPopup.show(
+          context,
+          title: 'Success',
+          message: 'Password reset successful!',
+          isWarning: false,
         );
         context.go('/login');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to reset password: $e')),
+        CustomPopup.show(
+          context,
+          title: 'Error',
+          message: 'Failed to reset password: $e',
+          isWarning: true,
         );
       }
     }

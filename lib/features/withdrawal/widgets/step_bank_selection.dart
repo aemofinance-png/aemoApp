@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -209,11 +210,11 @@ class StepBankSelection extends ConsumerWidget {
               InkWell(
                 onTap: () {
                   if (currentUser!.bankAccounts.length >= 3) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Maximum of 3 bank accounts allowed'),
-                        backgroundColor: AppColors.error,
-                      ),
+                    CustomPopup.show(
+                      context,
+                      title: 'Limit Reached',
+                      message: 'Maximum of 3 bank accounts allowed',
+                      isWarning: true,
                     );
                   } else {
                     _showAddBankAccountSheet(context, ref, currentUser);
@@ -440,22 +441,21 @@ class StepBankSelection extends ConsumerWidget {
                           ref.invalidate(currentUserProvider);
                           if (context.mounted) {
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Bank account linked successfully'),
-                                backgroundColor: AppColors.success,
-                              ),
+                            CustomPopup.show(
+                              context,
+                              title: 'Success',
+                              message: 'Bank account linked successfully',
+                              isWarning: false,
                             );
                           }
                         } catch (e) {
                           if (context.mounted) {
                             setModalState(() => isSubmitting = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error linking bank account: $e'),
-                                backgroundColor: AppColors.error,
-                              ),
+                            CustomPopup.show(
+                              context,
+                              title: 'Error',
+                              message: 'Error linking bank account: $e',
+                              isWarning: true,
                             );
                           }
                         }

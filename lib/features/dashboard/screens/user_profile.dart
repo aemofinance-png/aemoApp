@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -555,11 +556,11 @@ class _DesktopProfileView extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (user.bankAccounts.length >= 3) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Maximum of 3 bank accounts allowed'),
-                            backgroundColor: AppColors.error,
-                          ),
+                        CustomPopup.show(
+                          context,
+                          title: 'Limit Reached',
+                          message: 'Maximum of 3 bank accounts allowed',
+                          isWarning: true,
                         );
                       } else {
                         _showAddBankAccountSheet(context, ref, user);
@@ -1139,11 +1140,11 @@ class _MobileProfileView extends StatelessWidget {
         GestureDetector(
           onTap: () {
             if (user.bankAccounts.length >= 3) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Maximum of 3 bank accounts allowed'),
-                  backgroundColor: AppColors.error,
-                ),
+              CustomPopup.show(
+                context,
+                title: 'Limit Reached',
+                message: 'Maximum of 3 bank accounts allowed',
+                isWarning: true,
               );
             } else {
               _showAddBankAccountSheet(context, ref, user);
@@ -1739,10 +1740,10 @@ void _showEditProfileSheet(
 
                                   if (sheetContext.mounted && context.mounted) {
                                     if (newName != user.fullName) {
-                                      _showThemedPopup(
+                                      CustomPopup.show(
                                         context,
-                                        'Identity Verification Required',
-                                        'Since you changed your name, you must re-verify your identity to maintain account security.',
+                                        title: 'Identity Verification Required',
+                                        message: 'Since you changed your name, you must re-verify your identity to maintain account security.',
                                         isWarning: true,
                                         onClosed: () {
                                           if (sheetContext.mounted) {
@@ -1752,10 +1753,10 @@ void _showEditProfileSheet(
                                         },
                                       );
                                     } else {
-                                      _showThemedPopup(
+                                      CustomPopup.show(
                                         context,
-                                        'Profile Updated',
-                                        'Your personal information has been successfully updated.',
+                                        title: 'Profile Updated',
+                                        message: 'Your personal information has been successfully updated.',
                                         onClosed: () {
                                           if (sheetContext.mounted) {
                                             Navigator.pop(sheetContext);
@@ -1768,10 +1769,10 @@ void _showEditProfileSheet(
                                 } catch (e) {
                                   if (sheetContext.mounted) {
                                     setState(() => isLoading = false);
-                                    _showThemedPopup(
+                                    CustomPopup.show(
                                       sheetContext,
-                                      'Update Failed',
-                                      'We encountered an error while saving your profile: $e',
+                                      title: 'Update Failed',
+                                      message: 'We encountered an error while saving your profile: $e',
                                       isWarning: true,
                                     );
                                   }
@@ -1811,88 +1812,6 @@ void _showEditProfileSheet(
         },
       );
     },
-  );
-}
-
-void _showThemedPopup(BuildContext context, String title, String message,
-    {bool isWarning = false, VoidCallback? onClosed}) {
-  showDialog(
-    context: context,
-    useRootNavigator: true,
-    barrierDismissible: false,
-    builder: (dialogContext) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      backgroundColor: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isWarning
-                    ? AppColors.warning.withValues(alpha: 0.1)
-                    : AppColors.success.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isWarning
-                    ? Icons.warning_amber_rounded
-                    : Icons.check_circle_outline_rounded,
-                color: isWarning ? AppColors.warning : AppColors.success,
-                size: 40,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryDark,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 15,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  if (onClosed != null) onClosed();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryDark,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: Text(
-                  isWarning ? 'UNDERSTOOD' : 'DONE',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }
 
@@ -1938,22 +1857,21 @@ void _showDeleteBankAccountDialog(
 
                         if (context.mounted) {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Bank account deleted successfully'),
-                              backgroundColor: AppColors.success,
-                            ),
+                          CustomPopup.show(
+                            context,
+                            title: 'Success',
+                            message: 'Bank account deleted successfully',
+                            isWarning: false,
                           );
                         }
                       } catch (e) {
                         if (context.mounted) {
                           setDialogState(() => isDeleting = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error deleting bank account: $e'),
-                              backgroundColor: AppColors.error,
-                            ),
+                          CustomPopup.show(
+                            context,
+                            title: 'Error',
+                            message: 'Error deleting bank account: $e',
+                            isWarning: true,
                           );
                         }
                       }
@@ -2148,23 +2066,21 @@ void _showAddBankAccountSheet(
                                 ref.invalidate(currentUserProvider);
                                 if (context.mounted) {
                                   Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Bank account linked successfully'),
-                                      backgroundColor: AppColors.success,
-                                    ),
+                                  CustomPopup.show(
+                                    context,
+                                    title: 'Success',
+                                    message: 'Bank account linked successfully',
+                                    isWarning: false,
                                   );
                                 }
                               } catch (e) {
                                 if (context.mounted) {
                                   setModalState(() => isSubmitting = false);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text('Error linking bank account: $e'),
-                                      backgroundColor: AppColors.error,
-                                    ),
+                                  CustomPopup.show(
+                                    context,
+                                    title: 'Error',
+                                    message: 'Error linking bank account: $e',
+                                    isWarning: true,
                                   );
                                 }
                               }

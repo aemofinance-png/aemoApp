@@ -11,6 +11,7 @@ import 'package:aemo_loan_app/features/loan_application/providers/loan_provider.
 import 'package:aemo_loan_app/app/router.dart';
 import 'package:aemo_loan_app/data/models/user_model.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'dart:math';
 
 import '../widgets/personal_info_step.dart';
@@ -150,10 +151,12 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
   Future<void> _handleSubmit() async {
     if (!_validateCurrentStep()) return;
     if (_documents.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please upload at least one document'),
-            backgroundColor: AppColors.error),
+      CustomPopup.show(
+        context,
+        title: 'Documents Required',
+        message:
+            'Please upload at least one document to proceed with your application.',
+        isWarning: true,
       );
       return;
     }

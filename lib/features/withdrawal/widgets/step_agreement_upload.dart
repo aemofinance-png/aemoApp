@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
@@ -23,10 +24,11 @@ class StepAgreementUpload extends ConsumerWidget {
         await notifier.uploadDocument(result.files.first);
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Upload failed: $e'),
-                backgroundColor: Colors.red),
+          CustomPopup.show(
+            context,
+            title: 'Upload Failed',
+            message: 'Upload failed: $e',
+            isWarning: true,
           );
         }
       }

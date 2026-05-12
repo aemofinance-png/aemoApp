@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -140,12 +141,12 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                   : () async {
                       if (state.currentStep == 0) {
                         if (state.uploadedDocument == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Please upload your loan agreement to proceed.'),
-                              backgroundColor: AppColors.error,
-                            ),
+                          CustomPopup.show(
+                            context,
+                            title: 'Action Required',
+                            message:
+                                'Please upload your loan agreement to proceed.',
+                            isWarning: true,
                           );
                           return;
                         }
@@ -155,12 +156,11 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
 
                       if (state.currentStep == 1) {
                         if (state.selectedAccount == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Please select a bank account to proceed.'),
-                              backgroundColor: AppColors.error,
-                            ),
+                          CustomPopup.show(
+                            context,
+                            title: 'Action Required',
+                            message: 'Please select a bank account to proceed.',
+                            isWarning: true,
                           );
                           return;
                         }
@@ -179,12 +179,11 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Failed to process withdrawal: $e'),
-                                backgroundColor: Colors.red,
-                              ),
+                            CustomPopup.show(
+                              context,
+                              title: 'Error',
+                              message: 'Failed to process withdrawal: $e',
+                              isWarning: true,
                             );
                           }
                         }

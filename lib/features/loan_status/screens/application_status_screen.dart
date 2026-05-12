@@ -1,4 +1,5 @@
 import 'package:aemo_loan_app/data/models/user_model.dart';
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -227,8 +228,11 @@ class _ApplicationStatusScreenState
             _isPreGenerating = false;
             if (_userWaitingForAgreement) {
               _userWaitingForAgreement = false;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Failed to generate agreement')),
+              CustomPopup.show(
+                context,
+                title: 'Error',
+                message: 'Failed to generate agreement',
+                isWarning: true,
               );
             }
           });
@@ -240,8 +244,11 @@ class _ApplicationStatusScreenState
           _isPreGenerating = false;
           if (_userWaitingForAgreement) {
             _userWaitingForAgreement = false;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: $e')),
+            CustomPopup.show(
+              context,
+              title: 'Error',
+              message: 'Error: $e',
+              isWarning: true,
             );
           }
         });

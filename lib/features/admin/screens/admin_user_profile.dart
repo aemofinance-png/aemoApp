@@ -1,5 +1,6 @@
 import 'package:aemo_loan_app/core/utils/email_service.dart';
 import 'package:aemo_loan_app/features/admin/providers/admin_provider.dart';
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -562,8 +563,11 @@ void _showAdminDeleteBankAccountDialog(
           onPressed: () async {
             Navigator.pop(context);
             // Show loading
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Deleting bank account...')),
+            CustomPopup.show(
+              context,
+              title: 'Processing',
+              message: 'Deleting bank account...',
+              isWarning: false,
             );
 
             try {
@@ -575,22 +579,20 @@ void _showAdminDeleteBankAccountDialog(
                   );
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Bank account deleted successfully'),
-                    backgroundColor: AppColors.success,
-                  ),
+                CustomPopup.show(
+                  context,
+                  title: 'Success',
+                  message: 'Bank account deleted successfully',
+                  isWarning: false,
                 );
               }
             } catch (e) {
               if (context.mounted) {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error deleting bank account: $e'),
-                    backgroundColor: AppColors.error,
-                  ),
+                CustomPopup.show(
+                  context,
+                  title: 'Error',
+                  message: 'Error deleting bank account: $e',
+                  isWarning: true,
                 );
               }
             }

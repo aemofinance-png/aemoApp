@@ -1,3 +1,4 @@
+import 'package:aemo_loan_app/shared/widgets/custom_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,9 +41,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _resetPassword() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please enter your email to reset password')),
+      CustomPopup.show(
+        context,
+        title: 'Action Required',
+        message: 'Please enter your email to reset password',
+        isWarning: true,
       );
       return;
     }
@@ -51,16 +54,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .read(authNotifierProvider.notifier)
         .sendPasswordResetEmail(email);
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Password reset email sent. Please check your inbox.')),
+      CustomPopup.show(
+        context,
+        title: 'Success',
+        message: 'Password reset email sent. Please check your inbox.',
+        isWarning: false,
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Failed to send password reset email. Please try again.')),
+      CustomPopup.show(
+        context,
+        title: 'Error',
+        message: 'Failed to send password reset email. Please try again.',
+        isWarning: true,
       );
     }
   }
