@@ -10,6 +10,8 @@ import '../../../data/providers/service_providers.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../shared/widgets/skeleton.dart';
+import '../../../shared/widgets/custom_popup.dart';
+import 'package:web/web.dart' as web;
 
 class AdminWithdrawalsScreen extends ConsumerStatefulWidget {
   const AdminWithdrawalsScreen({super.key});
@@ -456,23 +458,29 @@ class _AdminWithdrawalsScreenState
     );
   }
 
-  Widget _buildSmallActionBtn(String label, IconData icon) {
+  Widget _buildSmallActionBtn(String label, IconData icon,
+      {VoidCallback? onTap}) {
     return InkWell(
-      onTap: () {},
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: const Color(0xFF737780)),
-          const SizedBox(width: 4),
-          Text(
-            label.toUpperCase(),
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF737780),
-              letterSpacing: 1,
+      onTap: onTap ?? () {},
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: const Color(0xFF1F477B)),
+            const SizedBox(width: 6),
+            Text(
+              label.toUpperCase(),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF1F477B),
+                letterSpacing: 1,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -599,6 +607,40 @@ class _AdminWithdrawalsScreenState
                     fontWeight: FontWeight.w600),
               ),
               const Spacer(),
+              if (w.documentUrl != null && w.documentUrl!.isNotEmpty)
+                _buildSmallActionBtn(
+                  'View Agreement',
+                  Icons.description_rounded,
+                  onTap: () {
+                    web.window.open(w.documentUrl!, '_blank', '');
+                  },
+                )
+              else
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.warning_amber_rounded,
+                          size: 12, color: AppColors.error),
+                      const SizedBox(width: 4),
+                      Text(
+                        'NO DOCUMENT',
+                        style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.error,
+                            letterSpacing: 0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(width: 16),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

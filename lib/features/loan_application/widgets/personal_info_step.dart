@@ -1,18 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aemo_loan_app/core/constants/app_colors.dart';
+import 'package:aemo_loan_app/core/theme/theme_extensions.dart';
 import 'package:aemo_loan_app/shared/widgets/custom_text_field.dart';
+import '../providers/loan_form_provider.dart';
 
-class PersonalInfoStep extends StatelessWidget {
+class PersonalInfoStep extends ConsumerStatefulWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController fullNameController;
-  final TextEditingController phoneController;
 
   const PersonalInfoStep({
     super.key,
     required this.formKey,
-    required this.fullNameController,
-    required this.phoneController,
   });
+
+  @override
+  ConsumerState<PersonalInfoStep> createState() => _PersonalInfoStepState();
+}
+
+class _PersonalInfoStepState extends ConsumerState<PersonalInfoStep> {
+  late TextEditingController _fullNameController;
+  late TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(loanFormProvider);
+    _fullNameController = TextEditingController(text: state.fullName);
+    _phoneController = TextEditingController(text: state.phone);
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +44,7 @@ class PersonalInfoStep extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Form(
-            key: formKey,
+            key: widget.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -53,25 +75,26 @@ class PersonalInfoStep extends StatelessWidget {
                 const SizedBox(height: 52),
                 CustomTextField(
                   label: 'FULL NAME',
-                  controller: fullNameController,
+                  controller: _fullNameController,
                   hint: 'e.g. Julian Montgomery',
                   prefixIcon: const Icon(Icons.person_outline, size: 20),
+                  onChanged: (v) => ref.read(loanFormProvider.notifier).updateFullName(v),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'Full name is required' : null,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   label: 'PHONE NUMBER',
-                  controller: phoneController,
+                  controller: _phoneController,
                   hint: '+1 (555) 000-0000',
                   prefixIcon: const Icon(Icons.phone_outlined, size: 20),
                   keyboardType: TextInputType.phone,
-                  validator: (v) => v == null || v.isEmpty
-                      ? 'Phone number is required'
-                      : null,
+                  onChanged: (v) => ref.read(loanFormProvider.notifier).updatePhone(v),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Phone number is required' : null,
                 ),
                 const SizedBox(height: 28),
-                _buildInfoBadge(),
+                _buildInfoBadge(context),
               ],
             ),
           ),
@@ -97,18 +120,19 @@ class PersonalInfoStep extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoBadge() {
+  Widget _buildInfoBadge(BuildContext context) {
+    final customColors = Theme.of(context).extension<AppCustomColors>()!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: customColors.infoBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+        border: Border.all(color: customColors.infoIcon.withValues(alpha: 0.1)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.shield_outlined, color: AppColors.primary, size: 24),
-          SizedBox(width: 16),
+          Icon(Icons.shield_outlined, color: customColors.infoIcon, size: 24),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,12 +142,12 @@ class PersonalInfoStep extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
+                    color: customColors.infoIcon,
                     letterSpacing: 0.5,
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
+                const SizedBox(height: 2),
+                const Text(
                   'Your data is encrypted with bank-grade security.',
                   style: TextStyle(
                     fontSize: 12,

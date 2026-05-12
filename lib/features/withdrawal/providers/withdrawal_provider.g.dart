@@ -6,7 +6,7 @@ part of 'withdrawal_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$withdrawalHash() => r'78392e10e630ebca79ebbc18d5131340a18b7664';
+String _$withdrawalHash() => r'5678e4fe3bd0f6e7a6e12a4ce5aff8b2c575720b';
 
 /// See also [Withdrawal].
 @ProviderFor(Withdrawal)

@@ -1,42 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aemo_loan_app/core/constants/app_colors.dart';
 import 'package:aemo_loan_app/core/constants/app_strings.dart';
 import 'package:aemo_loan_app/core/utils/formatters.dart';
 import 'package:aemo_loan_app/shared/widgets/custom_text_field.dart';
+import '../providers/loan_form_provider.dart';
 
-class LoanDetailsStep extends StatelessWidget {
+class LoanDetailsStep extends ConsumerStatefulWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController loanAmountController;
-  final String selectedLoanPurpose;
-  final int selectedDuration;
-  final Map<int, double> availableRates;
-  final double interestRate;
-  final double? monthlyPayment;
-  final double? totalPayment;
   final String countryCode;
-  final void Function(String?) onPurposeChanged;
-  final void Function(int?) onDurationChanged;
-  final void Function(String) onAmountChanged;
 
   const LoanDetailsStep({
     super.key,
     required this.formKey,
-    required this.loanAmountController,
-    required this.selectedLoanPurpose,
-    required this.selectedDuration,
-    required this.availableRates,
-    required this.interestRate,
-    required this.monthlyPayment,
-    required this.totalPayment,
     required this.countryCode,
-    required this.onPurposeChanged,
-    required this.onDurationChanged,
-    required this.onAmountChanged,
   });
 
   @override
+  ConsumerState<LoanDetailsStep> createState() => _LoanDetailsStepState();
+}
+
+class _LoanDetailsStepState extends ConsumerState<LoanDetailsStep> {
+  late TextEditingController _loanAmountController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(loanFormProvider);
+    _loanAmountController = TextEditingController(
+      text: state.loanAmount > 0 ? state.loanAmount.toString() : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _loanAmountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final currencyCode = Formatters.getCurrencyCode(countryCode);
+    final loanState = ref.watch(loanFormProvider);
+    final notifier = ref.read(loanFormProvider.notifier);
+    final currencyCode = Formatters.getCurrencyCode(widget.countryCode);
+    
+    // Determine available rates based on amount
+    final availableRates = Map.fromEntries(
+      AppStrings.loanRates.entries.where((entry) {
+        final minimum = AppStrings.loanMinimums[entry.key] ?? 0;
+        return loanState.loanAmount >= minimum;
+      }),
+    );
+
+    final interestRate = AppStrings.loanRates[loanState.loanDuration] ?? 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -44,7 +60,7 @@ class LoanDetailsStep extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Form(
-            key: formKey,
+            key: widget.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -75,13 +91,14 @@ class LoanDetailsStep extends StatelessWidget {
                 const SizedBox(height: 32),
                 CustomTextField(
                   label: 'HOW MUCH DO YOU NEED? ($currencyCode)',
-                  controller: loanAmountController,
+                  controller: _loanAmountController,
                   hint: '0.00',
-                  prefixIcon: const Icon(Icons.account_balance_wallet_outlined,
-                      size: 20),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: onAmountChanged,
+                  prefixIcon: const Icon(Icons.account_balance_wallet_outlined, size: 20),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (v) {
+                    final amount = double.tryParse(v) ?? 0.0;
+                    notifier.updateLoanAmount(amount);
+                  },
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Amount is required';
                     final amount = double.tryParse(v);
@@ -93,23 +110,23 @@ class LoanDetailsStep extends StatelessWidget {
                 _buildFieldLabel('LOAN PURPOSE'),
                 const SizedBox(height: 8),
                 _buildDropdown<String>(
-                  value: selectedLoanPurpose,
+                  value: loanState.loanPurpose,
                   hint: 'Select purpose',
                   items: AppStrings.loanPurposes,
-                  onChanged: onPurposeChanged,
+                  onChanged: (v) => notifier.updateLoanPurpose(v!),
                 ),
                 const SizedBox(height: 20),
                 _buildFieldLabel('REPAYMENT DURATION'),
                 const SizedBox(height: 8),
                 _buildDropdown<int>(
-                  value: selectedDuration,
+                  value: loanState.loanDuration,
                   hint: 'Select duration',
                   items: availableRates.keys.toList(),
                   itemLabelBuilder: (item) => '$item Months',
-                  onChanged: onDurationChanged,
+                  onChanged: (v) => notifier.updateLoanDuration(v!),
                 ),
                 const SizedBox(height: 32),
-                if (monthlyPayment != null) _buildSummaryCard(),
+                if (loanState.monthlyPayment != null) _buildSummaryCard(loanState, interestRate),
               ],
             ),
           ),
@@ -118,7 +135,7 @@ class LoanDetailsStep extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(LoanFormState state, double interestRate) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -137,7 +154,7 @@ class LoanDetailsStep extends StatelessWidget {
         children: [
           _buildSummaryRow(
             'Monthly Payment',
-            Formatters.currency(monthlyPayment!, countryCode),
+            Formatters.currency(state.monthlyPayment!, widget.countryCode),
             isHighlighted: true,
           ),
           const Padding(
@@ -151,15 +168,14 @@ class LoanDetailsStep extends StatelessWidget {
           const SizedBox(height: 12),
           _buildSummaryRow(
             'Total Repayment',
-            Formatters.currency(totalPayment!, countryCode),
+            Formatters.currency(state.totalPayment!, widget.countryCode),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value,
-      {bool isHighlighted = false}) {
+  Widget _buildSummaryRow(String label, String value, {bool isHighlighted = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -168,8 +184,7 @@ class LoanDetailsStep extends StatelessWidget {
           style: TextStyle(
             fontSize: isHighlighted ? 14 : 13,
             fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
-            color:
-                isHighlighted ? AppColors.textPrimary : AppColors.textSecondary,
+            color: isHighlighted ? AppColors.textPrimary : AppColors.textSecondary,
           ),
         ),
         Text(
@@ -204,7 +219,7 @@ class LoanDetailsStep extends StatelessWidget {
     String Function(T)? itemLabelBuilder,
   }) {
     return DropdownButtonFormField<T>(
-      initialValue: value,
+      value: value,
       hint: Text(hint),
       onChanged: onChanged,
       items: items.map((item) {
@@ -224,8 +239,7 @@ class LoanDetailsStep extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }

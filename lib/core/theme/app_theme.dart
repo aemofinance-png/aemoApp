@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import 'theme_extensions.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.background,
+      extensions: [
+        AppCustomColors(
+          infoBackground: AppColors.primary.withValues(alpha: 0.05),
+          infoIcon: AppColors.primary,
+          successLight: AppColors.success.withValues(alpha: 0.1),
+          errorLight: AppColors.error.withValues(alpha: 0.1),
+          pendingLight: AppColors.pending.withValues(alpha: 0.1),
+        ),
+      ],
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         primary: AppColors.primary,

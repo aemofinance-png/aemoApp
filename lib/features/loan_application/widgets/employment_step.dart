@@ -1,35 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aemo_loan_app/core/constants/app_colors.dart';
 import 'package:aemo_loan_app/core/constants/app_strings.dart';
 import 'package:aemo_loan_app/shared/widgets/custom_text_field.dart';
+import '../providers/loan_form_provider.dart';
 
-class EmploymentStep extends StatelessWidget {
+class EmploymentStep extends ConsumerStatefulWidget {
   final GlobalKey<FormState> formKey;
-  final String selectedEmploymentStatus;
-  final TextEditingController employerController;
-  final TextEditingController monthlyIncomeController;
   final String currencyCode;
-  final void Function(String?) onEmploymentStatusChanged;
 
   const EmploymentStep({
     super.key,
     required this.formKey,
-    required this.selectedEmploymentStatus,
-    required this.employerController,
-    required this.monthlyIncomeController,
     required this.currencyCode,
-    required this.onEmploymentStatusChanged,
   });
 
   @override
+  ConsumerState<EmploymentStep> createState() => _EmploymentStepState();
+}
+
+class _EmploymentStepState extends ConsumerState<EmploymentStep> {
+  late TextEditingController _employerController;
+  late TextEditingController _monthlyIncomeController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(loanFormProvider);
+    _employerController = TextEditingController(text: state.employer);
+    _monthlyIncomeController = TextEditingController(
+      text: state.monthlyIncome > 0 ? state.monthlyIncome.toString() : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _employerController.dispose();
+    _monthlyIncomeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final loanState = ref.watch(loanFormProvider);
+    final notifier = ref.read(loanFormProvider.notifier);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Form(
-            key: formKey,
+            key: widget.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,28 +83,32 @@ class EmploymentStep extends StatelessWidget {
                 _buildFieldLabel('EMPLOYMENT STATUS'),
                 const SizedBox(height: 8),
                 _buildDropdown(
-                  value: selectedEmploymentStatus,
+                  value: loanState.employmentStatus,
                   hint: 'Select status',
                   items: AppStrings.employmentStatuses,
-                  onChanged: onEmploymentStatusChanged,
+                  onChanged: (v) => notifier.updateEmploymentStatus(v!),
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   label: 'EMPLOYER NAME',
-                  controller: employerController,
+                  controller: _employerController,
                   hint: 'e.g. Global Tech Solutions',
                   prefixIcon: const Icon(Icons.business_outlined, size: 20),
+                  onChanged: (v) => notifier.updateEmployer(v),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'Employer is required' : null,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
-                  label: 'MONTHLY NET INCOME ($currencyCode)',
-                  controller: monthlyIncomeController,
+                  label: 'MONTHLY NET INCOME (${widget.currencyCode})',
+                  controller: _monthlyIncomeController,
                   hint: '0.00',
                   prefixIcon: const Icon(Icons.payments_outlined, size: 20),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (v) {
+                    final amount = double.tryParse(v) ?? 0.0;
+                    notifier.updateMonthlyIncome(amount);
+                  },
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Income is required';
                     if (double.tryParse(v) == null) return 'Invalid amount';
@@ -116,7 +142,7 @@ class EmploymentStep extends StatelessWidget {
     required void Function(String?) onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      initialValue: value,
+      value: value,
       hint: Text(hint),
       onChanged: onChanged,
       items: items.map((item) {
@@ -136,8 +162,7 @@ class EmploymentStep extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
