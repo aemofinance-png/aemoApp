@@ -44,11 +44,11 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
         final notifier = ref.read(loanFormProvider.notifier);
         notifier.updateFullName(currentUser.fullName);
         notifier.updatePhone(currentUser.phone ?? '');
-        
+
         final banks = ref.read(loanFormProvider).selectedBank;
         if (banks.isEmpty) {
           // Initialize with first bank if not set
-          // (Actual initialization logic depends on AppStrings, 
+          // (Actual initialization logic depends on AppStrings,
           // handled in Step widget for now or can be moved to Notifier build)
         }
       }
@@ -99,7 +99,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
   Future<void> _handleSubmit() async {
     if (!_validateCurrentStep()) return;
-    
+
     final formState = ref.read(loanFormProvider);
     if (formState.documents.isEmpty) {
       CustomPopup.show(
@@ -133,7 +133,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
 
     final application =
         await ref.read(loanNotifierProvider.notifier).submitApplication(
-              fullName: formState.fullName.trim(),
+              fullName: currentUser!.fullName.trim(),
               phone: formState.phone.trim(),
               employmentStatus: formState.employmentStatus,
               employer: formState.employer.trim(),
@@ -149,6 +149,7 @@ class _LoanApplicationScreenState extends ConsumerState<LoanApplicationScreen> {
     if (application != null && mounted) {
       context.go(AppRoutes.applicationSubmitted, extra: application);
     }
+    // print(currentUser?.fullName);
   }
 
   @override

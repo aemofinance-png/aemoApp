@@ -596,16 +596,16 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
         ),
         child: Row(
           children: [
-            if (app.status == LoanStatus.pending)
-              Container(
-                width: 4,
-                height: 100,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF001E40),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            // if (app.status == LoanStatus.pending)
+            Container(
+              width: 4,
+              height: 100,
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF001E40),
+                borderRadius: BorderRadius.circular(8),
               ),
+            ),
             Expanded(
               child: Column(
                 children: [
