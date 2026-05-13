@@ -318,6 +318,10 @@ class _DesktopStatusView extends StatelessWidget {
                                       _buildMainLoanInfoCard(
                                           context, countryCode),
                                       const SizedBox(height: 32),
+                                      if (application.status != LoanStatus.pending) ...[
+                                        _buildReviewCard(context),
+                                        const SizedBox(height: 32),
+                                      ],
                                       _buildDocumentsSection(context),
                                     ],
                                   ),
@@ -802,6 +806,73 @@ class _DesktopStatusView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildReviewCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'REVIEWER FEEDBACK',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              _buildSharedDataField(
+                'DECISION',
+                application.status == LoanStatus.approved
+                    ? 'Approved'
+                    : 'Rejected',
+              ),
+              const SizedBox(width: 80),
+              if (application.reviewedAt != null)
+                _buildSharedDataField(
+                  'REVIEWED ON',
+                  Formatters.date(application.reviewedAt!),
+                ),
+            ],
+          ),
+          if (application.adminNote != null &&
+              application.adminNote!.isNotEmpty) ...[
+            const SizedBox(height: 32),
+            const Divider(color: AppColors.border),
+            const SizedBox(height: 32),
+            Text(
+              'OFFICIAL NOTE',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textHint,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              application.adminNote!,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                color: AppColors.textPrimary,
+                height: 1.6,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

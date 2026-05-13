@@ -46,12 +46,99 @@ class _KycApprovalContent extends ConsumerStatefulWidget {
 }
 
 class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
+  final _kycRejectionReasonController = TextEditingController();
   // Toggle between document types if multiple exist
   int _selectedDocIndex = 0;
   bool _isApproving = false;
   bool _isDeclining = false;
 
   bool get _isUpdating => _isApproving || _isDeclining;
+
+  @override
+  void dispose() {
+    _kycRejectionReasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showKycRejectionDialog(BuildContext context, UserModel user) async {
+    _kycRejectionReasonController.clear();
+
+    return showDialog(
+      context: context,
+      barrierDismissible: !_isDeclining,
+      builder: (context) => AlertDialog(
+        title: const Text('Decline KYC'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Please provide a reason for declining this KYC submission. This will help the user correct their documents.',
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _kycRejectionReasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Enter reason (e.g. ID is blurry, Selfie mismatch)...',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.error),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final reason = _kycRejectionReasonController.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a reason')),
+                );
+                return;
+              }
+
+              Navigator.pop(context); // Close dialog
+
+              setState(() => _isDeclining = true);
+              try {
+                await ref.read(adminNotifierProvider.notifier).updateKycStatus(
+                      userId: user.id,
+                      status: VerificationStatus.unverified,
+                      kycRejectionReason: reason,
+                    );
+
+                await EmailService.sendKycRejectionEmail(
+                  toEmail: user.email,
+                  toName: user.fullName,
+                );
+
+                if (mounted) {
+                  context.go(AppRoutes.admin);
+                }
+              } finally {
+                if (mounted) {
+                  setState(() => _isDeclining = false);
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Decline'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,6 +295,39 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
                   ),
 
                   const SizedBox(height: 24),
+
+                  if (user.kycRejectionReason != null &&
+                      user.kycRejectionReason!.isNotEmpty) ...[
+                    const Text(
+                      'PREVIOUS REJECTION REASON',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.error,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.2)),
+                      ),
+                      child: Text(
+                        user.kycRejectionReason!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.error,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
 
                   // DOCUMENT PREVIEW label + doc type badge
                   Row(
@@ -394,25 +514,7 @@ class _KycApprovalContentState extends ConsumerState<_KycApprovalContent> {
               child: OutlinedButton.icon(
                 onPressed: _isUpdating
                     ? null
-                    : () async {
-                        setState(() => _isDeclining = true);
-                        try {
-                          await ref
-                              .read(adminNotifierProvider.notifier)
-                              .updateKycStatus(
-                                userId: user.id,
-                                status: VerificationStatus.unverified,
-                              );
-
-                          await EmailService.sendKycRejectionEmail(
-                            toEmail: user.email,
-                            toName: user.fullName,
-                          );
-                          if (context.mounted) context.go(AppRoutes.admin);
-                        } finally {
-                          if (mounted) setState(() => _isDeclining = false);
-                        }
-                      },
+                    : () => _showKycRejectionDialog(context, user),
                 icon: _isDeclining
                     ? const SizedBox(
                         width: 18,

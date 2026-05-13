@@ -496,9 +496,14 @@ class _DesktopProfileView extends StatelessWidget {
                             : user.verificationStatus ==
                                     VerificationStatus.pending
                                 ? 'Verification pending'
-                                : 'Not yet verified',
+                                : user.kycRejectionReason != null
+                                    ? 'Declined: ${user.kycRejectionReason}'
+                                    : 'Not yet verified',
                         style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13, color: AppColors.textSecondary),
+                            fontSize: 13,
+                            color: user.kycRejectionReason != null
+                                ? AppColors.error
+                                : AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -507,9 +512,11 @@ class _DesktopProfileView extends StatelessWidget {
                   onPressed: () =>
                       user.verificationStatus != VerificationStatus.verified
                           ? context.go(AppRoutes.kyc)
-                          : context.go(AppRoutes.kycStatus),
+                          : context.go('${AppRoutes.kycStatus}/${user.id}'),
                   child: Text(
-                    'VIEW CERTIFICATE',
+                    user.kycRejectionReason != null
+                        ? 'RE-SUBMIT KYC'
+                        : 'VIEW CERTIFICATE',
                     style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -1034,11 +1041,15 @@ class _MobileProfileView extends StatelessWidget {
                               : user.verificationStatus ==
                                       VerificationStatus.pending
                                   ? 'Pending — tap to check status'
-                                  : 'Not verified — tap to start KYC',
+                                  : user.kycRejectionReason != null
+                                      ? 'Declined: ${user.kycRejectionReason}'
+                                      : 'Not verified — tap to start KYC',
                           style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: _kycStatusColor(user.verificationStatus)),
+                              color: user.kycRejectionReason != null
+                                  ? AppColors.error
+                                  : _kycStatusColor(user.verificationStatus)),
                         ),
                       ],
                     ),

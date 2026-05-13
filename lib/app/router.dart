@@ -28,6 +28,9 @@ import '../features/admin/screens/admin_user_profile.dart';
 import '../features/admin/screens/admin_kyc_screen.dart';
 import '../data/models/loan_application_model.dart';
 import '../features/admin/screens/admin_detail_screen.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'router.g.dart';
 
 class AppRoutes {
   static const String home = '/home';
@@ -55,7 +58,8 @@ class AppRoutes {
 // In routes list:
 }
 
-final routerProvider = Provider<GoRouter>((ref) {
+@riverpod
+GoRouter router(RouterRef ref) {
   final authState = ref.watch(authStateProvider);
   final currentUser = ref.watch(currentUserProvider).value;
 
@@ -242,4 +246,4 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
-});
+}

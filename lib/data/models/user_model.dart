@@ -57,6 +57,7 @@ class UserModel extends Equatable {
   final String role;
   final DateTime createdAt;
   final VerificationStatus verificationStatus;
+  final String? kycRejectionReason;
   final String? idDocumentUrl;
   final String? selfieUrl;
   final List<BankAccount> bankAccounts;
@@ -75,6 +76,7 @@ class UserModel extends Equatable {
     required this.role,
     required this.createdAt,
     this.verificationStatus = VerificationStatus.unverified,
+    this.kycRejectionReason,
     this.idDocumentUrl,
     this.selfieUrl,
     this.bankAccounts = const [],
@@ -93,6 +95,7 @@ class UserModel extends Equatable {
       countryCode: map['countryCode'] ?? '',
       idDocumentUrl: map['idDocumentUrl'] as String?,
       selfieUrl: map['selfieUrl'] as String?,
+      kycRejectionReason: map['kycRejectionReason'] as String?,
       countryName: map['countryName'] as String? ?? 'Unknown',
       role: map['role'] ?? 'user',
       createdAt: DateTime.parse(map['createdAt']),
@@ -120,6 +123,7 @@ class UserModel extends Equatable {
       'postalCode': postalCode,
       'role': role,
       'verificationStatus': verificationStatus.name,
+      'kycRejectionReason': kycRejectionReason,
       'createdAt': createdAt.toIso8601String(),
       'idDocumentUrl': idDocumentUrl, // add this
       'selfieUrl': selfieUrl,
@@ -129,6 +133,7 @@ class UserModel extends Equatable {
 
   UserModel copyWith({
     VerificationStatus? verificationStatus,
+    String? kycRejectionReason,
     List<BankAccount>? bankAccounts,
     String? idDocumentUrl,
     String? selfieUrl,
@@ -149,6 +154,7 @@ class UserModel extends Equatable {
     return UserModel(
       bankAccounts: bankAccounts ?? this.bankAccounts,
       verificationStatus: verificationStatus ?? this.verificationStatus,
+      kycRejectionReason: kycRejectionReason ?? this.kycRejectionReason,
       id: id ?? this.id,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
@@ -181,5 +187,7 @@ class UserModel extends Equatable {
         postalCode,
         role,
         createdAt,
+        verificationStatus,
+        kycRejectionReason,
       ];
 }

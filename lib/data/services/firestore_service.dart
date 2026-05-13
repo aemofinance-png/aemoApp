@@ -4,7 +4,9 @@ import '../models/user_model.dart';
 import '../models/loan_application_model.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  FirestoreService(this._firestore);
 
   // Collection references
   CollectionReference get _users => _firestore.collection('users');
@@ -86,9 +88,11 @@ class FirestoreService {
   }
 
   Future<void> updateVerificationStatus(
-      String userId, VerificationStatus status) async {
+      String userId, VerificationStatus status,
+      {String? rejectionReason}) async {
     await _firestore.collection('users').doc(userId).update({
       'verificationStatus': status.name,
+      'kycRejectionReason': rejectionReason,
     });
   }
 

@@ -80,10 +80,15 @@ class AdminNotifier extends StateNotifier<AdminState> {
   Future<void> updateKycStatus({
     required String userId,
     required VerificationStatus status,
+    String? kycRejectionReason,
   }) async {
     state = state.copyWith(isLoading: true);
     try {
-      await _firestoreService.updateVerificationStatus(userId, status);
+      await _firestoreService.updateVerificationStatus(
+        userId,
+        status,
+        rejectionReason: kycRejectionReason,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     } finally {

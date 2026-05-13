@@ -84,61 +84,97 @@ class _BankAndDocumentsStepState extends ConsumerState<BankAndDocumentsStep> {
                 if (widget.currentUser?.bankAccounts.isNotEmpty ?? false) ...[
                   _buildFieldLabel('SAVED ACCOUNTS'),
                   const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      children: widget.currentUser!.bankAccounts.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final account = entry.value;
-                        final isLast = index == widget.currentUser!.bankAccounts.length - 1;
-                        return Column(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                notifier.updateBank(account.bankName);
-                                notifier.updateAccountNumber(account.accountNumber);
-                                _accountNumberController.text = account.accountNumber;
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.account_balance, color: AppColors.primary),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            account.bankName,
-                                            style: const TextStyle(fontWeight: FontWeight.w600),
-                                          ),
-                                          Text(
-                                            account.accountNumber,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: AppColors.textSecondary,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                  Column(
+                    children: widget.currentUser!.bankAccounts.map((account) {
+                      final isSelected = loanState.selectedBank == account.bankName && 
+                                        loanState.accountNumber == account.accountNumber;
+                                        
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: isSelected 
+                                ? AppColors.primary.withValues(alpha: 0.04) 
+                                : AppColors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary : AppColors.border,
+                              width: isSelected ? 2 : 1,
+                            ),
+                            boxShadow: isSelected ? [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              )
+                            ] : null,
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              notifier.updateBank(account.bankName);
+                              notifier.updateAccountNumber(account.accountNumber);
+                              _accountNumberController.text = account.accountNumber;
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: isSelected 
+                                          ? AppColors.primary.withValues(alpha: 0.1)
+                                          : AppColors.background,
+                                      shape: BoxShape.circle,
                                     ),
-                                    const Icon(Icons.chevron_right, color: AppColors.border),
-                                  ],
-                                ),
+                                    child: Icon(
+                                      Icons.account_balance, 
+                                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          account.bankName,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15,
+                                            color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          account.accountNumber,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: isSelected 
+                                                ? AppColors.primary.withValues(alpha: 0.7) 
+                                                : AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    const Icon(Icons.check_circle, color: AppColors.primary, size: 24)
+                                  else
+                                    const Icon(Icons.radio_button_unchecked, color: AppColors.border, size: 24),
+                                ],
                               ),
                             ),
-                            if (!isLast) const Divider(height: 1),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                 ],
 
                 _buildFieldLabel('ADD NEW ACCOUNT'),
@@ -183,27 +219,45 @@ class _BankAndDocumentsStepState extends ConsumerState<BankAndDocumentsStep> {
              if (file != null) notifier.addDocument(file);
           },
           child: Container(
-            padding: const EdgeInsets.all(24),
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: AppColors.primary.withValues(alpha: 0.2),
                 style: BorderStyle.solid,
               ),
             ),
             child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.cloud_upload_outlined, color: AppColors.primary, size: 32),
-                SizedBox(height: 12),
+                Icon(Icons.cloud_upload_outlined, color: AppColors.primary, size: 40),
+                SizedBox(height: 16),
                 Text(
                   'Upload ID, Paystub or Utility Bill',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700, 
+                    color: AppColors.primary
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'You can upload multiple files (JPG, PNG, PDF)',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13, 
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'JPG, PNG or PDF (Max 5MB)',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  'Maximum size: 5MB per file',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: AppColors.textHint),
                 ),
               ],
             ),

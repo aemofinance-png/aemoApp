@@ -32,16 +32,121 @@ class AdminDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
+  final _rejectionReasonController = TextEditingController();
   bool _isApproving = false;
   bool _isRejecting = false;
   bool _isDeleting = false;
 
   bool get _isActionLoading => _isApproving || _isRejecting || _isDeleting;
+
+  @override
+  void dispose() {
+    _rejectionReasonController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(
       () => ref.read(adminNotifierProvider.notifier).fetchAllApplications(),
+    );
+  }
+
+  Future<void> _showRejectionDialog(
+    BuildContext context,
+    LoanApplicationModel app,
+    UserModel applicant,
+  ) async {
+    _rejectionReasonController.clear();
+
+    return showDialog(
+      context: context,
+      barrierDismissible: !_isRejecting,
+      builder: (context) => AlertDialog(
+        title: const Text('Reject Application'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Please provide a reason for rejecting this application. This will be visible to the user.',
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _rejectionReasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Enter rejection reason...',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.error),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final reason = _rejectionReasonController.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a reason')),
+                );
+                return;
+              }
+
+              Navigator.pop(context); // Close dialog
+
+              setState(() => _isRejecting = true);
+              try {
+                final rejected = await ref
+                    .read(adminNotifierProvider.notifier)
+                    .rejectApplication(
+                      applicationId: app.id,
+                      adminNote: reason,
+                    );
+
+                if (!rejected) return;
+
+                await EmailService.sendRejectionEmail(
+                  duration: app.loanDuration,
+                  repayment: Formatters.currency(
+                    _calculateMonthlyRepayment(app),
+                    applicant.countryCode,
+                  ),
+                  toEmail: applicant.email,
+                  toName: applicant.fullName,
+                  loanAmount: Formatters.currency(
+                    app.loanAmount,
+                    applicant.countryCode,
+                  ),
+                  referenceNo: app.id,
+                );
+
+                if (mounted) {
+                  context.go(AppRoutes.admin);
+                }
+              } finally {
+                if (mounted) {
+                  setState(() => _isRejecting = false);
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Reject'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -125,34 +230,7 @@ class _AdminDetailScreenState extends ConsumerState<AdminDetailScreen> {
           Expanded(
             child: ElevatedButton(
               onPressed: app.status == LoanStatus.pending && !_isActionLoading
-                  ? () async {
-                      setState(() => _isRejecting = true);
-                      try {
-                        final rejected = await ref
-                            .read(adminNotifierProvider.notifier)
-                            .rejectApplication(applicationId: app.id);
-                        if (!rejected) return;
-                        await EmailService.sendRejectionEmail(
-                          duration: app.loanDuration,
-                          repayment: Formatters.currency(
-                              _calculateMonthlyRepayment(app),
-                              user.countryCode),
-                          toEmail: applicant?.email ?? '',
-                          toName: applicant!.fullName,
-                          loanAmount: Formatters.currency(
-                              app.loanAmount, user.countryCode),
-                          referenceNo: app.id,
-                          // date: app.createdAt);
-                        );
-                        if (context.mounted) {
-                          context.go(AppRoutes.admin);
-                        }
-                      } finally {
-                        if (mounted) {
-                          setState(() => _isRejecting = false);
-                        }
-                      }
-                    }
+                  ? () => _showRejectionDialog(context, app, applicant!)
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,

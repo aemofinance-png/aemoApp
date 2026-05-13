@@ -2,7 +2,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseStorage _storage;
+
+  StorageService(this._storage);
 
   // Pick a file from device
   Future<PlatformFile?> pickFile() async {
