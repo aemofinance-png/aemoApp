@@ -28,6 +28,9 @@ class URL {
   static void revokeObjectURL(String url) {}
 }
 
+String createBlobUrl(List<int> bytes) => '';
+void revokeBlobUrl(String url) {}
+
 class Blob {
   Blob(dynamic parts, [dynamic options]);
 }

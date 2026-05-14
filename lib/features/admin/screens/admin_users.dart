@@ -269,20 +269,6 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             onPressed:
                 _isLoggingOut ? null : () => ref.invalidate(allUsersProvider),
           ),
-          const SizedBox(width: 8),
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-              image: const DecorationImage(
-                image: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBUmfAuZIfZTpsWDpOf6631nQzI2H5EdMTF8EXGzbhHNbwDSkpL0WIG1A9jCRr7um99F42GdX1AM5tStvCj8oD6AqwkUfJI4Z0ZmM8dCNO7zaOURKd8dnKTsxImB0Mh_QEi8RY0D-JdsfzABo1yPBt7Sdql46H1RiMfeOl5tdLbEazRgs6BehoRgutuen3uLke9ZB80nZwRDelgUDLdQSC8rZ8UYTjM2kEe_Gi4I8uXb7xgV_vOhUS4ceLKEtgKKwk00LXp4h6zmYMn'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           if (showLogo) ...[
             const SizedBox(width: 8),
             IconButton(

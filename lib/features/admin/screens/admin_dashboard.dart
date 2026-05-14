@@ -277,19 +277,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
             ),
             const SizedBox(width: 12),
           ],
-          Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryLight,
-              image: DecorationImage(
-                image: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDIDOdrZZ0PfNtfEq5E0gWtpAQY4CZh4v3RN5pE8X6aMNzdBvohTTHgvhWTLQRYGBkXCwSCDj6uEGjKqAotrVWWX-CXd-MVQ409twRnThfdDjNzgH3oXa_nYdFSSFoqc-ILBDp_L1fDbpcq3-Q5lw4zVlxuxUPpcjV63bMvcDqseD_0u7enU08KHF3QxHXjcDtIUFjSfUYtET2LLLLb3Lca3PekdsC05nuY9VwDPgHnW8nqID_ZkJbxi_5fYVYLHkPMSgbB3VsyjOxV'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+         
           if (showLogo) ...[
             const SizedBox(width: 8),
             IconButton(

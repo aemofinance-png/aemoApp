@@ -1,66 +1,124 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:http/http.dart' as http;
-import 'package:web/web.dart' as web;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:simple_file_saver/simple_file_saver.dart';
 
 class DocumentViewerScreen extends StatefulWidget {
-  final String imageUrl;
+  final String? imageUrl;
+  final Uint8List? bytes;
   final String title;
-  // final bool isPdf;
 
   const DocumentViewerScreen({
     super.key,
-    required this.imageUrl,
+    this.imageUrl,
+    this.bytes,
     required this.title,
-    // this.isPdf = false
-  });
+  }) : assert(imageUrl != null || bytes != null);
 
   @override
   State<DocumentViewerScreen> createState() => _DocumentViewerScreenState();
 }
 
 class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
-  // bool get _isPdf =>
-  //     widget.imageUrl.toLowerCase().contains('.pdf') ||
-  //     widget.imageUrl.toLowerCase().contains('application/pdf');
-
-  // PDF state
   PdfController? _pdfController;
-  String? _localPdfPath;
-  bool _isLoadingPdf = true;
-  String? _pdfError;
-  final int _totalPages = 0;
-  final int _currentPage = 0;
+  bool _isLoading = true;
+  String? _error;
   bool _isPdf = false;
+  Uint8List? _documentBytes;
+  bool _isDownloading = false;
+
   @override
   void initState() {
     super.initState();
-    _downloadPdf();
+    _initViewer();
   }
 
-  Future<void> _downloadPdf() async {
+  Future<void> _initViewer() async {
     try {
-      final response = await http.get(Uri.parse(widget.imageUrl));
-      final contentType = response.headers['content-type'] ?? '';
-      final isPdf = contentType.contains('application/pdf');
-
-      if (!isPdf) {
+      if (widget.bytes != null) {
+        _documentBytes = widget.bytes;
+        _pdfController = PdfController(
+          document: PdfDocument.openData(_documentBytes!),
+        );
         setState(() {
-          _isPdf = false;
-          _isLoadingPdf = false;
+          _isPdf = true;
+          _isLoading = false;
         });
         return;
       }
 
-      // Open PDF in a new browser tab using dart:html
-      web.window.open(widget.imageUrl, '_blank', '');
+      if (widget.imageUrl != null) {
+        final response = await http.get(Uri.parse(widget.imageUrl!));
+        _documentBytes = response.bodyBytes;
+        final contentType = response.headers['content-type'] ?? '';
+        final isPdf = contentType.contains('application/pdf') || 
+                      widget.imageUrl!.toLowerCase().contains('.pdf');
 
-      if (mounted) Navigator.pop(context);
+        if (isPdf) {
+          _pdfController = PdfController(
+            document: PdfDocument.openData(_documentBytes!),
+          );
+          setState(() {
+            _isPdf = true;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isPdf = false;
+            _isLoading = false;
+          });
+        }
+      }
     } catch (e) {
       setState(() {
-        _pdfError = 'Error: $e';
-        _isLoadingPdf = false;
+        _error = 'Error loading document: $e';
+        _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _downloadFile() async {
+    if (_documentBytes == null) return;
+
+    if (kIsWeb) {
+      if (widget.imageUrl != null) {
+        await launchUrl(Uri.parse(widget.imageUrl!), mode: LaunchMode.externalApplication);
+      }
+      return;
+    }
+
+    setState(() => _isDownloading = true);
+    try {
+      final basename = widget.title.replaceAll(' ', '_');
+      final extension = _isPdf ? 'pdf' : 'jpg';
+      
+      final result = await SimpleFileSaver.saveFile(
+        fileInfo: FileSaveInfo.fromBytes(
+          bytes: _documentBytes!,
+          basename: basename,
+          extension: extension,
+        ),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Saved: $result')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save file: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isDownloading = false);
     }
   }
 
@@ -76,21 +134,29 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          if (_isPdf && _totalPages > 0)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Text(
-                '${_currentPage + 1} / $_totalPages',
-                style: const TextStyle(fontSize: 14),
-              ),
+          if (!_isLoading && _documentBytes != null)
+            _isDownloading 
+              ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))))
+              : IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: _downloadFile,
+                  tooltip: 'Download Document',
+                ),
+          if (_isPdf && widget.imageUrl != null)
+            IconButton(
+              icon: const Icon(Icons.open_in_new),
+              onPressed: () => launchUrl(Uri.parse(widget.imageUrl!), mode: LaunchMode.externalApplication),
+              tooltip: 'Open in Browser',
             ),
         ],
       ),
-      body: _isLoadingPdf
+      body: _isLoading
           ? _buildLoading()
-          : _isPdf
-              ? _buildPdfViewer()
-              : _buildImageViewer(),
+          : _error != null
+              ? Center(child: Text(_error!))
+              : _isPdf
+                  ? _buildPdfViewer()
+                  : _buildImageViewer(),
     );
   }
 
@@ -109,7 +175,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
 
   Widget _buildImageViewer() {
     return PhotoView(
-      imageProvider: NetworkImage(widget.imageUrl),
+      imageProvider: widget.bytes != null ? MemoryImage(widget.bytes!) : NetworkImage(widget.imageUrl!) as ImageProvider,
       loadingBuilder: (context, event) => const Center(
         child: CircularProgressIndicator(),
       ),
@@ -120,13 +186,16 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   }
 
   Widget _buildPdfViewer() {
-    if (_isLoadingPdf) return _buildLoading();
-    if (_pdfError != null || _pdfController == null) {
-      return Center(child: Text(_pdfError ?? 'Failed to load PDF'));
-    }
-
+    if (_pdfController == null) return const Center(child: Text('Failed to load PDF'));
+    
+    // PdfView uses a PageView internally. For a scrollable list of all pages, 
+    // we can use PdfViewBuilders or just trust the PdfView's swipe behavior 
+    // and ensure it's not restricted. The user mentioned it only shows the first page.
+    // Actually, PdfView should allow swiping. If they want a vertical scrollable list:
+    
     return PdfView(
       controller: _pdfController!,
+      scrollDirection: Axis.vertical,
     );
   }
 }

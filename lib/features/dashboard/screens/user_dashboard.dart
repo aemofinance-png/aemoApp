@@ -256,65 +256,38 @@ class _DesktopDashboard extends StatelessWidget {
   }
 
   Widget _buildTopNavBar(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
-        border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 12),
-          Text(
-            currentUser?.fullName ?? '',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            onPressed: () => context.go(AppRoutes.withdrawals),
-          ),
-          const SizedBox(width: 16),
-          GestureDetector(
-            onTap: () => context.go(AppRoutes.profile),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
-                image: currentUser?.selfieUrl != null &&
-                        currentUser!.selfieUrl!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(currentUser!.selfieUrl!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 12),
+            Text(
+              'Aemo Dashboard',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
-              child: currentUser?.selfieUrl == null ||
-                      currentUser!.selfieUrl!.isEmpty
-                  ? Center(
-                      child: Text(
-                        currentUser?.fullName.isNotEmpty ?? false
-                            ? currentUser!.fullName[0]
-                            : '?',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  : null,
             ),
-          ),
-        ],
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.notifications_none_rounded),
+              onPressed: () {},
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              onPressed: () => context.go(AppRoutes.withdrawals),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -782,50 +755,35 @@ class _MobileDashboard extends StatelessWidget {
   }
 
   Widget _buildNavbar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-      decoration: const BoxDecoration(
-          color: AppColors.white,
-          border: Border(bottom: BorderSide(color: AppColors.border))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Builder(
-                  builder: (context) => IconButton(
-                      icon: const Icon(Icons.menu),
-                      onPressed: () => Scaffold.of(context).openDrawer())),
-              const SizedBox(width: 10),
-              Text(currentUser?.fullName ?? '',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold)),
-            ],
-          ),
-          GestureDetector(
-            onTap: () => context.push(AppRoutes.profile),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.primaryLight,
-              backgroundImage: currentUser?.selfieUrl != null &&
-                      currentUser!.selfieUrl!.isNotEmpty
-                  ? NetworkImage(currentUser!.selfieUrl!)
-                  : null,
-              child: currentUser?.selfieUrl == null ||
-                      currentUser!.selfieUrl!.isEmpty
-                  ? Text(
-                      currentUser?.fullName.isNotEmpty ?? false
-                          ? currentUser!.fullName[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary))
-                  : null,
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: const BoxDecoration(
+            color: AppColors.white,
+            border: Border(bottom: BorderSide(color: AppColors.border))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Builder(
+                    builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () => Scaffold.of(context).openDrawer())),
+                const SizedBox(width: 8),
+                Text('Dashboard',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold)),
+              ],
             ),
-          ),
-        ],
+            IconButton(
+              icon: const Icon(Icons.person_outline_rounded),
+              onPressed: () => context.push(AppRoutes.profile),
+            ),
+          ],
+        ),
       ),
     );
   }

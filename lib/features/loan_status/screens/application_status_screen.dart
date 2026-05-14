@@ -16,8 +16,9 @@ import 'dart:math';
 import '../../admin/screens/document_viewer_screen.dart';
 import 'package:aemo_loan_app/core/utils/stub_web.dart' if (dart.library.js_interop) 'package:aemo_loan_app/core/utils/platform_web.dart' as web;
 import 'dart:convert';
-import 'dart:js_interop';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 
 class ApplicationStatusScreen extends ConsumerStatefulWidget {
   final String applicationId;
@@ -36,6 +37,7 @@ class _ApplicationStatusScreenState
     extends ConsumerState<ApplicationStatusScreen> {
   bool _isPreGenerating = false;
   String? _preGeneratedUrl;
+  Uint8List? _agreementBytes;
   bool _userWaitingForAgreement = false;
   final bool _isLoading2 = false;
 
@@ -143,12 +145,32 @@ class _ApplicationStatusScreenState
     LoanApplicationModel application,
     UserModel? currentUser,
   ) {
-    if (_preGeneratedUrl != null) {
-      web.window.open(_preGeneratedUrl!, '_blank', '');
+    if (_agreementBytes != null || _preGeneratedUrl != null) {
+      _viewAgreement(context);
     } else {
       setState(() => _userWaitingForAgreement = true);
       if (!_isPreGenerating && currentUser != null) {
         _startAgreementGeneration(application, currentUser);
+      }
+    }
+  }
+
+  void _viewAgreement(BuildContext context) {
+    if (kIsWeb) {
+      if (_preGeneratedUrl != null) {
+        web.window.open(_preGeneratedUrl!, '_blank', '');
+      }
+    } else {
+      if (_agreementBytes != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DocumentViewerScreen(
+              bytes: _agreementBytes,
+              title: 'Loan Agreement',
+            ),
+          ),
+        );
       }
     }
   }
@@ -207,17 +229,18 @@ class _ApplicationStatusScreenState
       );
 
       if (response.statusCode == 200) {
-        final blob = web.Blob([response.bodyBytes.toJS].toJS);
-        final url = web.URL.createObjectURL(blob);
+        final url = web.createBlobUrl(response.bodyBytes);
+        final bytes = response.bodyBytes;
 
         if (mounted) {
           setState(() {
             _preGeneratedUrl = url;
+            _agreementBytes = bytes;
             _isPreGenerating = false;
           });
 
           if (_userWaitingForAgreement) {
-            web.window.open(url, '_blank', '');
+            _viewAgreement(context);
             setState(() => _userWaitingForAgreement = false);
           }
         }
@@ -431,50 +454,38 @@ class _DesktopStatusView extends StatelessWidget {
   }
 
   Widget _buildTopNavBar(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
-        border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: () => context.go(AppRoutes.profile),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
-                image: currentUser?.selfieUrl != null &&
-                        currentUser!.selfieUrl!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(currentUser!.selfieUrl!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
-              child: currentUser?.selfieUrl == null ||
-                      currentUser!.selfieUrl!.isEmpty
-                  ? Center(
-                      child: Text(
-                        currentUser?.fullName.isNotEmpty ?? false
-                            ? currentUser!.fullName[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  : null,
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary),
+              onPressed: () => Scaffold.of(context).openDrawer(),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Text(
+              'Application Status',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+              ),
+            ),
+            const Spacer(),
+            // Only show one profile entry point
+            IconButton(
+              icon: const Icon(Icons.person_outline_rounded, color: AppColors.textPrimary),
+              onPressed: () => context.go(AppRoutes.profile),
+            ),
+          ],
+        ),
       ),
     );
   }

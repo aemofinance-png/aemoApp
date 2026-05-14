@@ -67,6 +67,20 @@ class AdminNotifier extends StateNotifier<AdminState> {
     );
   }
 
+  Future<void> updateWithdrawalStatus({
+    required String withdrawalId,
+    required WithdrawalStatus status,
+  }) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await _firestoreService.updateWithdrawalStatus(withdrawalId, status);
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
   Future<void> deleteUserBankAccount({
     required String userId,
     required String bankAccountId,
