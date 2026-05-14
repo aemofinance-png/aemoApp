@@ -28,7 +28,7 @@ class URL {
   static void revokeObjectURL(String url) {}
 }
 
-String createBlobUrl(List<int> bytes) => '';
+String createBlobUrl(List<int> bytes, {String type = 'application/octet-stream'}) => '';
 void revokeBlobUrl(String url) {}
 
 class Blob {

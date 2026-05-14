@@ -229,7 +229,7 @@ class _ApplicationStatusScreenState
       );
 
       if (response.statusCode == 200) {
-        final url = web.createBlobUrl(response.bodyBytes);
+        final url = web.createBlobUrl(response.bodyBytes, type: 'application/pdf');
         final bytes = response.bodyBytes;
 
         if (mounted) {

@@ -58411,7 +58411,7 @@ return A.w(A.aZO(e,B.cu.yg(A.ax(["clientName",a8.b,"loanAmount",a7.x,"annualRate
 case 7:i=b0
 if(i.b===200){a3=A.a([new Uint8Array(A.j6(i.w))],t.vs)
 e=v.G
-a4=new e.Blob(a3)
+a4=new e.Blob(a3,{type:"application/pdf"})
 h=e.URL.createObjectURL(a4)
 g=i.w
 if(n.c!=null){n.I(new A.aHh(n,h,g))
