@@ -17,17 +17,20 @@ class StepAgreementUpload extends ConsumerWidget {
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
         withData: true,
+        allowMultiple: true,
       );
 
       if (result == null || result.files.isEmpty) return;
       try {
-        await notifier.uploadDocument(result.files.first);
+        for (final file in result.files) {
+          await notifier.uploadDocument(file);
+        }
       } catch (e) {
         if (context.mounted) {
           CustomPopup.show(
             context,
             title: 'Upload Failed',
-            message: 'Upload failed: $e',
+            message: 'One or more uploads failed: $e',
             isWarning: true,
           );
         }
@@ -49,7 +52,7 @@ class StepAgreementUpload extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         const Text(
-          'To ensure regulatory compliance and secure your funds, please review and upload your signed withdrawal agreement.',
+          'To ensure regulatory compliance and secure your funds, please review and upload your signed withdrawal agreement. You can upload multiple documents if necessary.',
           style: TextStyle(
             fontSize: 14,
             color: Color(0xFF64748B),
@@ -71,7 +74,7 @@ class StepAgreementUpload extends ConsumerWidget {
               SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'LOAN_AGREEMENT.PDF',
+                  'WITHDRAWAL_AGREEMENT.PDF',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -83,29 +86,58 @@ class StepAgreementUpload extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: Column(
-            children: List.generate(
-              4,
-              (i) => Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                height: 10,
-                width: i == 3 ? 140 : double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
+        if (state.uploadedDocuments.isNotEmpty) ...[
+          const Text(
+            'Uploaded Documents',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF0D1B3E),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          ...state.uploadedDocuments.asMap().entries.map((entry) {
+            final index = entry.key;
+            final file = entry.value;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle,
+                      color: Color(0xFF16A34A), size: 18),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      file.name,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF0D1B3E),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close,
+                        color: Color(0xFF94A3B8), size: 18),
+                    onPressed: () => notifier.removeDocument(index),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 16),
+        ],
         GestureDetector(
           onTap: state.isUploading ? null : pickFile,
           child: Container(
@@ -136,22 +168,15 @@ class StepAgreementUpload extends ConsumerWidget {
                   Text(
                     state.isUploading
                         ? 'Uploading...'
-                        : state.uploadedDocument != null
-                            ? state.uploadedDocument!.name
-                            : 'Upload Signed Copy',
-                    style: TextStyle(
+                        : state.uploadedDocuments.isEmpty
+                            ? 'Upload Signed Copy'
+                            : 'Upload More Documents',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: state.uploadedDocument != null
-                          ? const Color(0xFF16A34A)
-                          : const Color(0xFF0D1B3E),
+                      color: Color(0xFF0D1B3E),
                     ),
                   ),
-                  if (state.uploadedDocument != null) ...[
-                    const SizedBox(width: 8),
-                    const Icon(Icons.check_circle,
-                        color: Color(0xFF16A34A), size: 16),
-                  ],
                 ],
               ),
             ),

@@ -11,7 +11,7 @@ class WithdrawalModel {
   final double amount;
   final String bankName;
   final String accountNumber;
-  final String? documentUrl;
+  final List<String> documentUrls;
   final WithdrawalStatus status;
   final DateTime createdAt;
   final DateTime? completedAt;
@@ -25,7 +25,7 @@ class WithdrawalModel {
     required this.amount,
     required this.bankName,
     required this.accountNumber,
-    this.documentUrl,
+    this.documentUrls = const [],
     this.status = WithdrawalStatus.pending,
     required this.createdAt,
     this.completedAt,
@@ -41,7 +41,7 @@ class WithdrawalModel {
       amount: (map['amount'] as num).toDouble(),
       bankName: map['bankName'] ?? '',
       accountNumber: map['accountNumber'] ?? '',
-      documentUrl: map['documentUrl'],
+      documentUrls: List<String>.from(map['documentUrls'] ?? []),
       status: WithdrawalStatus.values.firstWhere(
         (e) => e.name == map['status'],
         orElse: () => WithdrawalStatus.pending,
@@ -62,7 +62,7 @@ class WithdrawalModel {
       'amount': amount,
       'bankName': bankName,
       'accountNumber': accountNumber,
-      'documentUrl': documentUrl,
+      'documentUrls': documentUrls,
       'status': status.name,
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),

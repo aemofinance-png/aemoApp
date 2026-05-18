@@ -10,7 +10,9 @@ import '../../../data/providers/service_providers.dart';
 import '../../../app/router.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../shared/widgets/skeleton.dart';
-import 'package:aemo_loan_app/core/utils/stub_web.dart' if (dart.library.js_interop) 'package:aemo_loan_app/core/utils/platform_web.dart' as web;
+import 'package:aemo_loan_app/core/utils/stub_web.dart'
+    if (dart.library.js_interop) 'package:aemo_loan_app/core/utils/platform_web.dart'
+    as web;
 
 class AdminWithdrawalsScreen extends ConsumerStatefulWidget {
   const AdminWithdrawalsScreen({super.key});
@@ -606,13 +608,25 @@ class _AdminWithdrawalsScreenState
                     fontWeight: FontWeight.w600),
               ),
               const Spacer(),
-              if (w.documentUrl != null && w.documentUrl!.isNotEmpty)
-                _buildSmallActionBtn(
-                  'View Agreement',
-                  Icons.description_rounded,
-                  onTap: () {
-                    web.window.open(w.documentUrl!, '_blank', '');
-                  },
+              if (w.documentUrls.isNotEmpty)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: w.documentUrls.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final url = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: _buildSmallActionBtn(
+                        w.documentUrls.length > 1
+                            ? 'Doc ${index + 1}'
+                            : 'View Agreement',
+                        Icons.description_rounded,
+                        onTap: () {
+                          web.window.open(url, '_blank', '');
+                        },
+                      ),
+                    );
+                  }).toList(),
                 )
               else
                 Container(

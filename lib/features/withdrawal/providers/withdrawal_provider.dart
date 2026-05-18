@@ -11,9 +11,9 @@ part 'withdrawal_provider.g.dart';
 class WithdrawalState {
   final int currentStep;
   final BankAccount? selectedAccount;
-  final PlatformFile? uploadedDocument;
+  final List<PlatformFile> uploadedDocuments;
   final bool isUploading;
-  final String? uploadedUrl;
+  final List<String> uploadedUrls;
   final LoanApplicationModel? application;
   final bool isLoadingApplication;
   final bool isSubmittingWithdrawal;
@@ -21,9 +21,9 @@ class WithdrawalState {
   WithdrawalState({
     this.currentStep = 0,
     this.selectedAccount,
-    this.uploadedDocument,
+    this.uploadedDocuments = const [],
     this.isUploading = false,
-    this.uploadedUrl,
+    this.uploadedUrls = const [],
     this.application,
     this.isLoadingApplication = false,
     this.isSubmittingWithdrawal = false,
@@ -32,9 +32,9 @@ class WithdrawalState {
   WithdrawalState copyWith({
     int? currentStep,
     BankAccount? selectedAccount,
-    PlatformFile? uploadedDocument,
+    List<PlatformFile>? uploadedDocuments,
     bool? isUploading,
-    String? uploadedUrl,
+    List<String>? uploadedUrls,
     LoanApplicationModel? application,
     bool? isLoadingApplication,
     bool? isSubmittingWithdrawal,
@@ -42,9 +42,9 @@ class WithdrawalState {
     return WithdrawalState(
       currentStep: currentStep ?? this.currentStep,
       selectedAccount: selectedAccount ?? this.selectedAccount,
-      uploadedDocument: uploadedDocument ?? this.uploadedDocument,
+      uploadedDocuments: uploadedDocuments ?? this.uploadedDocuments,
       isUploading: isUploading ?? this.isUploading,
-      uploadedUrl: uploadedUrl ?? this.uploadedUrl,
+      uploadedUrls: uploadedUrls ?? this.uploadedUrls,
       application: application ?? this.application,
       isLoadingApplication: isLoadingApplication ?? this.isLoadingApplication,
       isSubmittingWithdrawal:
@@ -123,14 +123,22 @@ class Withdrawal extends _$Withdrawal {
       final url = await storageRef.getDownloadURL();
 
       state = state.copyWith(
-        uploadedDocument: file,
-        uploadedUrl: url,
+        uploadedDocuments: [...state.uploadedDocuments, file],
+        uploadedUrls: [...state.uploadedUrls, url],
         isUploading: false,
       );
     } catch (e) {
       state = state.copyWith(isUploading: false);
       rethrow;
     }
+  }
+
+  void removeDocument(int index) {
+    final docs = [...state.uploadedDocuments];
+    final urls = [...state.uploadedUrls];
+    docs.removeAt(index);
+    urls.removeAt(index);
+    state = state.copyWith(uploadedDocuments: docs, uploadedUrls: urls);
   }
 
   String _getContentType(String? extension) {
@@ -164,7 +172,7 @@ class Withdrawal extends _$Withdrawal {
         amount: state.application!.loanAmount,
         bankName: state.selectedAccount!.bankName,
         accountNumber: state.selectedAccount!.accountNumber,
-        documentUrl: state.uploadedUrl,
+        documentUrls: state.uploadedUrls,
         createdAt: DateTime.now(),
       );
 

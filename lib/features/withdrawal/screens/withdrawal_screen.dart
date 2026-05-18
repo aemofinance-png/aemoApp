@@ -140,12 +140,12 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                   ? null
                   : () async {
                       if (state.currentStep == 0) {
-                        if (state.uploadedDocument == null) {
+                        if (state.uploadedDocuments.isEmpty) {
                           CustomPopup.show(
                             context,
                             title: 'Action Required',
                             message:
-                                'Please upload your loan agreement to proceed.',
+                                'Please upload your signed withdrawal agreement to proceed.',
                             isWarning: true,
                           );
                           return;
@@ -208,7 +208,9 @@ class _WithdrawalScreenState extends ConsumerState<WithdrawalScreen> {
                       ),
                     )
                   : Text(
-                      state.currentStep == 2 ? 'CONFIRM WITHDRAWAL' : 'CONTINUE',
+                      state.currentStep == 2
+                          ? 'CONFIRM WITHDRAWAL'
+                          : 'CONTINUE',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
